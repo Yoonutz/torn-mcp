@@ -1,0 +1,6 @@
+# Local secrets for `wrangler dev`. Copy to `.dev.vars` (gitignored) and fill in.
+# In production these are set with: wrangler secret put TORN_API_KEY
+
+# Optional server-level fallback Torn API key, used only when a request
+# omits the X-Torn-Api-Key header. Leave blank for pure multi-tenant mode.
+TORN_API_KEY=

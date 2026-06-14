@@ -1,0 +1,85 @@
+# ── Secrets & personal data (NEVER commit) ─────────────────────────
+# Env files hold TORN_API_KEY and other secrets
+.env
+.env.*
+!.env.example
+*.env
+
+# Wrangler local secrets + state
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.wrangler/
+
+# API keys, tokens, credentials
+*secret*
+*secrets*
+*credentials*
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cert
+apikey*
+api-key*
+*.apikey
+
+# Cloud / deploy credentials
+.aws/
+aws-credentials*
+kubeconfig
+*.kubeconfig
+.railway/
+.render/
+fly.secrets*
+azure-credentials*
+gcp-key*.json
+service-account*.json
+
+# Redis / local data dumps
+dump.rdb
+*.rdb
+redis-data/
+
+# ── Build output ───────────────────────────────────────────────────
+node_modules/
+dist/
+docs/superpowers/
+build/
+*.tsbuildinfo
+
+# ── Test / coverage ────────────────────────────────────────────────
+coverage/
+.nyc_output/
+.vitest/
+
+# ── Logs ───────────────────────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Caches / tmp ───────────────────────────────────────────────────
+.cache/
+tmp/
+.tmp/
+.DS_Store
+
+# ── Claude Code (personal/per-machine only) ────────────────────────
+# Keep shared team config (.claude/settings.json, commands/, agents/);
+# ignore personal local overrides.
+.claude/settings.local.json
+.claude/**/*.local.json
+
+# ── OS / editor ────────────────────────────────────────────────────
+Thumbs.db
+desktop.ini
+.idea/
+*.swp
+*.swo
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.shared.json

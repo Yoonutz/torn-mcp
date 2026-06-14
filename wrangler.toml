@@ -1,0 +1,36 @@
+# @license MIT
+name = "torn-mcp"
+main = "src/index.ts"
+compatibility_date = "2025-05-10"
+compatibility_flags = ["nodejs_compat"]
+
+# Durable Object bindings.
+#  - MCP_OBJECT: required by the McpAgent (one DO per MCP session).
+#  - RATE_LIMITER: per-API-key request counter (see src/rateLimiter.ts).
+[[durable_objects.bindings]]
+name = "MCP_OBJECT"
+class_name = "TornMCP"
+
+[[durable_objects.bindings]]
+name = "RATE_LIMITER"
+class_name = "RateLimiter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["TornMCP"]
+new_classes = ["RateLimiter"]
+
+# Optional server-level fallback Torn API key, used only when a request
+# omits the X-Torn-Api-Key header. Set with:
+#   wrangler secret put TORN_API_KEY
+# Leaving it unset keeps the server purely multi-tenant (header required).
+
+# Custom domain (none yet). When you own a domain on Cloudflare, uncomment
+# and set the pattern; the final endpoint becomes https://<pattern>/mcp.
+# Until then the default URL is https://torn-mcp.<account>.workers.dev/mcp
+# [[routes]]
+# pattern = "torn-mcp.example.com"
+# custom_domain = true
+
+[observability]
+enabled = true
