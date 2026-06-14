@@ -16,10 +16,10 @@ A remote [Model Context Protocol](https://modelcontextprotocol.io) server for th
 The deployed endpoint is:
 
 ```
-https://torn-mcp.<your-account-subdomain>.workers.dev/mcp
+https://torn-mcp.yoonutz.workers.dev/mcp
 ```
 
-(Replace `<your-account-subdomain>` with the one Cloudflare assigns after your first deploy — see [Deploy](#deploy). Add a custom domain later to drop the `workers.dev` host.)
+(This is the live hosted instance. Or run your own — see [Deploy](#deploy). Add a custom domain later to drop the `workers.dev` host.)
 
 **VS Code** — user-level `mcp.json` (works from any workspace):
 
@@ -28,7 +28,7 @@ https://torn-mcp.<your-account-subdomain>.workers.dev/mcp
   "servers": {
     "torn": {
       "type": "http",
-      "url": "https://torn-mcp.<your-account-subdomain>.workers.dev/mcp",
+      "url": "https://torn-mcp.yoonutz.workers.dev/mcp",
       "headers": { "X-Torn-Api-Key": "YOUR_TORN_API_KEY" }
     }
   }
@@ -98,7 +98,7 @@ npx wrangler deploy
 ```
 
 After the first deploy, wrangler prints your live URL:
-`https://torn-mcp.<your-account-subdomain>.workers.dev`. The MCP endpoint is that URL + `/mcp`.
+`https://torn-mcp.yoonutz.workers.dev`. The MCP endpoint is that URL + `/mcp`.
 
 ### Optional: server-level fallback key
 
