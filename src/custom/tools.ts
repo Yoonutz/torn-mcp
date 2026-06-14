@@ -4,6 +4,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { errorResult, jsonResult, type ToolResult } from "../mcpResult.js";
+import { humanizeTimestamps } from "../torn.js";
 import {
   analyzePlayer,
   comparePlayers,
@@ -22,7 +23,7 @@ import {
 
 async function run(fn: () => Promise<unknown>): Promise<ToolResult> {
   try {
-    return jsonResult(await fn());
+    return jsonResult(humanizeTimestamps(await fn()));
   } catch (e) {
     return errorResult(e instanceof Error ? e.message : "Tool failed.");
   }

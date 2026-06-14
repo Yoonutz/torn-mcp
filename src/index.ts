@@ -2,7 +2,15 @@
 import { McpAgent } from "agents/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { buildUrl, parseTornError, resolveEndpointPath, sha256Hex } from "./torn.js";
+import {
+  buildUrl,
+  humanizeTimestamps,
+  parseTornError,
+  requiredParamsHint,
+  resolveEndpointPath,
+  sha256Hex,
+  validateParams,
+} from "./torn.js";
 import { ENDPOINTS, TAGS, type EndpointDef, type TornTag } from "./generated/endpoints.js";
 import { RateLimiter, LIMIT, type RateCheck } from "./rateLimiter.js";
 import { errorResult, textResult, type ToolResult } from "./mcpResult.js";
@@ -37,7 +45,7 @@ function describeTag(tag: TornTag): string {
   const lines = Object.entries(map).map(([name, def]) => {
     const summary = (def.summary ?? "").replace(/\s+/g, " ").slice(0, 90);
     const idNote = def.requiresId ? " (requires id)" : "";
-    return `- ${name}${idNote}: ${summary}`;
+    return `- ${name}${idNote}: ${summary}${requiredParamsHint(def)}`;
   });
   return (
     `Fetch Torn ${tag} data (Torn API v2). Set 'endpoint' to one of:\n` +
@@ -123,8 +131,16 @@ export class TornMCP extends McpAgent<Env, unknown, Props> {
     } catch (e) {
       return errorResult(e instanceof Error ? e.message : "Invalid endpoint.");
     }
+    // Validate params against the catalog before spending a Torn request.
+    const paramErr = validateParams(tag, endpoint, params ?? {});
+    if (paramErr) return errorResult(paramErr);
+
     const r = await this.tornGet(path, params);
-    return r.ok ? textResult(r.text) : errorResult(r.error);
+    if (!r.ok) return errorResult(r.error);
+    // Add human-readable timestamps; fall back to raw text if JSON didn't parse.
+    return r.json !== null
+      ? textResult(JSON.stringify(humanizeTimestamps(r.json), null, 2))
+      : textResult(r.text);
   }
 
   /** Shared fetch core: auth check, per-key rate limit, fetch, error mapping. */

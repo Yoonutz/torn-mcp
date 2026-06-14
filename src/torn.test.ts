@@ -1,6 +1,12 @@
 // @license MIT
 import { describe, it, expect } from "vitest";
-import { buildUrl, parseTornError, resolveEndpointPath } from "./torn.js";
+import {
+  buildUrl,
+  humanizeTimestamps,
+  parseTornError,
+  resolveEndpointPath,
+  validateParams,
+} from "./torn.js";
 
 describe("resolveEndpointPath", () => {
   it("resolves a plain endpoint", () => {
@@ -44,6 +50,48 @@ describe("buildUrl", () => {
     expect(new URL(buildUrl("/market/bazaar", undefined, "K")).host).toBe(
       "api.torn.com",
     );
+  });
+});
+
+describe("validateParams", () => {
+  it("flags a missing required param with allowed values", () => {
+    const msg = validateParams("faction", "news", {});
+    expect(msg).toMatch(/requires query param 'cat'/);
+    expect(msg).toMatch(/armoryAction/);
+  });
+  it("rejects an invalid enum value with the allowed list", () => {
+    const msg = validateParams("faction", "news", { cat: "armorynews" });
+    expect(msg).toMatch(/Invalid 'cat'='armorynews'/);
+    expect(msg).toMatch(/main/);
+  });
+  it("passes when the required enum value is valid", () => {
+    expect(validateParams("faction", "news", { cat: "armoryAction" })).toBeNull();
+  });
+  it("returns null for endpoints with no required params", () => {
+    expect(validateParams("torn", "timestamp", {})).toBeNull();
+  });
+});
+
+describe("humanizeTimestamps", () => {
+  const EPOCH = 1781471794;
+  const ISO = new Date(EPOCH * 1000).toISOString().replace(".000Z", "Z");
+
+  it("adds an ISO sibling for epoch timestamp fields, keeping the original", () => {
+    const out = humanizeTimestamps({ timestamp: EPOCH }) as any;
+    expect(out.timestamp).toBe(EPOCH);
+    expect(out.timestamp_human).toBe(ISO);
+  });
+  it("handles *_at keys and nests into arrays/objects", () => {
+    const out = humanizeTimestamps({
+      crimes: [{ created_at: EPOCH, name: "x" }],
+    }) as any;
+    expect(out.crimes[0].created_at_human).toBe(ISO);
+    expect(out.crimes[0].name).toBe("x");
+  });
+  it("ignores non-timestamp numbers and out-of-range ints", () => {
+    const out = humanizeTimestamps({ level: 50, money: 999 }) as any;
+    expect(out.level_human).toBeUndefined();
+    expect(out.money_human).toBeUndefined();
   });
 });
 
