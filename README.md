@@ -91,7 +91,7 @@ Higher-level tools that aggregate multiple endpoints and return structured summa
 Prereqs: Node 18+, a Cloudflare account, `npx wrangler login` once.
 
 ```bash
-git clone https://github.com/ionutfilea/torn-mcp.git
+git clone https://github.com/Yoonutz/torn-mcp.git
 cd torn-mcp
 npm install
 npx wrangler deploy

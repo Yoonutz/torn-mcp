@@ -17,8 +17,8 @@ class_name = "RateLimiter"
 
 [[migrations]]
 tag = "v1"
-new_sqlite_classes = ["TornMCP"]
-new_classes = ["RateLimiter"]
+# Free plan requires all Durable Objects to be SQLite-backed.
+new_sqlite_classes = ["TornMCP", "RateLimiter"]
 
 # Optional server-level fallback Torn API key, used only when a request
 # omits the X-Torn-Api-Key header. Set with:
