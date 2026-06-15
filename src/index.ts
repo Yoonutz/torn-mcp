@@ -4,19 +4,33 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import {
   buildUrl,
-  humanizeTimestamps,
+  ensureKey,
   parseTornError,
   requiredParamsHint,
   resolveEndpointPath,
   sha256Hex,
   validateParams,
 } from "./torn.js";
+import {
+  annotate,
+  filterByTimeWindow,
+  followPages,
+  isEmptyPayload,
+  resolveTimeParams,
+  truncate,
+  WINDOW_NOTE,
+  MAX_ITEMS,
+  MAX_BYTES,
+  MAX_PAGES,
+} from "./enrich.js";
 import { ENDPOINTS, TAGS, type EndpointDef, type TornTag } from "./generated/endpoints.js";
 import { RateLimiter, LIMIT, type RateCheck } from "./rateLimiter.js";
 import { errorResult, textResult, type ToolResult } from "./mcpResult.js";
 import { registerCustomTools } from "./custom/tools.js";
 
 export { RateLimiter };
+
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 interface Env {
   MCP_OBJECT: DurableObjectNamespace;
@@ -30,10 +44,6 @@ interface Props {
   apiKey: string;
   [key: string]: unknown;
 }
-
-type TornGet =
-  | { ok: true; text: string; json: any }
-  | { ok: false; error: string };
 
 function endpointNames(tag: TornTag): [string, ...string[]] {
   return Object.keys(ENDPOINTS[tag]) as [string, ...string[]];
@@ -105,7 +115,7 @@ export class TornMCP extends McpAgent<Env, unknown, Props> {
     );
   }
 
-  /** Resolve + fetch, returning parsed JSON. Throws on any error (for services). */
+  /** Resolve + fetch (paginated, merged) parsed JSON for services. Throws on error. */
   private async call(
     tag: string,
     endpoint: string,
@@ -113,12 +123,12 @@ export class TornMCP extends McpAgent<Env, unknown, Props> {
     params?: Record<string, string | number>,
   ): Promise<any> {
     const path = resolveEndpointPath(tag, endpoint, id);
-    const r = await this.tornGet(path, params);
-    if (!r.ok) throw new Error(r.error);
-    return r.json;
+    const fetched = await this.fetchMerged(path, params);
+    if (!fetched.ok) throw new Error(fetched.error);
+    return fetched.data;
   }
 
-  /** Generated-tool handler: resolve path, fetch, return raw JSON text. */
+  /** Generated-tool handler: fetch merged JSON, then filter/annotate/truncate. */
   private async callTorn(
     tag: TornTag,
     endpoint: string,
@@ -131,69 +141,124 @@ export class TornMCP extends McpAgent<Env, unknown, Props> {
     } catch (e) {
       return errorResult(e instanceof Error ? e.message : "Invalid endpoint.");
     }
-    // Validate params against the catalog before spending a Torn request.
-    const paramErr = validateParams(tag, endpoint, params ?? {});
+    const resolved = resolveTimeParams(params, Date.now());
+    const paramErr = validateParams(tag, endpoint, resolved);
     if (paramErr) return errorResult(paramErr);
 
-    const r = await this.tornGet(path, params);
-    if (!r.ok) return errorResult(r.error);
-    // Add human-readable timestamps; fall back to raw text if JSON didn't parse.
-    return r.json !== null
-      ? textResult(JSON.stringify(humanizeTimestamps(r.json), null, 2))
-      : textResult(r.text);
-  }
+    const fetched = await this.fetchMerged(path, resolved);
+    if (!fetched.ok) return errorResult(fetched.error);
 
-  /** Shared fetch core: auth check, per-key rate limit, fetch, error mapping. */
-  private async tornGet(
-    path: string,
-    params: Record<string, string | number> | undefined,
-  ): Promise<TornGet> {
-    const apiKey = this.props.apiKey;
-    if (!apiKey) {
-      return {
-        ok: false,
-        error:
-          "Missing Torn API key. Send it in the X-Torn-Api-Key request header.",
-      };
+    let result: any = filterByTimeWindow(fetched.data, { from: resolved.from, to: resolved.to });
+
+    // Empty-window re-fetch: window set but nothing came back → widen once.
+    // Note: this fallback re-runs pagination, costing up to MAX_PAGES extra requests.
+    const hasWindow = resolved.from !== undefined || resolved.to !== undefined;
+    if (hasWindow && isEmptyPayload(result)) {
+      const widened: Record<string, string | number> = { ...resolved };
+      delete widened.from;
+      delete widened.to;
+      const refetched = await this.fetchMerged(path, widened);
+      if (refetched.ok && !isEmptyPayload(refetched.data)) {
+        result = refetched.data;
+        result._note = WINDOW_NOTE;
+      }
     }
 
-    // Per-key rate limiting via Durable Object.
+    result = annotate(tag, endpoint, result);
+    result = truncate(result, { maxItems: MAX_ITEMS, maxBytes: MAX_BYTES });
+    if (fetched.partial) result._pages_partial = "Stopped paginating early; partial data.";
+    return textResult(JSON.stringify(result, null, 2));
+  }
+
+  /**
+   * Fetch one absolute Torn URL: per-key rate-limit, transient retry (Torn
+   * throws intermittent 504s), parse. Re-attaches the key (follow links omit
+   * it). Throws on any error — the key never appears in the message.
+   */
+  private async rateLimitedFetch(url: string): Promise<any> {
+    const apiKey = this.props.apiKey;
+    if (!apiKey) {
+      throw new Error("Missing Torn API key. Send it in the X-Torn-Api-Key request header.");
+    }
+
     const keyHash = await sha256Hex(apiKey);
-    const stub = this.env.RATE_LIMITER.get(
-      this.env.RATE_LIMITER.idFromName(keyHash),
-    );
+    const stub = this.env.RATE_LIMITER.get(this.env.RATE_LIMITER.idFromName(keyHash));
     const check = await stub.fetch("https://rate-limiter/check");
     const rc = (await check.json()) as RateCheck;
     if (rc.limited) {
-      return {
-        ok: false,
-        error:
-          `Rate limit exceeded (~${LIMIT}/min per key). Retry in ` +
-          `${Math.ceil(rc.resetMs / 1000)}s.`,
-      };
+      throw new Error(
+        `Rate limit exceeded (~${LIMIT}/min per key). Retry in ${Math.ceil(rc.resetMs / 1000)}s.`,
+      );
     }
 
-    const url = buildUrl(path, params, apiKey);
-    let res: Response;
+    // SSRF / key-exfil guard: follow URLs come from Torn's _metadata.links, but
+    // the key must never be sent anywhere except the fixed Torn host.
+    let host: string;
     try {
-      res = await fetch(url, { headers: { "User-Agent": "torn-mcp" } });
+      host = new URL(url).host;
     } catch {
-      // Never include the URL — it contains the key.
-      return { ok: false, error: "Network error contacting the Torn API." };
+      throw new Error("Refusing to fetch a malformed Torn URL.");
     }
+    if (host !== "api.torn.com") {
+      throw new Error("Refusing to send the API key to a non-Torn host.");
+    }
+
+    const withKey = ensureKey(url, apiKey);
+    let res: Response | null = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        res = await fetch(withKey, { headers: { "User-Agent": "torn-mcp" } });
+      } catch {
+        if (attempt === 2) throw new Error("Network error contacting the Torn API.");
+        await sleep(400 * Math.pow(2, attempt));
+        continue;
+      }
+      if (res.status === 429 || res.status >= 500) {
+        if (attempt === 2) break;
+        await sleep(400 * Math.pow(2, attempt));
+        continue;
+      }
+      break;
+    }
+    if (!res) throw new Error("Network error contacting the Torn API.");
 
     const text = await res.text();
     const tornErr = parseTornError(text);
-    if (tornErr) return { ok: false, error: tornErr };
-    if (!res.ok) return { ok: false, error: `Torn API returned HTTP ${res.status}.` };
-
-    let json: any = null;
+    if (tornErr) throw new Error(tornErr);
+    if (!res.ok) throw new Error(`Torn API returned HTTP ${res.status}.`);
     try {
-      json = JSON.parse(text);
+      return JSON.parse(text);
     } catch {
-      // Leave json null; raw text is still returned for generated tools.
+      throw new Error("Torn API returned a non-JSON response.");
     }
-    return { ok: true, text, json };
+  }
+
+  /**
+   * Shared fetch core for raw tools and intelligence services: resolve relative
+   * time, fetch page 1, follow pagination, return merged JSON. Relative-time
+   * resolution is idempotent, so callTorn may also resolve beforehand.
+   */
+  private async fetchMerged(
+    path: string,
+    params: Record<string, string | number> | undefined,
+  ): Promise<{ ok: true; data: any; partial: boolean } | { ok: false; error: string }> {
+    if (!this.props.apiKey) {
+      return {
+        ok: false,
+        error: "Missing Torn API key. Send it in the X-Torn-Api-Key request header.",
+      };
+    }
+    const resolved = resolveTimeParams(params, Date.now());
+    const firstUrl = buildUrl(path, resolved, this.props.apiKey);
+    const fetchUrl = (url: string) => this.rateLimitedFetch(url);
+    let firstPage: any;
+    try {
+      firstPage = await fetchUrl(firstUrl);
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : "Torn request failed." };
+    }
+    const { merged, partial } = await followPages(firstPage, fetchUrl, MAX_PAGES);
+    return { ok: true, data: merged, partial };
   }
 }
 

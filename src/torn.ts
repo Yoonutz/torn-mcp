@@ -78,14 +78,13 @@ export function requiredParamsHint(def: EndpointDef): string {
 const TS_MIN = 1_000_000_000; // 2001-09
 const TS_MAX = 4_000_000_000; // 2096-10
 
+const TS_KEYS = new Set([
+  "timestamp", "cache_timestamp", "signed_up", "until",
+  "started", "ended", "executed", "created", "updated", "expires", "seen", "date",
+]);
+
 function isTimestampKey(key: string): boolean {
-  return (
-    key === "timestamp" ||
-    key === "cache_timestamp" ||
-    key === "signed_up" ||
-    key === "until" ||
-    key.endsWith("_at")
-  );
+  return TS_KEYS.has(key) || key.endsWith("_at");
 }
 
 function toHuman(epochSeconds: number): string {
@@ -130,6 +129,17 @@ export function buildUrl(
   }
   url.searchParams.set("key", key);
   return url.toString();
+}
+
+/**
+ * Ensure a Torn URL carries the API key. Torn strips the key from the
+ * `_metadata.links` URLs used for pagination, so follow-up fetches must re-add
+ * it. Overwrites any existing key param.
+ */
+export function ensureKey(url: string, key: string): string {
+  const u = new URL(url);
+  u.searchParams.set("key", key);
+  return u.toString();
 }
 
 /**
