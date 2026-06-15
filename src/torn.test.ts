@@ -74,42 +74,48 @@ describe("validateParams", () => {
 });
 
 describe("humanizeTimestamps", () => {
-  const EPOCH = 1781471794;
-  const ISO = new Date(EPOCH * 1000).toISOString().replace(".000Z", "Z");
+  // 2026-06-13 15:54:10 UTC → Torn City Time log format.
+  const EPOCH = 1781366050;
+  const TCT = "15:54:10 - 13/06/26";
 
-  it("adds an ISO sibling for epoch timestamp fields, keeping the original", () => {
+  it("rewrites the field to TCT and moves the epoch to <key>_epoch", () => {
     const out = humanizeTimestamps({ timestamp: EPOCH }) as any;
-    expect(out.timestamp).toBe(EPOCH);
-    expect(out.timestamp_human).toBe(ISO);
+    expect(out.timestamp).toBe(TCT);
+    expect(out.timestamp_epoch).toBe(EPOCH);
   });
   it("handles *_at keys and nests into arrays/objects", () => {
     const out = humanizeTimestamps({
       crimes: [{ created_at: EPOCH, name: "x" }],
     }) as any;
-    expect(out.crimes[0].created_at_human).toBe(ISO);
+    expect(out.crimes[0].created_at).toBe(TCT);
+    expect(out.crimes[0].created_at_epoch).toBe(EPOCH);
     expect(out.crimes[0].name).toBe("x");
   });
   it("ignores non-timestamp numbers and out-of-range ints", () => {
     const out = humanizeTimestamps({ level: 50, money: 999 }) as any;
-    expect(out.level_human).toBeUndefined();
-    expect(out.money_human).toBeUndefined();
+    expect(out.level).toBe(50);
+    expect(out.level_epoch).toBeUndefined();
+    expect(out.money_epoch).toBeUndefined();
   });
 });
 
 describe("humanizeTimestamps (widened keys)", () => {
+  const TCT = /^\d{2}:\d{2}:\d{2} - \d{2}\/\d{2}\/20$/; // HH:MM:SS - DD/MM/YY, year 2020
+
   it("annotates bare Torn v2 time fields", () => {
     const out = humanizeTimestamps({
       started: 1_600_000_000, ended: 1_600_000_100, executed: 1_600_000_200,
     }) as Record<string, unknown>;
-    expect(out.started_human).toContain("2020");
-    expect(out.ended_human).toContain("2020");
-    expect(out.executed_human).toContain("2020");
+    expect(out.started).toMatch(TCT);
+    expect(out.ended).toMatch(TCT);
+    expect(out.executed).toMatch(TCT);
   });
 
   it("still annotates the original keys", () => {
     const out = humanizeTimestamps({ timestamp: 1_600_000_000, signed_up: 1_600_000_000 }) as Record<string, unknown>;
-    expect(out.timestamp_human).toContain("2020");
-    expect(out.signed_up_human).toContain("2020");
+    expect(out.timestamp).toMatch(TCT);
+    expect(out.timestamp_epoch).toBe(1_600_000_000);
+    expect(out.signed_up).toMatch(TCT);
   });
 });
 

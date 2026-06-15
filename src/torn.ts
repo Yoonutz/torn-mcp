@@ -87,21 +87,29 @@ function isTimestampKey(key: string): boolean {
   return TS_KEYS.has(key) || key.endsWith("_at");
 }
 
+/**
+ * Format epoch seconds as Torn City Time (TCT = UTC), matching the in-game log
+ * display: `HH:MM:SS - DD/MM/YY` (24-hour).
+ */
 function toHuman(epochSeconds: number): string {
-  return new Date(epochSeconds * 1000).toISOString().replace(".000Z", "Z");
+  const d = new Date(epochSeconds * 1000);
+  const p = (n: number) => String(n).padStart(2, "0");
+  const time = `${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`;
+  const date = `${p(d.getUTCDate())}/${p(d.getUTCMonth() + 1)}/${p(d.getUTCFullYear() % 100)}`;
+  return `${time} - ${date}`;
 }
 
 /**
- * Recursively add a human-readable ISO sibling for every epoch-seconds field
- * (keys like `timestamp`, `*_at`, `signed_up`, `until`). The original epoch is
- * kept; a `<key>_human` field is added next to it. Humans can't read epoch.
+ * Recursively rewrite every epoch-seconds field (keys like `timestamp`, `*_at`,
+ * `signed_up`, `until`) to Torn City Time, and move the raw epoch to a
+ * `<key>_epoch` sibling. So `timestamp: 1781366050` becomes
+ * `timestamp: "15:54:10 - 13/06/26"` + `timestamp_epoch: 1781366050`.
  */
 export function humanizeTimestamps(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(humanizeTimestamps);
   if (value && typeof value === "object") {
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      out[k] = humanizeTimestamps(v);
       if (
         typeof v === "number" &&
         Number.isInteger(v) &&
@@ -109,7 +117,10 @@ export function humanizeTimestamps(value: unknown): unknown {
         v <= TS_MAX &&
         isTimestampKey(k)
       ) {
-        out[`${k}_human`] = toHuman(v);
+        out[k] = toHuman(v);
+        out[`${k}_epoch`] = v;
+      } else {
+        out[k] = humanizeTimestamps(v);
       }
     }
     return out;

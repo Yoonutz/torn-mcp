@@ -19,7 +19,23 @@ Live endpoint (hosted instance):
 https://torn-mcp.yoonutz.workers.dev/mcp
 ```
 
-Pick your client below. Replace `YOUR_TORN_API_KEY` with your key ([get one](#get-a-torn-api-key)). Prefer to self-host? See [Deploy](#deploy).
+**One-click install:**
+
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install-0098FF?logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=torn&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ftorn-mcp.yoonutz.workers.dev%2Fmcp%22%2C%22headers%22%3A%7B%22X-Torn-Api-Key%22%3A%22YOUR_TORN_API_KEY%22%7D%7D)
+[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install-24bfa5?logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=torn&quality=insiders&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ftorn-mcp.yoonutz.workers.dev%2Fmcp%22%2C%22headers%22%3A%7B%22X-Torn-Api-Key%22%3A%22YOUR_TORN_API_KEY%22%7D%7D)
+[![Install in Cursor](https://img.shields.io/badge/Cursor-Install-000000?logo=cursor&logoColor=white)](https://cursor.com/install-mcp?name=torn&config=eyJ1cmwiOiJodHRwczovL3Rvcm4tbWNwLnlvb251dHoud29ya2Vycy5kZXYvbWNwIiwiaGVhZGVycyI6eyJYLVRvcm4tQXBpLUtleSI6IllPVVJfVE9STl9BUElfS0VZIn19)
+
+Click a badge → the client opens with the server pre-filled. It installs with a `YOUR_TORN_API_KEY` placeholder — replace it with your real key ([get one](#get-a-torn-api-key)) in the client's MCP settings after install.
+
+**Setup guides** (these clients have no one-click protocol — badge links to their MCP docs; use the config blocks below):
+
+[![Claude Code](https://img.shields.io/badge/Claude_Code-Setup-D97757?logo=anthropic&logoColor=white)](https://docs.claude.com/en/docs/claude-code/mcp)
+[![Claude Desktop](https://img.shields.io/badge/Claude_Desktop-Setup-D97757?logo=anthropic&logoColor=white)](https://modelcontextprotocol.io/quickstart/user)
+[![Windsurf](https://img.shields.io/badge/Windsurf-Setup-09B6A2?logo=windsurf&logoColor=white)](https://docs.windsurf.com/windsurf/cascade/mcp)
+[![Visual Studio](https://img.shields.io/badge/Visual_Studio-Setup-5C2D91?logo=visualstudio&logoColor=white)](https://learn.microsoft.com/en-us/visualstudio/ide/mcp-servers)
+[![Continue](https://img.shields.io/badge/Continue-Setup-000000?logo=continue&logoColor=white)](https://docs.continue.dev/customize/deep-dives/mcp)
+
+Or set it up manually — pick your client below. Prefer to self-host? See [Deploy](#deploy).
 
 <details>
 <summary><b>Claude Code</b> (CLI)</summary>
@@ -36,11 +52,19 @@ Check it: `claude mcp list`. Remove: `claude mcp remove torn`.
 <details>
 <summary><b>VS Code</b> (CLI)</summary>
 
+macOS / Linux (bash, zsh):
+
 ```bash
 code --add-mcp '{"name":"torn","type":"http","url":"https://torn-mcp.yoonutz.workers.dev/mcp","headers":{"X-Torn-Api-Key":"YOUR_TORN_API_KEY"}}'
 ```
 
-PowerShell: keep the single quotes around the JSON. Insiders: use `code-insiders`. Then open **Copilot Chat → Agent mode → 🛠️ tools** and enable `torn`.
+Windows PowerShell — escape the inner quotes with `\"` (the `code.cmd` shim strips plain quotes otherwise):
+
+```powershell
+code --add-mcp '{\"name\":\"torn\",\"type\":\"http\",\"url\":\"https://torn-mcp.yoonutz.workers.dev/mcp\",\"headers\":{\"X-Torn-Api-Key\":\"YOUR_TORN_API_KEY\"}}'
+```
+
+Insiders: use `code-insiders`. Then open **Copilot Chat → Agent mode → 🛠️ tools** and enable `torn`. (If quoting still fights you, use the manual `mcp.json` below — no escaping needed.)
 
 Manual alternative — user `mcp.json` (Command Palette → _MCP: Open User Configuration_):
 
@@ -97,7 +121,7 @@ Edit `~/.codeium/windsurf/mcp_config.json`:
 <details>
 <summary><b>Claude Desktop</b></summary>
 
-Settings → Developer → Edit Config (`claude_desktop_config.json`):
+Settings → Developer → Edit Config (`claude_desktop_config.json`). Recent versions accept a remote URL directly:
 
 ```json
 {
@@ -105,6 +129,24 @@ Settings → Developer → Edit Config (`claude_desktop_config.json`):
     "torn": {
       "url": "https://torn-mcp.yoonutz.workers.dev/mcp",
       "headers": { "X-Torn-Api-Key": "YOUR_TORN_API_KEY" }
+    }
+  }
+}
+```
+
+If your version only supports stdio servers (the connection fails), use the `mcp-remote` bridge instead:
+
+```json
+{
+  "mcpServers": {
+    "torn": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://torn-mcp.yoonutz.workers.dev/mcp",
+        "--header",
+        "X-Torn-Api-Key:YOUR_TORN_API_KEY"
+      ]
     }
   }
 }
@@ -149,6 +191,8 @@ mcpServers:
 ```
 
 </details>
+
+> The **Claude Code** and **VS Code** CLI commands above are tested. The other clients use the same endpoint + `X-Torn-Api-Key` header (verified working), but their config key names and file paths can change between versions — check the client's own MCP docs if a connection fails.
 
 > Security: putting the key inline lands it in config files / shell history. Where the client supports it (e.g. VS Code `${input:...}` prompts), prefer that over a plaintext key.
 
