@@ -1,0 +1,38 @@
+name: Sync OpenAPI
+
+# Weekly check for Torn OpenAPI spec changes. Regenerates the endpoint catalog,
+# gates on typecheck + tests, and commits straight to main only if everything
+# passes (main's ruleset is bypassed via the admin-owned GH_PAT). A failing run
+# (e.g. a spec change that breaks the build) commits nothing and notifies you.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run sync-openapi
+      - run: npm run typecheck
+      - run: npm test
+      - name: Commit regenerated files if the spec changed
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Torn spec unchanged — nothing to commit."
+            exit 0
+          fi
+          git config user.name "torn-mcp-sync"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore(sync): regenerate from updated Torn OpenAPI spec"
+          git push
