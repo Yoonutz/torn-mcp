@@ -45,7 +45,7 @@ const SEEDS = {
   "market/properties": { kind: "const", value: "1" },
   "market/rentals": { kind: "const", value: "1" },
   "market/itemmarket": { kind: "item" },
-  "market/auctionhouselisting": { kind: "item" },
+  "market/auctionhouselisting": { kind: "list", source: "market/auctionhouse" },
   "torn/itemdetails": { kind: "item" },
   "faction/crime": { kind: "list", source: "faction/crimes" },
   "faction/raidreport": { kind: "list", source: "faction/raids" },
@@ -86,6 +86,13 @@ function defaultParams(def) {
   return params;
 }
 
+// Some endpoints mark a param optional but the API needs it (e.g. inventory and
+// personalstats require a category). Supply a valid value so they can be tested.
+const PARAM_OVERRIDES = {
+  "user/inventory": { cat: "Collectible" },
+  "user/personalstats": { cat: "all" },
+};
+
 const cache = new Map(); // source "tag/ep" or "ctx:userId" → resolved value
 async function tornGet(path, params) {
   await gate();
@@ -99,6 +106,30 @@ async function tornGet(path, params) {
     err = e.message;
   }
   return { json, err, ms: Date.now() - t, status: res?.status };
+}
+
+/** Collapse array indices so repeated per-item errors read as one. */
+function normPath(p) {
+  return (p || "(root)").replace(/\/\d+/g, "/*");
+}
+
+/** Turn a raw ajv error into a plain-English reason. */
+function explain(e) {
+  const at = normPath(e.instancePath);
+  switch (e.keyword) {
+    case "required":
+      return `missing required field '${e.params?.missingProperty}' (at ${at})`;
+    case "type":
+      return `wrong type at ${at} — schema expects ${e.params?.type}`;
+    case "enum":
+      return `value at ${at} is not one of the allowed values`;
+    case "additionalProperties":
+      return `unexpected extra field '${e.params?.additionalProperty}' at ${at}`;
+    case "oneOf":
+      return `value at ${at} matches more than one schema branch (Torn enum|string overlap)`;
+    default:
+      return `${at}: ${e.message}`;
+  }
 }
 
 function firstArrayItem(json) {
@@ -177,7 +208,7 @@ for (const tag of catalog.tagList) {
 
     // Determine the path to call.
     let path = def.path;
-    let params = defaultParams(def);
+    let params = { ...defaultParams(def), ...(PARAM_OVERRIDES[`${tag}/${name}`] ?? {}) };
     let note = "";
     if (!path) {
       const id = await resolveId(tag, name);
@@ -196,70 +227,86 @@ for (const tag of catalog.tagList) {
       continue;
     }
     let status = "pass";
-    let validationErr = "";
+    let reasons = [];
     if (validate && !validate._compileError) {
-      const ok = validate(json);
-      if (!ok) {
+      if (!validate(json)) {
         const errs = validate.errors ?? [];
         // Torn's spec uses `oneOf: [Enum, string]`, where a value matches both
-        // branches → "must match exactly one". That's a known spec smell, not
-        // drift. Only non-oneOf errors (missing fields, wrong types) are real.
-        const onlyOneOf = errs.every((e) => /match exactly one schema in oneOf/.test(e.message ?? ""));
+        // branches. That's a known spec smell, not drift. Only non-oneOf errors
+        // (missing fields, wrong types) are real failures.
+        const onlyOneOf = errs.every((e) => e.keyword === "oneOf");
         status = onlyOneOf ? "smell" : "fail";
-        validationErr = errs
-          .slice(0, 3)
-          .map((e) => `${e.instancePath || "/"} ${e.message}`)
-          .join("; ");
+        const relevant = status === "fail" ? errs.filter((e) => e.keyword !== "oneOf") : errs;
+        reasons = [...new Set(relevant.map(explain))];
       }
     } else {
-      note = "no/uncompilable schema";
+      reasons = ["no schema to validate against"];
     }
-    results.push({ ep: `${tag}/${name}`, status, ms, note: validationErr || note });
+    results.push({ ep: `${tag}/${name}`, status, ms, reasons, note });
   }
 }
 
-// ── Report ──────────────────────────────────────────────────────────
-const counts = results.reduce((a, r) => ((a[r.status] = (a[r.status] ?? 0) + 1), a), {});
-const failed = results.filter((r) => r.status === "fail");
+// ── Report (human-first) ────────────────────────────────────────────
+const pass = results.filter((r) => r.status === "pass");
+const fails = results.filter((r) => r.status === "fail");
+const smells = results.filter((r) => r.status === "smell");
+const skips = results.filter((r) => r.status === "skip");
+
 const lines = [];
 lines.push(`# Torn conformance report`);
 lines.push("");
 lines.push(`OpenAPI ${catalog.openapiVersion} · ${results.length} endpoints · mode: ${COMPILE_ONLY ? "compile-check (no calls)" : "live"}`);
 lines.push("");
-lines.push(`**Totals:** ${Object.entries(counts).map(([k, v]) => `${k} ${v}`).join(" · ")}`);
-if (failed.length) {
+lines.push(
+  `**${pass.length} ok** · **${fails.length} real drift** · ` +
+    `${smells.length} spec smell · ${skips.length} not tested`,
+);
+
+if (fails.length) {
   lines.push("");
-  lines.push("## Failures");
-  lines.push("| Endpoint | ms | Detail |");
-  lines.push("|----------|----|--------|");
-  for (const r of failed) lines.push(`| ${r.ep} | ${r.ms ?? ""} | ${r.note ?? ""} |`);
+  lines.push(`## ❌ Real drift — Torn's live data doesn't match its own docs (${fails.length})`);
+  lines.push("These are the ones to look at. Each row says which field and what's wrong.");
+  lines.push("");
+  lines.push("| Endpoint | What's wrong |");
+  lines.push("|----------|--------------|");
+  for (const r of fails) lines.push(`| \`${r.ep}\` | ${(r.reasons ?? []).join("<br>") || "—"} |`);
 }
-const smells = results.filter((r) => r.status === "smell");
+
 if (smells.length) {
   lines.push("");
-  lines.push("## Spec smells (oneOf overlap — Torn's docs, not drift)");
-  lines.push("| Endpoint | Detail |");
-  lines.push("|----------|--------|");
-  for (const r of smells) lines.push(`| ${r.ep} | ${r.note ?? ""} |`);
+  lines.push(`## ⚠️ Spec smells — ignore (${smells.length})`);
+  lines.push(
+    "Torn documents some fields as `enum OR string`, so a value matches both — a quirk in " +
+      "Torn's docs, not a real mismatch. Endpoints: " +
+      smells.map((r) => `\`${r.ep}\``).join(", "),
+  );
 }
-const skipped = results.filter((r) => r.status === "skip");
-if (skipped.length) {
+
+if (skips.length) {
   lines.push("");
-  lines.push("## Skipped (Torn error / no sample id — couldn't validate)");
-  for (const r of skipped) lines.push(`- ${r.ep}: ${r.note ?? ""}`);
+  lines.push(`## ⏭️ Not tested — couldn't build a valid request (${skips.length})`);
+  lines.push("Usually a missing sample id or a category the test didn't supply.");
+  lines.push("");
+  lines.push("| Endpoint | Why |");
+  lines.push("|----------|-----|");
+  for (const r of skips) lines.push(`| \`${r.ep}\` | ${r.note ?? ""} |`);
 }
+
 if (compileIssues.length) {
   lines.push("");
-  lines.push("## Schemas ajv could not compile");
+  lines.push(`## Schemas that wouldn't compile (${compileIssues.length})`);
   for (const c of compileIssues) lines.push(`- ${c}`);
 }
+
 const report = lines.join("\n");
 console.log(report);
 writeFileSync(join(root, "conformance-report.md"), report + "\n");
-writeFileSync(join(root, "conformance.json"), JSON.stringify({ counts, results }, null, 2));
+writeFileSync(
+  join(root, "conformance.json"),
+  JSON.stringify({ summary: { pass: pass.length, fail: fails.length, smell: smells.length, skip: skips.length }, results }, null, 2),
+);
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, report + "\n");
 
-// Fail the run only on real schema-validation failures.
-const schemaFailures = failed.length;
-console.log(`\n${schemaFailures} schema failure(s).`);
-process.exit(schemaFailures > 0 ? 1 : 0);
+// Fail the run only on real drift.
+console.log(`\n${fails.length} real drift failure(s).`);
+process.exit(fails.length > 0 ? 1 : 0);
