@@ -1,7 +1,7 @@
 // @license MIT
 // Pure helpers for talking to the Torn City API v2. No Worker globals here so
 // these stay unit-testable in plain Node.
-import { ENDPOINTS, type EndpointDef, type TornTag } from "./generated/endpoints.js";
+import { ENDPOINTS, type EndpointDef, type QueryParam, type TornTag } from "./generated/endpoints.js";
 
 /** Fixed Torn API host. Never user-controlled (SSRF guard). */
 export const TORN_API_BASE = "https://api.torn.com/v2";
@@ -43,12 +43,26 @@ export function validateParams(
   tag: string,
   endpoint: string,
   params: Record<string, string | number> = {},
+  id?: string,
 ): string | null {
   const tagMap = ENDPOINTS[tag as TornTag] as
     | Record<string, EndpointDef>
     | undefined;
   const def = tagMap?.[endpoint];
   if (!def) return null; // unknown endpoint handled by resolveEndpointPath
+
+  // Schema-grounded id check: when the path id is typed integer, reject a
+  // non-numeric value (e.g. an item name) up front instead of letting Torn
+  // return an opaque "Incorrect ID".
+  if (
+    id !== undefined &&
+    id !== "" &&
+    def.idParam?.type === "integer" &&
+    !/^\d+$/.test(String(id))
+  ) {
+    return `'${id}' is not a valid id for endpoint '${endpoint}' — it must be a numeric Torn id.`;
+  }
+
   for (const q of def.query) {
     const val = params[q.name];
     const missing = val === undefined || val === "";
@@ -72,16 +86,22 @@ export function validateParams(
   return null;
 }
 
-/** Required query params for an endpoint, formatted for a tool description. */
-export function requiredParamsHint(def: EndpointDef): string {
-  const reqs = def.query.filter((q) => q.required);
-  if (reqs.length === 0) return "";
-  const parts = reqs.map((q) => {
-    if (!q.enum) return q.name;
-    const vals = q.enum.slice(0, 10).join("|");
-    return `${q.name}=${vals}${q.enum.length > 10 ? "|…" : ""}`;
-  });
-  return ` · requires ${parts.join(", ")}`;
+/**
+ * Format an endpoint's params for a tool description: required params, plus
+ * optional params that carry an enum (e.g. `cat` on items/inventory) — those
+ * are the ones the model needs to know exist to get useful results.
+ */
+export function paramsHint(def: EndpointDef): string {
+  // Show the full enum — the model needs every value (e.g. inventory cat=Drug).
+  const fmtEnum = (q: QueryParam): string => `${q.name}=${(q.enum ?? []).join("|")}`;
+  const segs: string[] = [];
+  const reqs = def.query.filter((q) => q.required).map((q) => (q.enum ? fmtEnum(q) : q.name));
+  if (reqs.length) segs.push(`requires ${reqs.join(", ")}`);
+  const optEnums = def.query
+    .filter((q) => !q.required && q.enum && q.enum.length > 0)
+    .map(fmtEnum);
+  if (optEnums.length) segs.push(`filter ${optEnums.join(", ")}`);
+  return segs.length ? ` · ${segs.join(" · ")}` : "";
 }
 
 const TS_MIN = 1_000_000_000; // 2001-09

@@ -7,7 +7,7 @@ import {
   buildUrl,
   ensureKey,
   parseTornError,
-  requiredParamsHint,
+  paramsHint,
   resolveEndpointPath,
   sha256Hex,
   validateParams,
@@ -18,10 +18,7 @@ import {
   followPages,
   isEmptyPayload,
   resolveTimeParams,
-  truncate,
   WINDOW_NOTE,
-  MAX_ITEMS,
-  MAX_BYTES,
   MAX_PAGES,
 } from "./enrich.js";
 import { ENDPOINTS, TAGS, type EndpointDef, type TornTag } from "./generated/endpoints.js";
@@ -33,7 +30,7 @@ import { registerCustomTools } from "./custom/tools.js";
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.3.0";
+const VERSION = "0.4.0";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -67,7 +64,7 @@ function describeTag(tag: TornTag): string {
   const lines = Object.entries(map).map(([name, def]) => {
     const summary = (def.summary ?? "").replace(/\s+/g, " ").slice(0, 90);
     const idNote = def.requiresId ? " (requires id)" : "";
-    return `- ${name}${idNote}: ${summary}${requiredParamsHint(def)}`;
+    return `- ${name}${idNote}: ${summary}${paramsHint(def)}`;
   });
   return (
     `Fetch Torn ${tag} data (Torn API v2). Set 'endpoint' to one of:\n` +
@@ -82,9 +79,19 @@ function describeTag(tag: TornTag): string {
  * Workers-native Streamable HTTP transport; the Worker routes each session
  * (by Mcp-Session-Id) to the same DO.
  */
+/** Endpoints whose id is a Torn item id — eligible for name→id resolution. */
+const ITEM_ID_ENDPOINTS = new Set([
+  "market/itemmarket",
+  "market/bazaar",
+  "torn/items",
+  "torn/itemdetails",
+]);
+
 export class TornMCP extends DurableObject<Env> {
   private mcp: McpServer;
   private transport: WebStandardStreamableHTTPServerTransport | null = null;
+  /** Cached lowercase item-name → id map, built lazily from /torn/items. */
+  private itemMap: Map<string, string> | null = null;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -145,6 +152,40 @@ export class TornMCP extends DurableObject<Env> {
     );
   }
 
+  /** Lazily build a lowercase item-name → id map from the full /torn/items list. */
+  private async itemNameToId(apiKey: string): Promise<Map<string, string>> {
+    if (this.itemMap) return this.itemMap;
+    const res = await this.fetchMerged(apiKey, "/torn/items", {});
+    if (!res.ok) throw new Error(res.error);
+    const map = new Map<string, string>();
+    for (const it of (res.data?.items as any[]) ?? []) {
+      if (it && it.name != null && it.id != null) {
+        map.set(String(it.name).toLowerCase(), String(it.id));
+      }
+    }
+    this.itemMap = map;
+    return map;
+  }
+
+  /**
+   * For item-id endpoints, resolve a non-numeric id (an item name) to its
+   * numeric id via /torn/items. Numeric ids and non-item endpoints pass through.
+   */
+  private async resolveItemName(
+    apiKey: string,
+    tag: string,
+    endpoint: string,
+    id: string | undefined,
+  ): Promise<string | undefined> {
+    if (!id || /^\d+$/.test(id)) return id;
+    if (!ITEM_ID_ENDPOINTS.has(`${tag}/${endpoint}`)) return id;
+    const hit = (await this.itemNameToId(apiKey)).get(id.toLowerCase());
+    if (!hit) {
+      throw new Error(`No Torn item named '${id}'. Use the exact item name or a numeric item id.`);
+    }
+    return hit;
+  }
+
   /** Resolve + fetch (paginated, merged) parsed JSON for services. Throws on error. */
   private async call(
     apiKey: string,
@@ -153,7 +194,8 @@ export class TornMCP extends DurableObject<Env> {
     id?: string,
     params?: Record<string, string | number>,
   ): Promise<any> {
-    const path = resolveEndpointPath(tag, endpoint, id);
+    const resolvedId = await this.resolveItemName(apiKey, tag, endpoint, id);
+    const path = resolveEndpointPath(tag, endpoint, resolvedId);
     const fetched = await this.fetchMerged(apiKey, path, params);
     if (!fetched.ok) throw new Error(fetched.error);
     return fetched.data;
@@ -169,12 +211,13 @@ export class TornMCP extends DurableObject<Env> {
   ): Promise<ToolResult> {
     let path: string;
     try {
+      id = await this.resolveItemName(apiKey, tag, endpoint, id);
       path = resolveEndpointPath(tag, endpoint, id);
     } catch (e) {
       return errorResult(e instanceof Error ? e.message : "Invalid endpoint.");
     }
     const resolved = resolveTimeParams(params, Date.now());
-    const paramErr = validateParams(tag, endpoint, resolved);
+    const paramErr = validateParams(tag, endpoint, resolved, id);
     if (paramErr) return errorResult(paramErr);
 
     const fetched = await this.fetchMerged(apiKey, path, resolved);
@@ -196,8 +239,11 @@ export class TornMCP extends DurableObject<Env> {
     }
 
     result = annotate(tag, endpoint, result);
-    result = truncate(result, { maxItems: MAX_ITEMS, maxBytes: MAX_BYTES });
-    if (fetched.partial) result._pages_partial = "Stopped paginating early; partial data.";
+    if (fetched.partial) {
+      result._pages_partial =
+        `Stopped after ${MAX_PAGES} pages (subrequest limit). More data may exist — ` +
+        `narrow with from/to or a category filter, or page via _metadata.links.next.`;
+    }
     return textResult(JSON.stringify(result, null, 2));
   }
 

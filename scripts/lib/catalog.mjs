@@ -101,7 +101,12 @@ export function buildCatalog(spec) {
     };
     if (hasParam) {
       entry.idPath = rawPath;
-      if (pathParam) entry.idParam = { name: pathParam.name, description: pathParam.description };
+      if (pathParam)
+        entry.idParam = {
+          name: pathParam.name,
+          type: pathParam.type,
+          description: pathParam.description,
+        };
     } else {
       entry.path = rawPath;
       entry.summary = (op.summary || "").trim() || entry.summary;
@@ -157,7 +162,7 @@ export interface EndpointDef {
   /** Path template containing a single {param} placeholder. */
   idPath?: string;
   /** The path parameter, when this endpoint is id-scoped. */
-  idParam?: { name: string; description?: string };
+  idParam?: { name: string; type?: string; description?: string };
   /** True when the endpoint can only be called with an id. */
   requiresId: boolean;
   /** Operation summary from the spec. */

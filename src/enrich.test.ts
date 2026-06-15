@@ -1,17 +1,14 @@
 // @license MIT
 import { describe, it, expect } from "vitest";
-import { mergePages, isEmptyPayload, MAX_ITEMS, MAX_BYTES, MAX_PAGES } from "./enrich.js";
+import { mergePages, isEmptyPayload, MAX_PAGES } from "./enrich.js";
 import { resolveTimeParams } from "./enrich.js";
 import { followPages } from "./enrich.js";
 import { filterByTimeWindow } from "./enrich.js";
-import { truncate } from "./enrich.js";
 import { annotate } from "./enrich.js";
 
 describe("consts", () => {
-  it("has the locked defaults", () => {
-    expect(MAX_PAGES).toBe(3);
-    expect(MAX_ITEMS).toBe(50);
-    expect(MAX_BYTES).toBe(24_000);
+  it("follows up to the subrequest-safe page bound", () => {
+    expect(MAX_PAGES).toBe(40);
   });
 });
 
@@ -190,46 +187,6 @@ describe("filterByTimeWindow", () => {
   });
 });
 
-describe("truncate", () => {
-  it("caps a list to maxItems and records the receipt", () => {
-    const attacks = Array.from({ length: 60 }, (_v, i) => ({ id: i }));
-    const out = truncate({ attacks, _metadata: {} }, { maxItems: 50, maxBytes: 1_000_000 });
-    expect(out.attacks).toHaveLength(50);
-    expect(out._truncated).toEqual({ items_omitted: 10 });
-  });
-
-  it("shrinks further to honor the byte cap", () => {
-    const attacks = Array.from({ length: 50 }, (_v, i) => ({ id: i, blob: "x".repeat(200) }));
-    const out = truncate({ attacks }, { maxItems: 50, maxBytes: 2_000 });
-    expect(out.attacks.length).toBeLessThan(50);
-    expect(out._truncated.items_omitted).toBeGreaterThan(0);
-    expect(JSON.stringify(out).length).toBeLessThanOrEqual(2_000);
-  });
-
-  it("leaves a small payload untouched", () => {
-    const data = { attacks: [{ id: 1 }] };
-    const out = truncate(data, { maxItems: 50, maxBytes: 1_000_000 });
-    expect(out._truncated).toBeUndefined();
-    expect(out.attacks).toEqual([{ id: 1 }]);
-  });
-
-  it("drops the largest non-underscore field for an oversized object payload", () => {
-    const data = {
-      money: { wallet: 1, big: "x".repeat(5_000), small: "y" },
-    };
-    const out = truncate(data, { maxItems: 50, maxBytes: 500 });
-    // Non-array payload → dropLargestFields path. The biggest field is dropped.
-    expect(JSON.stringify(out).length).toBeLessThanOrEqual(500);
-    expect(out._truncated.fields_dropped).toContain("money");
-  });
-
-  it("leaves a small non-array object payload untouched", () => {
-    const data = { money: { wallet: 1, vault: 2 } };
-    const out = truncate(data, { maxItems: 50, maxBytes: 1_000_000 });
-    expect(out._truncated).toBeUndefined();
-    expect(out.money).toEqual({ wallet: 1, vault: 2 });
-  });
-});
 
 describe("annotate", () => {
   it("computes total_cash for user/money", () => {

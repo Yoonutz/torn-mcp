@@ -18,7 +18,7 @@ export interface EndpointDef {
   /** Path template containing a single {param} placeholder. */
   idPath?: string;
   /** The path parameter, when this endpoint is id-scoped. */
-  idParam?: { name: string; description?: string };
+  idParam?: { name: string; type?: string; description?: string };
   /** True when the endpoint can only be called with an id. */
   requiresId: boolean;
   /** Operation summary from the spec. */
@@ -240,6 +240,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/basic",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -289,6 +290,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/bounties",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -360,6 +362,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/competition",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -408,6 +411,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{crimeId}/crimes",
       "idParam": {
         "name": "crimeId",
+        "type": "integer",
         "description": "Crime id"
       }
     },
@@ -435,6 +439,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/discord",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -581,6 +586,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/faction",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -694,6 +700,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/forumposts",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -774,6 +781,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/forumthreads",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -801,6 +809,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/hof",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -850,6 +859,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/icons",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -995,6 +1005,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/job",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -1718,6 +1729,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/personalstats",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -1756,6 +1768,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/profile",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -1806,6 +1819,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/properties",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -1833,6 +1847,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{id}/property",
       "idParam": {
         "name": "id",
+        "type": "integer|string",
         "description": "User id or user discord id"
       }
     },
@@ -2298,6 +2313,7 @@ export const ENDPOINTS = {
       "idPath": "/user/{tradeId}/trade",
       "idParam": {
         "name": "tradeId",
+        "type": "integer",
         "description": "Trade id"
       }
     },
@@ -2644,6 +2660,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{id}/basic",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Faction id"
       }
     },
@@ -2671,6 +2688,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{id}/chain",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Faction id"
       }
     },
@@ -2729,6 +2747,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{id}/chains",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Faction id"
       }
     },
@@ -2756,6 +2775,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{chainId}/chainreport",
       "idParam": {
         "name": "chainId",
+        "type": "integer",
         "description": "Chain id"
       }
     },
@@ -2956,6 +2976,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{crimeId}/crime",
       "idParam": {
         "name": "crimeId",
+        "type": "integer",
         "description": "Crime id"
       }
     },
@@ -2983,6 +3004,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{id}/hof",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Faction id"
       }
     },
@@ -3021,6 +3043,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{id}/members",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Faction id"
       }
     },
@@ -3176,6 +3199,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{raidWarId}/raidreport",
       "idParam": {
         "name": "raidWarId",
+        "type": "integer",
         "description": "Raid war id"
       }
     },
@@ -3234,6 +3258,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{id}/raids",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Faction id"
       }
     },
@@ -3298,6 +3323,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{id}/rankedwars",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Faction id"
       }
     },
@@ -3324,6 +3350,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{rankedWarId}/rankedwarreport",
       "idParam": {
         "name": "rankedWarId",
+        "type": "integer",
         "description": "Ranked war id"
       }
     },
@@ -3650,6 +3677,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{id}/territory",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Faction id"
       }
     },
@@ -3742,6 +3770,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{id}/territorywars",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Faction id"
       }
     },
@@ -3768,6 +3797,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{territoryWarId}/territorywarreport",
       "idParam": {
         "name": "territoryWarId",
+        "type": "integer",
         "description": "Territory war id"
       }
     },
@@ -3884,6 +3914,7 @@ export const ENDPOINTS = {
       "idPath": "/faction/{id}/wars",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Faction id"
       }
     },
@@ -3989,6 +4020,7 @@ export const ENDPOINTS = {
       "idPath": "/company/{id}/employees",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Company id"
       }
     },
@@ -4116,6 +4148,7 @@ export const ENDPOINTS = {
       "idPath": "/company/{typeId}/companies",
       "idParam": {
         "name": "typeId",
+        "type": "integer",
         "description": "Company type id"
       }
     },
@@ -4154,6 +4187,7 @@ export const ENDPOINTS = {
       "idPath": "/company/{id}/profile",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Company id"
       }
     },
@@ -4385,6 +4419,7 @@ export const ENDPOINTS = {
       "idPath": "/forum/{threadId}/posts",
       "idParam": {
         "name": "threadId",
+        "type": "integer",
         "description": "Thread id"
       }
     },
@@ -4411,6 +4446,7 @@ export const ENDPOINTS = {
       "idPath": "/forum/{threadId}/thread",
       "idParam": {
         "name": "threadId",
+        "type": "integer",
         "description": "Thread id"
       }
     },
@@ -4469,6 +4505,7 @@ export const ENDPOINTS = {
       "idPath": "/forum/{categoryIds}/threads",
       "idParam": {
         "name": "categoryIds",
+        "type": "array<integer>",
         "description": "Category id or a list of category ids (comma separated)"
       }
     },
@@ -4599,6 +4636,7 @@ export const ENDPOINTS = {
       "idPath": "/market/{id}/auctionhouselisting",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Listing id"
       }
     },
@@ -4656,6 +4694,7 @@ export const ENDPOINTS = {
       "idPath": "/market/{id}/auctionhouse",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Item id"
       },
       "path": "/market/auctionhouse"
@@ -4717,6 +4756,7 @@ export const ENDPOINTS = {
       "idPath": "/market/{id}/bazaar",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Item id"
       }
     },
@@ -4835,6 +4875,7 @@ export const ENDPOINTS = {
       "idPath": "/market/{id}/itemmarket",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Item id"
       }
     },
@@ -4884,6 +4925,7 @@ export const ENDPOINTS = {
       "idPath": "/market/{propertyTypeId}/properties",
       "idParam": {
         "name": "propertyTypeId",
+        "type": "integer",
         "description": "Property type id"
       }
     },
@@ -4933,6 +4975,7 @@ export const ENDPOINTS = {
       "idPath": "/market/{propertyTypeId}/rentals",
       "idParam": {
         "name": "propertyTypeId",
+        "type": "integer",
         "description": "Property type id"
       }
     },
@@ -5113,6 +5156,7 @@ export const ENDPOINTS = {
       "idPath": "/racing/{raceId}/race",
       "idParam": {
         "name": "raceId",
+        "type": "integer",
         "description": "Race id"
       }
     },
@@ -5153,6 +5197,7 @@ export const ENDPOINTS = {
       "idPath": "/racing/{trackId}/records",
       "idParam": {
         "name": "trackId",
+        "type": "integer",
         "description": "Track id"
       }
     },
@@ -5484,6 +5529,7 @@ export const ENDPOINTS = {
       "idPath": "/torn/{id}/eliminationteam",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Elimination team id"
       }
     },
@@ -5602,6 +5648,7 @@ export const ENDPOINTS = {
       "idPath": "/torn/{ids}/honors",
       "idParam": {
         "name": "ids",
+        "type": "array<integer>",
         "description": "Honor id or a list of honor ids (comma separated)"
       }
     },
@@ -5707,6 +5754,7 @@ export const ENDPOINTS = {
       "idPath": "/torn/{id}/itemdetails",
       "idParam": {
         "name": "id",
+        "type": "integer",
         "description": "Item uid"
       }
     },
@@ -5805,6 +5853,7 @@ export const ENDPOINTS = {
       "idPath": "/torn/{ids}/items",
       "idParam": {
         "name": "ids",
+        "type": "array<integer>",
         "description": "Item id or a list of item ids (comma separated)"
       }
     },
@@ -5854,6 +5903,7 @@ export const ENDPOINTS = {
       "idPath": "/torn/{logCategoryId}/logtypes",
       "idParam": {
         "name": "logCategoryId",
+        "type": "integer",
         "description": "Log category id"
       }
     },
@@ -5881,6 +5931,7 @@ export const ENDPOINTS = {
       "idPath": "/torn/{ids}/medals",
       "idParam": {
         "name": "ids",
+        "type": "array<integer>",
         "description": "Medal id or a list of medal ids (comma separated)"
       }
     },
@@ -5974,6 +6025,7 @@ export const ENDPOINTS = {
       "idPath": "/torn/{stockId}/stocks",
       "idParam": {
         "name": "stockId",
+        "type": "integer",
         "description": "Stock id"
       }
     },
@@ -6000,6 +6052,7 @@ export const ENDPOINTS = {
       "idPath": "/torn/{crimeId}/subcrimes",
       "idParam": {
         "name": "crimeId",
+        "type": "integer",
         "description": "Crime id"
       }
     },

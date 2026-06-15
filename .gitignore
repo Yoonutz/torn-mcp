@@ -5,6 +5,9 @@
 !.env.example
 *.env
 
+# Personal, project-local agent instructions (private)
+CLAUDE.local.md
+
 # Sync workflow scratch (commit message for the OpenAPI sync job)
 .sync-msg.txt
 

@@ -4,10 +4,12 @@ import {
   buildUrl,
   ensureKey,
   humanizeTimestamps,
+  paramsHint,
   parseTornError,
   resolveEndpointPath,
   validateParams,
 } from "./torn.js";
+import { ENDPOINTS } from "./generated/endpoints.js";
 
 describe("resolveEndpointPath", () => {
   it("resolves a plain endpoint", () => {
@@ -80,6 +82,25 @@ describe("validateParams", () => {
   });
   it("returns null for endpoints with no required params", () => {
     expect(validateParams("torn", "timestamp", {})).toBeNull();
+  });
+  it("rejects a non-numeric id for an integer-id endpoint", () => {
+    expect(validateParams("market", "itemmarket", {}, "xanax")).toMatch(
+      /must be a numeric Torn id/,
+    );
+  });
+  it("accepts a numeric id for an integer-id endpoint", () => {
+    expect(validateParams("market", "itemmarket", {}, "206")).toBeNull();
+  });
+});
+
+describe("paramsHint", () => {
+  it("surfaces optional enum params as a filter (incl. Drug)", () => {
+    const hint = paramsHint(ENDPOINTS.user.inventory);
+    expect(hint).toMatch(/filter cat=/);
+    expect(hint).toMatch(/Drug/);
+  });
+  it("shows required enum params", () => {
+    expect(paramsHint(ENDPOINTS.faction.news)).toMatch(/requires cat=/);
   });
 });
 

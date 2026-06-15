@@ -6,10 +6,13 @@ import { humanizeTimestamps } from "./torn.js";
 
 type Json = any;
 
-/** Default ceilings (named so callers and tests share one source of truth). */
-export const MAX_PAGES = 3;
-export const MAX_ITEMS = 50;
-export const MAX_BYTES = 24_000;
+/**
+ * Max pages to auto-follow. The MCP server does not truncate response data —
+ * it returns everything. The only ceiling is Cloudflare's per-request
+ * subrequest cap (~50); we stay under it and, if a dataset is larger, surface a
+ * continuation marker rather than silently cutting.
+ */
+export const MAX_PAGES = 40;
 
 /**
  * Torn wraps payloads under one data key plus `_metadata` (e.g. `{ attacks: [...],
@@ -204,72 +207,6 @@ export function filterByTimeWindow(
 
   if (kept.length === 0) return { ...data, [dataKey]: items, _note: WINDOW_NOTE };
   return { ...data, [dataKey]: kept };
-}
-
-/**
- * Drop the largest non-`_` fields until the receipt-included payload is under the
- * byte cap (oversized non-list payloads). The `_truncated` receipt's own bytes
- * are counted while measuring, mirroring the array path. If the irreducible
- * residual (`_`-prefixed fields + braces) alone still exceeds maxBytes, this is
- * best-effort: it returns the smallest payload it can reach.
- */
-function dropLargestFields(data: Json, maxBytes: number): Json {
-  const working: Record<string, Json> = { ...data };
-  const dropped: string[] = [];
-  const build = (): Json =>
-    dropped.length ? { ...working, _truncated: { fields_dropped: dropped } } : { ...working };
-
-  const fields = Object.keys(working)
-    .filter((k) => !k.startsWith("_"))
-    .map((k) => ({ k, size: JSON.stringify(working[k]).length }))
-    .sort((a, b) => b.size - a.size);
-
-  for (const { k } of fields) {
-    if (JSON.stringify(build()).length <= maxBytes) break;
-    delete working[k];
-    dropped.push(k);
-  }
-  return build();
-}
-
-/**
- * Cap the merged list to `maxItems`, then pop trailing items until the whole
- * payload is under `maxBytes`. Records what was cut in a sibling `_truncated`
- * field. Top-level only — simpler than Sol's recursive `_truncateObj`, and we
- * never inject a sentinel string into the array. Returns a new object.
- */
-export function truncate(data: Json, opts: { maxItems: number; maxBytes: number }): Json {
-  if (!data || typeof data !== "object") return data;
-  const { dataKey, value } = unwrapData(data);
-
-  if (dataKey === null || !Array.isArray(value)) {
-    if (JSON.stringify(data).length <= opts.maxBytes) return data;
-    return dropLargestFields(data, opts.maxBytes);
-  }
-
-  let items = (value as Json[]).slice();
-  let omitted = 0;
-  if (items.length > opts.maxItems) {
-    omitted = items.length - opts.maxItems;
-    items = items.slice(0, opts.maxItems);
-  }
-
-  // Build the candidate including the `_truncated` receipt so its bytes count
-  // against the cap (otherwise the receipt could push the result back over).
-  const build = (): Record<string, Json> => {
-    const o: Record<string, Json> = { ...data, [dataKey]: items };
-    if (omitted > 0) o._truncated = { items_omitted: omitted };
-    return o;
-  };
-
-  let out = build();
-  while (items.length > 0 && JSON.stringify(out).length > opts.maxBytes) {
-    items = items.slice(0, -1);
-    omitted += 1;
-    out = build();
-  }
-
-  return out;
 }
 
 /** Mutates the (already humanized) payload to add computed sibling fields. */
