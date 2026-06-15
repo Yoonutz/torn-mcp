@@ -2,6 +2,7 @@
 import { describe, it, expect } from "vitest";
 import {
   buildUrl,
+  ensureKey,
   humanizeTimestamps,
   parseTornError,
   resolveEndpointPath,
@@ -92,6 +93,34 @@ describe("humanizeTimestamps", () => {
     const out = humanizeTimestamps({ level: 50, money: 999 }) as any;
     expect(out.level_human).toBeUndefined();
     expect(out.money_human).toBeUndefined();
+  });
+});
+
+describe("humanizeTimestamps (widened keys)", () => {
+  it("annotates bare Torn v2 time fields", () => {
+    const out = humanizeTimestamps({
+      started: 1_600_000_000, ended: 1_600_000_100, executed: 1_600_000_200,
+    }) as Record<string, unknown>;
+    expect(out.started_human).toContain("2020");
+    expect(out.ended_human).toContain("2020");
+    expect(out.executed_human).toContain("2020");
+  });
+
+  it("still annotates the original keys", () => {
+    const out = humanizeTimestamps({ timestamp: 1_600_000_000, signed_up: 1_600_000_000 }) as Record<string, unknown>;
+    expect(out.timestamp_human).toContain("2020");
+    expect(out.signed_up_human).toContain("2020");
+  });
+});
+
+describe("ensureKey", () => {
+  it("appends the key to a keyless URL", () => {
+    expect(ensureKey("https://api.torn.com/v2/user/log?limit=2", "SECRET"))
+      .toBe("https://api.torn.com/v2/user/log?limit=2&key=SECRET");
+  });
+  it("overwrites an existing key param", () => {
+    expect(ensureKey("https://api.torn.com/v2/user/log?key=OLD", "NEW"))
+      .toBe("https://api.torn.com/v2/user/log?key=NEW");
   });
 });
 
