@@ -62,11 +62,21 @@ describe("validateParams", () => {
   });
   it("rejects an invalid enum value with the allowed list", () => {
     const msg = validateParams("faction", "news", { cat: "armorynews" });
-    expect(msg).toMatch(/Invalid 'cat'='armorynews'/);
+    expect(msg).toMatch(/Invalid cat value 'armorynews'/);
     expect(msg).toMatch(/main/);
   });
   it("passes when the required enum value is valid", () => {
     expect(validateParams("faction", "news", { cat: "armoryAction" })).toBeNull();
+  });
+  it("accepts a comma-separated list of valid enum values", () => {
+    expect(
+      validateParams("faction", "news", { cat: "armoryAction,armoryDeposit" }),
+    ).toBeNull();
+  });
+  it("flags only the invalid token in a comma-separated list", () => {
+    const msg = validateParams("faction", "news", { cat: "armoryAction,drugs" });
+    expect(msg).toMatch(/Invalid cat value 'drugs'/);
+    expect(msg).not.toMatch(/armoryAction'/);
   });
   it("returns null for endpoints with no required params", () => {
     expect(validateParams("torn", "timestamp", {})).toBeNull();

@@ -56,8 +56,17 @@ export function validateParams(
       const allowed = q.enum ? ` (one of: ${q.enum.join(", ")})` : "";
       return `Endpoint '${endpoint}' requires query param '${q.name}'${allowed}.`;
     }
-    if (!missing && q.enum && !q.enum.includes(String(val))) {
-      return `Invalid '${q.name}'='${val}' for endpoint '${endpoint}'. Allowed: ${q.enum.join(", ")}.`;
+    if (!missing && q.enum) {
+      // Some enum params (e.g. faction/news `cat`) accept a comma-separated
+      // list. Validate each token against the enum.
+      const bad = String(val)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .filter((v) => !q.enum!.includes(v));
+      if (bad.length > 0) {
+        return `Invalid ${q.name} value${bad.length > 1 ? "s" : ""} '${bad.join(", ")}' for endpoint '${endpoint}'. Allowed: ${q.enum.join(", ")}.`;
+      }
     }
   }
   return null;
