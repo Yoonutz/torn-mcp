@@ -30,6 +30,9 @@ import { registerCustomTools } from "./custom/tools.js";
 
 export { RateLimiter };
 
+/** Server version, surfaced in the MCP display name and serverInfo. */
+const VERSION = "0.1.0";
+
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 interface Env {
@@ -66,7 +69,7 @@ function describeTag(tag: TornTag): string {
 }
 
 export class TornMCP extends McpAgent<Env, unknown, Props> {
-  server = new McpServer({ name: "torn-mcp", version: "0.1.0" });
+  server = new McpServer({ name: `Torn MCP v${VERSION}`, version: VERSION });
 
   async init(): Promise<void> {
     // Generated layer: one grouped tool per Torn tag.
