@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.6.0**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.6.1**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -10,7 +10,7 @@ Current version: **v0.6.0**. Roadmap reflects actual repo state — no drift.
 | **4 — Observability & ops** | Version reporting, weekly sync, CI, protection | dev time | ✅ shipped |
 | **5 — Schema metadata** | Key-level + stability badges | dev time | ✅ shipped |
 | **6 — Response schemas** | Type the intelligence layer from the spec | ~8-12h | 🟢 mostly done |
-| **7 — Contract tests** | Prove tools match the spec | ~4-6h | ⏳ planned |
+| **7 — Contract tests** | Prove tools match the spec | ~4-6h | ✅ shipped |
 | **8 — Key-access pre-check** | Warn on endpoints the key can't use | ~3-5h | ⏸️ parked |
 
 ## ✅ Phase 1 — Core server & tools
@@ -74,13 +74,13 @@ Current version: **v0.6.0**. Roadmap reflects actual repo state — no drift.
 **Ships on:** v0.6.0
 **Unlocks:** rename-proof intelligence tools
 
-## ⏳ Phase 7 — Contract tests
+## ✅ Phase 7 — Contract tests
 
 | Task | Effort | Version | Notes |
 |------|--------|---------|-------|
-| ⏳ Spec contract test suite | ~4-6h | | Prove every tool calls Torn correctly and stays in sync with the spec. |
+| ✅ Spec contract test suite | dev time | v0.6.1 | Prove every tool calls Torn correctly and stays in sync with the spec. |
 
-**Trigger to start:** alongside Phase 6
+**Ships on:** v0.6.1
 
 ## ⏸️ Phase 8 — Key-access pre-check
 
