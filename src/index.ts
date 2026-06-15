@@ -25,13 +25,13 @@ import {
 import { ENDPOINTS, TAGS, type EndpointDef, type TornTag } from "./generated/endpoints.js";
 import { MANIFEST } from "./generated/manifest.js";
 import { RateLimiter, LIMIT, type RateCheck } from "./rateLimiter.js";
-import { errorResult, textResult, type ToolResult } from "./mcpResult.js";
+import { dualResult, errorResult, textResult, type ToolResult } from "./mcpResult.js";
 import { registerCustomTools } from "./custom/tools.js";
 
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.6.1";
+const VERSION = "0.8.0";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -224,28 +224,30 @@ export class TornMCP extends DurableObject<Env> {
     const fetched = await this.fetchMerged(apiKey, path, resolved);
     if (!fetched.ok) return errorResult(fetched.error);
 
-    let result: any = filterByTimeWindow(fetched.data, { from: resolved.from, to: resolved.to });
+    // Canonical data (close to the schema): merged + window-filtered Torn data.
+    let canonical: any = filterByTimeWindow(fetched.data, { from: resolved.from, to: resolved.to });
 
     // Empty-window re-fetch: window set but nothing came back → widen once.
     const hasWindow = resolved.from !== undefined || resolved.to !== undefined;
-    if (hasWindow && isEmptyPayload(result)) {
+    if (hasWindow && isEmptyPayload(canonical)) {
       const widened: Record<string, string | number> = { ...resolved };
       delete widened.from;
       delete widened.to;
       const refetched = await this.fetchMerged(apiKey, path, widened);
       if (refetched.ok && !isEmptyPayload(refetched.data)) {
-        result = refetched.data;
-        result._note = WINDOW_NOTE;
+        canonical = refetched.data;
+        canonical._note = WINDOW_NOTE;
       }
     }
-
-    result = annotate(tag, endpoint, result);
     if (fetched.partial) {
-      result._pages_partial =
+      canonical._pages_partial =
         `Stopped after ${MAX_PAGES} pages (subrequest limit). More data may exist — ` +
         `narrow with from/to or a category filter, or page via _metadata.links.next.`;
     }
-    return textResult(JSON.stringify(result, null, 2));
+
+    // Presentation channel: humanized + computed annotations over the canonical.
+    const enriched = annotate(tag, endpoint, canonical);
+    return dualResult(canonical, JSON.stringify(enriched, null, 2));
   }
 
   /**

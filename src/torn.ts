@@ -140,16 +140,18 @@ function toHuman(epochSeconds: number): string {
 }
 
 /**
- * Recursively rewrite every epoch-seconds field (keys like `timestamp`, `*_at`,
- * `signed_up`, `until`) to Torn City Time, and move the raw epoch to a
- * `<key>_epoch` sibling. So `timestamp: 1781366050` becomes
- * `timestamp: "15:54:10 - 13/06/26"` + `timestamp_epoch: 1781366050`.
+ * Additive, non-destructive enrichment: keep every epoch-seconds field as-is
+ * (the canonical value the schema describes) and add a readable Torn City Time
+ * sibling. So `timestamp: 1781366050` stays, and `timestamp_human:
+ * "15:54:10 - 13/06/26"` is added next to it. The base field remains
+ * schema-true; the `_human` view is presentation layered on top.
  */
 export function humanizeTimestamps(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(humanizeTimestamps);
   if (value && typeof value === "object") {
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      out[k] = humanizeTimestamps(v);
       if (
         typeof v === "number" &&
         Number.isInteger(v) &&
@@ -157,10 +159,7 @@ export function humanizeTimestamps(value: unknown): unknown {
         v <= TS_MAX &&
         isTimestampKey(k)
       ) {
-        out[k] = toHuman(v);
-        out[`${k}_epoch`] = v;
-      } else {
-        out[k] = humanizeTimestamps(v);
+        out[`${k}_human`] = toHuman(v);
       }
     }
     return out;

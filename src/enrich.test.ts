@@ -203,10 +203,10 @@ describe("annotate", () => {
     expect(out.money._computed.excluded).toMatch(/points/);
   });
 
-  it("rewrites epoch timestamps to TCT with an _epoch sibling", () => {
+  it("keeps the epoch and adds a _human sibling", () => {
     const out = annotate("user", "profile", { profile: { signed_up: 1_600_000_000 } });
-    expect(out.profile.signed_up).toMatch(/^\d{2}:\d{2}:\d{2} - \d{2}\/\d{2}\/\d{2}$/);
-    expect(out.profile.signed_up_epoch).toBe(1_600_000_000);
+    expect(out.profile.signed_up).toBe(1_600_000_000);
+    expect(out.profile.signed_up_human).toMatch(/^\d{2}:\d{2}:\d{2} - \d{2}\/\d{2}\/\d{2}$/);
   });
 
   it("is a no-op annotation for an endpoint with no registry entry", () => {

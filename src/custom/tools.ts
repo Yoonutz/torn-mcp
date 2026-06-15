@@ -3,7 +3,7 @@
 // aggregation service (see services.ts) and returns structured JSON.
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { errorResult, jsonResult, type ToolResult } from "../mcpResult.js";
+import { dualResult, errorResult, type ToolResult } from "../mcpResult.js";
 import { humanizeTimestamps } from "../torn.js";
 import {
   analyzePlayer,
@@ -23,7 +23,9 @@ import {
 
 async function run(fn: () => Promise<unknown>): Promise<ToolResult> {
   try {
-    return jsonResult(humanizeTimestamps(await fn()));
+    const data = await fn();
+    // Canonical structured data; humanized presentation as text.
+    return dualResult(data, JSON.stringify(humanizeTimestamps(data), null, 2));
   } catch (e) {
     return errorResult(e instanceof Error ? e.message : "Tool failed.");
   }

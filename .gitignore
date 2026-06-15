@@ -11,6 +11,10 @@ CLAUDE.local.md
 # Sync workflow scratch (commit message for the OpenAPI sync job)
 .sync-msg.txt
 
+# Conformance run output (uploaded as a CI artifact, not committed)
+conformance-report.md
+conformance.json
+
 # Wrangler local secrets + state
 .dev.vars
 .dev.vars.*

@@ -1,0 +1,34 @@
+name: Conformance
+
+# Weekly live conformance: call every Torn endpoint with the test key and
+# validate each response against its OpenAPI schema. Without the
+# TORN_TEST_API_KEY secret the harness runs in compile-check mode (no calls).
+# Non-gating for PRs; a real schema mismatch fails this run and notifies.
+
+on:
+  schedule:
+    - cron: "0 7 * * 3" # Wednesdays 07:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Run conformance
+        env:
+          TORN_TEST_API_KEY: ${{ secrets.TORN_TEST_API_KEY }}
+        run: node scripts/conformance.mjs
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-report
+          path: |
+            conformance-report.md
+            conformance.json

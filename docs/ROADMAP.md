@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.6.1**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.8.0**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -11,7 +11,10 @@ Current version: **v0.6.1**. Roadmap reflects actual repo state — no drift.
 | **5 — Schema metadata** | Key-level + stability badges | dev time | ✅ shipped |
 | **6 — Response schemas** | Type the intelligence layer from the spec | ~8-12h | 🟢 mostly done |
 | **7 — Contract tests** | Prove tools match the spec | ~4-6h | ✅ shipped |
-| **8 — Key-access pre-check** | Warn on endpoints the key can't use | ~3-5h | ⏸️ parked |
+| **8 — Live conformance** | Validate real Torn responses against the schema | ~6-10h | 🟢 mostly done |
+| **9 — Permission-error clarity** | Tell the user which key an endpoint needs | ~1-2h | ⏳ planned |
+| **10 — Additive enrichment** | Keep canonical data; add views beside it | dev time | ✅ shipped |
+| **11 — Canonical output channel** | Schema-true `structuredContent` + human text | ~6-10h | ✅ shipped |
 
 ## ✅ Phase 1 — Core server & tools
 
@@ -82,10 +85,39 @@ Current version: **v0.6.1**. Roadmap reflects actual repo state — no drift.
 
 **Ships on:** v0.6.1
 
-## ⏸️ Phase 8 — Key-access pre-check
+## 🟢 Phase 8 — Live conformance harness
 
 | Task | Effort | Version | Notes |
 |------|--------|---------|-------|
-| ⏸️ Warn before calling out-of-reach endpoints | ~3-5h | | Check the caller's key once and flag endpoints it cannot access. |
+| ✅ Conformance harness + weekly workflow | dev time | v0.6.2 | Calls every endpoint weekly and checks the real response matches the schema. |
+| 🟡 First live run with the full-access key | external | | Confirm the full sweep passes once the test key is in place. |
 
-**Blocked on:** product decision on whether it's worth the extra call
+**Ships on:** v0.6.2
+**Blocked on:** full-access test key (`TORN_TEST_API_KEY` secret)
+
+## ⏳ Phase 9 — Permission-error clarity
+
+| Task | Effort | Version | Notes |
+|------|--------|---------|-------|
+| ⏳ Add the needed key level to access errors | ~1-2h | | When a call is refused, tell the user which key level the endpoint needs. |
+
+**Trigger to start:** next session
+
+## ✅ Phase 10 — Additive enrichment
+
+| Task | Effort | Version | Notes |
+|------|--------|---------|-------|
+| ✅ Make enrichment non-destructive | dev time | v0.7.0 | Keep the raw value the schema defines and add the readable version beside it. |
+
+**Ships on:** v0.7.0
+**Unlocks:** tool output stays close to the validated schema
+
+## ✅ Phase 11 — Canonical output channel
+
+| Task | Effort | Version | Notes |
+|------|--------|---------|-------|
+| ✅ Emit schema-true data as structured content | dev time | v0.8.0 | The raw data goes in its own channel, kept close to the schema. |
+| ✅ Keep the human/summary view as text | dev time | v0.8.0 | Presentation sits beside the contract so consumers pick raw or formatted. |
+
+**Ships on:** v0.8.0
+**Unlocks:** tool output validated against the schema; consumers choose raw vs formatted
