@@ -2,10 +2,14 @@
 // Intelligence-layer aggregation services. Each calls one or more Torn
 // endpoints and returns a structured, AI-friendly summary instead of raw JSON.
 //
-// Field access is defensive (optional chaining, presence checks): every field
-// read here is confirmed to exist in the Torn v2 response schemas, but values
-// are skipped rather than assumed when absent. Services take an injected `call`
-// so they unit-test with a mock and never touch Worker globals.
+// `call()` results are cast to their generated response type (src/generated/
+// types.ts), so a Torn field rename fails typecheck here instead of silently
+// degrading a summary. Reads stay defensive (optional chaining) because Torn
+// fields are frequently nullable. Helpers take `any` — the type safety that
+// matters is on the response-field access in each service body.
+import type { components } from "../generated/types.js";
+
+type S = components["schemas"];
 
 /** Resolve tag+endpoint(+id) and return the parsed Torn JSON, or throw. */
 export type TornCall = (
@@ -45,66 +49,68 @@ function depth(listings: any[]): number {
 
 export async function analyzePlayer(call: TornCall, id?: string) {
   const [profileRes, statsRes] = await Promise.all([
-    call("user", "profile", id),
-    call("user", "personalstats", id).catch(() => null),
+    call("user", "profile", id) as Promise<S["UserProfileResponse"]>,
+    call("user", "personalstats", id).catch(() => null) as Promise<S["UserPersonalStatsResponse"] | null>,
   ]);
-  const p = profileRes?.profile ?? {};
+  const p = profileRes?.profile;
   return {
-    id: p.id,
-    name: p.name,
-    level: p.level,
-    status: p.status?.state ?? p.status?.description,
-    online: p.last_action?.status,
-    last_action: p.last_action?.relative,
-    life: lifePct(p.life) !== undefined
-      ? { current: p.life?.current, maximum: p.life?.maximum, pct: lifePct(p.life) }
+    id: p?.id,
+    name: p?.name,
+    level: p?.level,
+    status: p?.status?.state ?? p?.status?.description,
+    online: p?.last_action?.status,
+    last_action: p?.last_action?.relative,
+    life: lifePct(p?.life) !== undefined
+      ? { current: p?.life?.current, maximum: p?.life?.maximum, pct: lifePct(p?.life) }
       : undefined,
-    age_days: p.age,
-    faction_id: p.faction_id ?? null,
+    age_days: p?.age,
+    faction_id: p?.faction_id ?? null,
     social: {
-      awards: p.awards,
-      friends: p.friends,
-      enemies: p.enemies,
-      karma: p.karma,
+      awards: p?.awards,
+      friends: p?.friends,
+      enemies: p?.enemies,
+      karma: p?.karma,
     },
     personalstats: statsRes?.personalstats ?? null,
   };
 }
 
 export async function summarizePlayer(call: TornCall, id?: string) {
-  const p = (await call("user", "profile", id))?.profile ?? {};
+  const res = (await call("user", "profile", id)) as S["UserProfileResponse"];
+  const p = res?.profile;
   return {
-    id: p.id,
-    name: p.name,
-    level: p.level,
-    status: p.status?.state ?? p.status?.description,
-    online: p.last_action?.status,
-    last_action: p.last_action?.relative,
-    life_pct: lifePct(p.life),
-    faction_id: p.faction_id ?? null,
+    id: p?.id,
+    name: p?.name,
+    level: p?.level,
+    status: p?.status?.state ?? p?.status?.description,
+    online: p?.last_action?.status,
+    last_action: p?.last_action?.relative,
+    life_pct: lifePct(p?.life),
+    faction_id: p?.faction_id ?? null,
   };
 }
 
 export async function comparePlayers(call: TornCall, ids: string[]) {
   const players = await Promise.all(
     ids.map(async (id) => {
-      const p = (await call("user", "profile", id))?.profile ?? {};
+      const res = (await call("user", "profile", id)) as S["UserProfileResponse"];
+      const p = res?.profile;
       return {
-        id: p.id ?? id,
-        name: p.name,
-        level: p.level,
-        status: p.status?.state ?? p.status?.description,
-        online: p.last_action?.status,
-        life_pct: lifePct(p.life),
+        id: p?.id ?? id,
+        name: p?.name,
+        level: p?.level,
+        status: p?.status?.state ?? p?.status?.description,
+        online: p?.last_action?.status,
+        life_pct: lifePct(p?.life),
       };
     }),
   );
-  const topLevel = Math.max(0, ...players.map((p) => p.level ?? 0));
+  const topLevel = Math.max(0, ...players.map((p) => Number(p.level ?? 0)));
   return {
     count: players.length,
     players: players.map((p) => ({
       ...p,
-      level_gap_to_top: topLevel - (p.level ?? 0),
+      level_gap_to_top: topLevel - Number(p.level ?? 0),
     })),
   };
 }
@@ -119,10 +125,10 @@ function memberActivity(members: any[]) {
 
 export async function summarizeFaction(call: TornCall, id?: string) {
   const [basicRes, membersRes] = await Promise.all([
-    call("faction", "basic", id),
-    call("faction", "members", id).catch(() => null),
+    call("faction", "basic", id) as Promise<S["FactionBasicResponse"]>,
+    call("faction", "members", id).catch(() => null) as Promise<S["FactionMembersResponse"] | null>,
   ]);
-  const members: any[] = membersRes?.members ?? [];
+  const members = membersRes?.members ?? [];
   const byPosition: Record<string, number> = {};
   for (const m of members) {
     const pos = m?.position ?? "Unknown";
@@ -137,8 +143,9 @@ export async function summarizeFaction(call: TornCall, id?: string) {
 }
 
 export async function factionMemberActivity(call: TornCall, id?: string) {
-  const members: any[] = (await call("faction", "members", id))?.members ?? [];
-  type Entry = { id: any; name: any; last_action: any };
+  const res = (await call("faction", "members", id)) as S["FactionMembersResponse"];
+  const members = res?.members ?? [];
+  type Entry = { id: unknown; name: unknown; last_action: unknown };
   const buckets: Record<"online" | "idle" | "offline", Entry[]> = {
     online: [],
     idle: [],
@@ -163,7 +170,8 @@ export async function factionMemberActivity(call: TornCall, id?: string) {
 }
 
 export async function warReadinessReport(call: TornCall, id?: string) {
-  const members: any[] = (await call("faction", "members", id))?.members ?? [];
+  const res = (await call("faction", "members", id)) as S["FactionMembersResponse"];
+  const members = res?.members ?? [];
   const breakdown = {
     okay: 0,
     hospital: 0,
@@ -203,8 +211,8 @@ export async function warReadinessReport(call: TornCall, id?: string) {
 
 export async function territorySummary(call: TornCall, id?: string) {
   const [factionRes, globalRes] = await Promise.all([
-    call("faction", "territory", id).catch(() => null),
-    call("torn", "territory").catch(() => null),
+    call("faction", "territory", id).catch(() => null) as Promise<S["FactionTerritoriesResponse"] | null>,
+    call("torn", "territory").catch(() => null) as Promise<S["TornTerritoriesResponse"] | null>,
   ]);
   const factionTerr = factionRes?.territory;
   const globalTerr = globalRes?.territory;
@@ -216,7 +224,8 @@ export async function territorySummary(call: TornCall, id?: string) {
 }
 
 export async function crimeAnalysis(call: TornCall, id?: string) {
-  const crimes: any[] = (await call("faction", "crimes", id))?.crimes ?? [];
+  const res = (await call("faction", "crimes", id)) as S["FactionCrimesResponse"];
+  const crimes = res?.crimes ?? [];
   const byStatus: Record<string, number> = {};
   const byDifficulty: Record<string, number> = {};
   let success = 0;
@@ -244,12 +253,12 @@ export async function crimeAnalysis(call: TornCall, id?: string) {
 
 export async function summarizeCompany(call: TornCall, id?: string) {
   const [profileRes, employeesRes] = await Promise.all([
-    call("company", "profile", id),
-    call("company", "employees", id).catch(() => null),
+    call("company", "profile", id) as Promise<S["CompanyProfileResponseMixed"]>,
+    call("company", "employees", id).catch(() => null) as Promise<S["CompanyEmployeesResponse"] | null>,
   ]);
-  const employees: any[] = employeesRes?.employees ?? [];
+  const employees = employeesRes?.employees ?? [];
   return {
-    company: profileRes?.profile ?? null,
+    company: (profileRes as any)?.profile ?? null,
     employee_count: employees.length,
   };
 }
@@ -258,20 +267,20 @@ export async function summarizeCompany(call: TornCall, id?: string) {
 
 export async function itemMarketAnalysis(call: TornCall, id: string) {
   const [marketRes, tornRes] = await Promise.all([
-    call("market", "itemmarket", id),
-    call("torn", "items", id).catch(() => null),
+    call("market", "itemmarket", id) as Promise<S["MarketItemMarketResponse"]>,
+    call("torn", "items", id).catch(() => null) as Promise<S["TornItemsResponse"] | null>,
   ]);
-  const im = marketRes?.itemmarket ?? {};
-  const listings: any[] = im.listings ?? [];
+  const im = marketRes?.itemmarket;
+  const listings = im?.listings ?? [];
   const prices = listings
     .map((l) => l?.price)
     .filter((n): n is number => typeof n === "number");
-  const tItem = (tornRes?.items ?? [])[0] ?? null;
+  const tItem = (tornRes?.items ?? [])[0];
   return {
-    id: im.item?.id ?? id,
-    name: im.item?.name,
-    type: im.item?.type,
-    average_price: im.item?.average_price,
+    id: im?.item?.id ?? id,
+    name: im?.item?.name,
+    type: im?.item?.type,
+    average_price: im?.item?.average_price,
     market_value: tItem?.value?.market_price,
     listings: {
       count: listings.length,
@@ -285,21 +294,20 @@ export async function itemMarketAnalysis(call: TornCall, id: string) {
 export async function marketAnalysis(call: TornCall, itemIds: string[]) {
   const items = await Promise.all(
     itemIds.map(async (id) => {
-      const im = (await call("market", "itemmarket", id))?.itemmarket ?? {};
-      const listings: any[] = im.listings ?? [];
+      const res = (await call("market", "itemmarket", id)) as S["MarketItemMarketResponse"];
+      const im = res?.itemmarket;
+      const listings = im?.listings ?? [];
       const lowest = lowestPrice(listings);
-      const avg = im.item?.average_price;
+      const avg = im?.item?.average_price;
       return {
-        id: im.item?.id ?? id,
-        name: im.item?.name,
+        id: im?.item?.id ?? id,
+        name: im?.item?.name,
         average_price: avg,
         lowest_listing: lowest,
         listings: listings.length,
         depth: depth(listings),
         spread:
-          typeof avg === "number" && typeof lowest === "number"
-            ? avg - lowest
-            : undefined,
+          typeof avg === "number" && typeof lowest === "number" ? avg - lowest : undefined,
       };
     }),
   );
@@ -311,21 +319,21 @@ export async function findProfitableItems(call: TornCall, itemIds: string[]) {
   const rows = await Promise.all(
     itemIds.map(async (id) => {
       const [marketRes, tornRes] = await Promise.all([
-        call("market", "itemmarket", id),
-        call("torn", "items", id).catch(() => null),
+        call("market", "itemmarket", id) as Promise<S["MarketItemMarketResponse"]>,
+        call("torn", "items", id).catch(() => null) as Promise<S["TornItemsResponse"] | null>,
       ]);
-      const im = marketRes?.itemmarket ?? {};
-      const listings: any[] = im.listings ?? [];
+      const im = marketRes?.itemmarket;
+      const listings = im?.listings ?? [];
       const lowest = lowestPrice(listings);
       const tItem = (tornRes?.items ?? [])[0];
-      const reference = tItem?.value?.market_price ?? im.item?.average_price;
+      const reference = tItem?.value?.market_price ?? im?.item?.average_price;
       const margin =
         typeof reference === "number" && typeof lowest === "number"
           ? reference - lowest
           : undefined;
       return {
-        id: im.item?.id ?? id,
-        name: im.item?.name,
+        id: im?.item?.id ?? id,
+        name: im?.item?.name,
         lowest_listing: lowest,
         reference_value: reference,
         margin,

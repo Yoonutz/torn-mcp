@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.5.0**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.6.0**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -9,7 +9,7 @@ Current version: **v0.5.0**. Roadmap reflects actual repo state — no drift.
 | **3 — Lean runtime** | Drop heavy framework, native transport | dev time | ✅ shipped |
 | **4 — Observability & ops** | Version reporting, weekly sync, CI, protection | dev time | ✅ shipped |
 | **5 — Schema metadata** | Key-level + stability badges | dev time | ✅ shipped |
-| **6 — Response schemas** | Type the intelligence layer from the spec | ~8-12h | ⏳ planned |
+| **6 — Response schemas** | Type the intelligence layer from the spec | ~8-12h | 🟢 mostly done |
 | **7 — Contract tests** | Prove tools match the spec | ~4-6h | ⏳ planned |
 | **8 — Key-access pre-check** | Warn on endpoints the key can't use | ~3-5h | ⏸️ parked |
 
@@ -64,14 +64,14 @@ Current version: **v0.5.0**. Roadmap reflects actual repo state — no drift.
 
 **Ships on:** v0.5.0
 
-## ⏳ Phase 6 — Response schemas
+## 🟢 Phase 6 — Response schemas
 
 | Task | Effort | Version | Notes |
 |------|--------|---------|-------|
-| ⏳ Type the intelligence tools from response shapes | ~8-12h | | Catch Torn field renames automatically instead of letting summaries quietly go blank. |
+| ✅ Type the intelligence tools from response shapes | dev time | v0.6.0 | Catch Torn field renames automatically instead of letting summaries quietly go blank. |
 | ⏳ Tell the model what each tool returns | ~3-4h | | Expose expected fields so the model knows results before calling. |
 
-**Trigger to start:** after current bugfix work
+**Ships on:** v0.6.0
 **Unlocks:** rename-proof intelligence tools
 
 ## ⏳ Phase 7 — Contract tests
