@@ -25,6 +25,7 @@ import {
   MAX_PAGES,
 } from "./enrich.js";
 import { ENDPOINTS, TAGS, type EndpointDef, type TornTag } from "./generated/endpoints.js";
+import { MANIFEST } from "./generated/manifest.js";
 import { RateLimiter, LIMIT, type RateCheck } from "./rateLimiter.js";
 import { errorResult, textResult, type ToolResult } from "./mcpResult.js";
 import { registerCustomTools } from "./custom/tools.js";
@@ -309,9 +310,17 @@ export default {
     }
 
     if (url.pathname === "/version") {
-      return new Response(JSON.stringify({ name: "torn-mcp", version: VERSION }), {
-        headers: { "content-type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          name: "torn-mcp",
+          server: VERSION,
+          openapi: MANIFEST.openapiVersion,
+          specHash: MANIFEST.specHash,
+          endpoints: MANIFEST.endpoints,
+          tags: MANIFEST.tags,
+        }),
+        { headers: { "content-type": "application/json" } },
+      );
     }
 
     return new Response("Not found", { status: 404 });

@@ -27,12 +27,13 @@ jobs:
       - run: npm test
       - name: Commit regenerated files if the spec changed
         run: |
-          if [ -z "$(git status --porcelain)" ]; then
+          # .sync-msg.txt is gitignored; its presence means sync detected changes.
+          if [ -z "$(git status --porcelain openapi.json src/generated docs/generated)" ]; then
             echo "Torn spec unchanged — nothing to commit."
             exit 0
           fi
           git config user.name "torn-mcp-sync"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "chore(sync): regenerate from updated Torn OpenAPI spec"
+          git add openapi.json src/generated docs/generated
+          git commit -F .sync-msg.txt
           git push

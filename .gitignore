@@ -5,6 +5,9 @@
 !.env.example
 *.env
 
+# Sync workflow scratch (commit message for the OpenAPI sync job)
+.sync-msg.txt
+
 # Wrangler local secrets + state
 .dev.vars
 .dev.vars.*
