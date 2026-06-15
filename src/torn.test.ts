@@ -2,6 +2,7 @@
 import { describe, it, expect } from "vitest";
 import {
   buildUrl,
+  endpointBadges,
   ensureKey,
   humanizeTimestamps,
   paramsHint,
@@ -101,6 +102,20 @@ describe("paramsHint", () => {
   });
   it("shows required enum params", () => {
     expect(paramsHint(ENDPOINTS.faction.news)).toMatch(/requires cat=/);
+  });
+});
+
+describe("endpointBadges", () => {
+  const def = (keyLevel?: string, stability?: string) =>
+    ({ keyLevel, stability, requiresId: false, query: [] }) as any;
+  it("shows a non-public key level", () => {
+    expect(endpointBadges(def("limited", "Stable"))).toBe(" [key: limited]");
+  });
+  it("hides the default public key level", () => {
+    expect(endpointBadges(def("public", "Stable"))).toBe("");
+  });
+  it("flags unstable endpoints", () => {
+    expect(endpointBadges(def("public", "Unstable"))).toBe(" ⚠ unstable");
   });
 });
 

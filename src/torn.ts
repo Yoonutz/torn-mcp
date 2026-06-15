@@ -104,6 +104,17 @@ export function paramsHint(def: EndpointDef): string {
   return segs.length ? ` · ${segs.join(" · ")}` : "";
 }
 
+/**
+ * Compact badges for a tool description: the required key level (shown only when
+ * above the default `public`) and an unstable-contract warning.
+ */
+export function endpointBadges(def: EndpointDef): string {
+  const badges: string[] = [];
+  if (def.keyLevel && def.keyLevel !== "public") badges.push(`[key: ${def.keyLevel}]`);
+  if (def.stability === "Unstable") badges.push("⚠ unstable");
+  return badges.length ? ` ${badges.join(" ")}` : "";
+}
+
 const TS_MIN = 1_000_000_000; // 2001-09
 const TS_MAX = 4_000_000_000; // 2096-10
 

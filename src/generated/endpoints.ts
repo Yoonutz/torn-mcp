@@ -25,6 +25,10 @@ export interface EndpointDef {
   summary?: string;
   /** Operation description from the spec. */
   description?: string;
+  /** Minimum API key access level: public | minimal | limited | full. */
+  keyLevel?: string;
+  /** Torn contract stability: "Stable" | "Unstable" (x-stability). */
+  stability?: string;
   /** Accepted query parameters (auth key excluded). */
   query: QueryParam[];
 }
@@ -35,6 +39,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your ammo information",
       "description": "Requires minimal key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -57,6 +63,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your detailed attacks",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "filters",
@@ -122,6 +130,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your simplified attacks",
       "description": "Requires limited access key. <br>Returns up to 1,000 rows. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "filters",
@@ -187,6 +197,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your bars information",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -209,6 +221,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your basic profile information",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -248,6 +262,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your battlestats",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -270,6 +286,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get bounties placed on you",
       "description": "<b>Globally cached selection.</b><br><br>Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -298,6 +316,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your calendar events start time",
       "description": "Requires minimal access key. <br>Only available to yourself.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -320,6 +340,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your casino streak & tokens",
       "description": "Requires limited access key. <br>Only available to yourself.",
+      "keyLevel": "limited",
+      "stability": "Unstable",
       "query": [
         {
           "name": "timestamp",
@@ -342,6 +364,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your competition information",
       "description": "Requires public access key.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -370,6 +394,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your cooldowns information",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -392,6 +418,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get your crime statistics",
       "description": "Requires minimal access key. <br>Return the details and statistics about for a specific crime.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -419,6 +447,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your discord information",
       "description": "Requires public key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -447,6 +477,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your education information",
       "description": "Requires minimal access key. <br>The response contains a list of complete eduactions and of a current education (if any).",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -469,6 +501,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your enlisted cars",
       "description": "Requires minimal access key. <br>Returns a list of all user enlisted cars.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -491,6 +525,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your equipment & clothing",
       "description": "Requires minimal access key.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -513,6 +549,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your events",
       "description": "Requires limited access key. <br> Unfortunately, the 'sort' parameter is not available for this selection.",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -566,6 +604,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction information",
       "description": "Requires public access key.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -594,6 +634,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get updates on your threads and posts",
       "description": "Requires minimal access key. <br>This selection returns data visible in 'Feed' section on forum page. Feed is sorted by timestamp descending. Only a maximum of 100 rows are returned.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -616,6 +658,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get updates on your friends' activity",
       "description": "Requires minimal access key. <br>This selection returns data visible in 'Friends' section on forum page. Feed is sorted by timestamp descending. Only a maximum of 100 rows are returned.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -638,6 +682,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your posts",
       "description": "Requires public access key. <br>Returns 20 posts per page.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -708,6 +754,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get updates on threads you subscribed to",
       "description": "Requires minimal access key. <br>This selection returns data visible in 'Subscribed Threads' section on forum page. Threads are sorted in the same way as on site.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -730,6 +778,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your threads",
       "description": "Requires public access key. <br>Returns 100 threads per page. The field 'new_posts' is also available, indicating the amount of unread posts with a Minimum API key (or higher).",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -789,6 +839,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your hall of fame rankings",
       "description": "Requires public access key. <br>When requesting selection with Limited, Full or Custom key, battle_stats selection will be populated.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -817,6 +869,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your achieved honors",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -839,6 +893,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your icons information",
       "description": "Requires public access key. <br> When requesting data for yourself with 'Custom', 'Limited' or 'Full' access keys, the response will be of type UserIconPrivate, otherwise UserIconPublic.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -867,6 +923,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your inventory",
       "description": "<b>Cached selection (1 hour per category).</b><br><br>Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -935,6 +993,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your item market listings",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "offset",
@@ -963,6 +1023,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your information about available item mods",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -985,6 +1047,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your job information",
       "description": "Requires public access key.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1013,6 +1077,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your jobpoints",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1035,6 +1101,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your starter job positions",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1057,6 +1125,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your friends, enemies or targets list",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -1125,6 +1195,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your logs",
       "description": "Requires full access key. <br> It's possible to pass a list of log ids or a log category id.<br>This selection is standalone and cannot be used together with other selections.",
+      "keyLevel": "full",
+      "stability": "Stable",
       "query": [
         {
           "name": "log",
@@ -1188,6 +1260,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your achieved medals",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1210,6 +1284,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your merits",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1232,6 +1308,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your messages",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -1285,6 +1363,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your current missions information",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1307,6 +1387,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your current wealth",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1329,6 +1411,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your unseen events",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -1362,6 +1446,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your unseen messages",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1384,6 +1470,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your notifications",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1406,6 +1494,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your current ongoing organized crime",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1428,6 +1518,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get available slots for organized crimes with status 'Recruiting'",
       "description": "Requires minimal access key. <br>Unlike 'faction' -> 'crimes', this selection only shows empty slots, and only for crimes with the 'Recruiting' status.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1450,6 +1542,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your personal stats",
       "description": "Requires public access key. <br>\n * UserPersonalStatsFull is returned only when this selection is requested with Limited, Full or Custom key access key.\n * UserPersonalStatsFullPublic is returned when the requested category is 'all'.\n * UserPersonalStatsPopular is returned when the requested category is 'popular'. Please try to use UserPersonalStatsPopular over UserPersonalStatsFullPublic wherever possible in order to reduce the server load.\n * Otherwise, UserPersonalStatsCategory is returned for the matched category.\n * Historical stats can be fetched via 'stat' query parameter. It's only possible to pass up to 10 historical stats at once (the rest is trimmed). When requesting historical stats the response will be of type UserPersonalStatsHistoric.\n * Use 'timestamp' query parameter to get historical stats at the certain point in time. It's possible some historical stats didn't exist at the given timestamp, and for such stats you will not receive anything back.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -1737,6 +1831,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your own profile",
       "description": "Requires public access key.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -1776,6 +1872,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your own properties",
       "description": "Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "filters",
@@ -1827,6 +1925,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your current property",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1855,6 +1955,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get user races",
       "description": "Requires minimal access key. <br>Returns a list of user races, ordered by race start timestamp.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -1919,6 +2021,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your current racing records",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1941,6 +2045,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your refills information",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -1963,6 +2069,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your reports",
       "description": "Requires limited access key. <br>\nThe limit is set to 25 when requesting any category other than 'stats'.<br>\nWhen requesting the 'stats' category, limit can be increased up to 100.",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -2034,6 +2142,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your detailed revives",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "filters",
@@ -2110,6 +2220,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your simplified revives",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "filters",
@@ -2186,6 +2298,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your skills",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2208,6 +2322,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your stocks",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2230,6 +2346,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your trades",
       "description": "Requires limited access key. <br> When requesting 'ongoing' trades (default), limit/offset/sort are not being used.",
+      "keyLevel": "limited",
+      "stability": "Unstable",
       "query": [
         {
           "name": "cat",
@@ -2294,6 +2412,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get your detailed trade",
       "description": "Requires limited access key. <br>Only possible to get trades you participated in.",
+      "keyLevel": "limited",
+      "stability": "Unstable",
       "query": [
         {
           "name": "timestamp",
@@ -2321,6 +2441,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your travel information",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2343,6 +2465,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your virus coding information",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2365,6 +2489,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your weapon experience information",
       "description": "Requires minimal key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2387,6 +2513,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your working stats",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2409,6 +2537,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all available user selections",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2431,6 +2561,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current server time",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2455,6 +2587,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's applications",
       "description": "Requires minimal access key with faction API access permissions. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2477,6 +2611,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's detailed attacks",
       "description": "Requires limited access key with faction API access permissions. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "filters",
@@ -2542,6 +2678,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's simplified attacks",
       "description": "Requires limited access key with faction API access permissions. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "filters",
@@ -2607,6 +2745,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's & member's balance details",
       "description": "Requires limited access key with faction API access permissions. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -2640,6 +2780,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's basic details",
       "description": "Requires public access key. <br> The 'is_enlisted' value will be populated if you have API faction permissions (with custom, limited or full access keys), otherwise it will be set as null.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2668,6 +2810,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's current chain",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2696,6 +2840,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get a list of your faction's completed chains",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -2755,6 +2901,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's latest chain report",
       "description": "Requires public access key. <br> This includes currently ongoing chains.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2783,6 +2931,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's challenge contributors",
       "description": "Requires limiteed access key with faction API access permissions. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "stat",
@@ -2868,6 +3018,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's organized crimes",
       "description": "Requires minimal access key with faction API access permissions. <br> It's possible to get older entries either by timestamp range (from, to) or with offset.<br> Crimes are ordered depending on the category chosen:\n * For categories 'all' & 'available', the ordering field is 'created_at'.\n * For categories 'successful', 'failed' & 'completed', the ordering field is 'executed_at'.\n * For categories 'recruiting' & 'expired', the ordering field is 'expired_at'.\n * For category 'planning', the ordering field is 'ready_at'.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -2957,6 +3109,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get a specific organized crime",
       "description": "Requires minimal access key with faction API access permissions. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2984,6 +3138,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's hall of fame rankings.",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3012,6 +3168,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get a list of your faction's members",
       "description": "Requires public access key. <br> The 'revive_setting' value will be populated (not Unknown) if you have faction permissions (with custom, limited or full access keys), otherwise it will be set as 'Unknown'.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -3051,6 +3209,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's news details",
       "description": "Requires minimal access key with faction API access permissions. <br> It is possible to pass up to 10 categories at the time (comma separated). Categories 'attack', 'depositFunds' and 'giveFunds' are only available with 'Custom', 'Limited' or 'Full' access keys.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -3136,6 +3296,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's positions details",
       "description": "Requires minimal access key with faction API access permissions. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3158,6 +3320,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get a list of current rackets",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3180,6 +3344,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get raid war details",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3207,6 +3373,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get raids history for your faction",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "from",
@@ -3266,6 +3434,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get ranked wars history for your faction",
       "description": "Requires public access key. <br> Use offset to get older results which are always ordered descending.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "offset",
@@ -3331,6 +3501,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get ranked war details",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3358,6 +3530,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get faction reports",
       "description": "Requires limited access key. <br>\nThe limit is set to 25 when requesting any category other than 'stats'.<br>\nWhen requesting the 'stats' category, limit can be increased up to 100.",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -3429,6 +3603,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's detailed revives",
       "description": "Requires limited access key with faction API access permissions. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "filters",
@@ -3505,6 +3681,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's simplified revives",
       "description": "Requires limited access key with faction API access permissions. <br>",
+      "keyLevel": "limited",
+      "stability": "Stable",
       "query": [
         {
           "name": "filters",
@@ -3581,6 +3759,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Search factions by name or other criteria",
       "description": "Requires public access key. <br>This selection is standalone and cannot be used together with other selections.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "name",
@@ -3635,6 +3815,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's challenges stats",
       "description": "Requires minimal access key with faction API access permissions. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3657,6 +3839,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get a list of your faction's territories",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3685,6 +3869,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get a list territory ownership",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "offset",
@@ -3719,6 +3905,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get territory wars history for your faction",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "from",
@@ -3778,6 +3966,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get territory war details",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3805,6 +3995,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's upgrades",
       "description": "Requires minimal access key with faction API access permissions. <br>",
+      "keyLevel": "minimal",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3827,6 +4019,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get faction warfare",
       "description": "Requires public access key. <br>The response depends on the selected category.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -3894,6 +4088,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your faction's wars & pacts details",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3921,6 +4117,8 @@ export const ENDPOINTS = {
     "lookup": {
       "requiresId": false,
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3943,6 +4141,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current server time",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -3967,6 +4167,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your company's applications",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Unstable",
       "query": [
         {
           "name": "timestamp",
@@ -3989,6 +4191,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get my company's employees",
       "description": "Requires public access key. <br>When using Limited, Custom or Full access API keys, the response will be:<br>\n * for director: CompanyEmployeeFull\n * for employee: CompanyEmployeeExtended\n * anyone else: CompanyEmployee.",
+      "keyLevel": "public",
+      "stability": "Unstable",
       "query": [
         {
           "name": "striptags",
@@ -4028,6 +4232,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your company's news details",
       "description": "Requires minimal access key. <br>",
+      "keyLevel": "minimal",
+      "stability": "Unstable",
       "query": [
         {
           "name": "striptags",
@@ -4106,6 +4312,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get a list of companies for a specific company type",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
       "query": [
         {
           "name": "limit",
@@ -4156,6 +4364,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get my company's profile",
       "description": "Requires public access key. <br>When using Limited, Custom or Full access API keys, the response will be of type CompanyProfileExtended, otherwise it will be CompanyProfile.",
+      "keyLevel": "public",
+      "stability": "Unstable",
       "query": [
         {
           "name": "striptags",
@@ -4195,6 +4405,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Search companies by name or other criteria",
       "description": "Requires public access key. <br>This selection is standalone and cannot be used together with other selections.",
+      "keyLevel": "public",
+      "stability": "Unstable",
       "query": [
         {
           "name": "name",
@@ -4247,6 +4459,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get daily companies snapshot CSV",
       "description": "Requires public access key.<br>Returns a CSV daily snapshot of companies.<br>This selection is standalone and cannot be used together with other selections.<br>\nCSV columns: id, name, created_at, days_old, image, type, rating, director_id,\nemployees_hired, employees_capacity, daily_income, daily_customers,\nweekly_income, weekly_customers, applications_allowed",
+      "keyLevel": "public",
+      "stability": "Unstable",
       "query": [
         {
           "name": "timestamp",
@@ -4269,6 +4483,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get your company's stock",
       "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Unstable",
       "query": [
         {
           "name": "timestamp",
@@ -4290,6 +4506,8 @@ export const ENDPOINTS = {
     "lookup": {
       "requiresId": false,
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -4312,6 +4530,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current server time",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -4336,6 +4556,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get publicly available forum categories",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -4358,6 +4580,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get specific forum thread posts",
       "description": "Requires public access key. <br>Returns 20 posts per page for a specific thread. <br> By default, it uses 'offset', but it's possible to filter posts with 'from' & 'to' parameters.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -4427,6 +4651,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get specific thread details",
       "description": "Requires public access key. <br>Contains details of a thread including topic content and poll (if any).",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -4454,6 +4680,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get threads across all forum categories",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -4513,6 +4741,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all available forum selections",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -4535,6 +4765,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current server time",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -4559,6 +4791,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current key log history",
       "description": "Available for any key. <br>\n * This selection contains up to last 250 request logs.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -4593,6 +4827,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current key info",
       "description": "Available for any key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -4617,6 +4853,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get specific item auction house listings",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -4644,6 +4882,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get auction house listings",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -4703,6 +4943,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get bazaar directory",
       "description": "Requires public access key. <br> The default response is of type 'BazaarWeekly', but if a category is chosen, the response will be of type 'BazaarSpecialized'.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -4764,6 +5006,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get item market listings",
       "description": "<b>Globally cached selection.</b><br><br>Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "bonus",
@@ -4883,6 +5127,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get properties market listings",
       "description": "<b>Globally cached selection.</b><br><br>Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "offset",
@@ -4933,6 +5179,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get properties rental listings",
       "description": "<b>Globally cached selection.</b><br><br>Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "offset",
@@ -4983,6 +5231,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all available market selections",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5005,6 +5255,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current server time",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5029,6 +5281,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get cars and their racing stats",
       "description": "Requires public access key. <br>Returns the stat details about racing cars.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5051,6 +5305,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all possible car upgrades",
       "description": "Requires public access key. <br>Returns the details about all possible car upgrades.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5073,6 +5329,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get races",
       "description": "Requires public access key. <br>Returns a list of races, ordered by race start timestamp.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -5137,6 +5395,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get specific race details",
       "description": "Requires public access key. <br>Returns the details of a race.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5164,6 +5424,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get track records",
       "description": "Requires public access key. <br>Returns a list of 5 best lap records for the chosen track and car class.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -5205,6 +5467,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get race tracks and descriptions",
       "description": "Requires public access key. <br>Returns the details about racing tracks.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5227,6 +5491,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all available racing selections",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5249,6 +5515,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current server time",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5273,6 +5541,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all available property selections",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5295,6 +5565,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current server time",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5319,6 +5591,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get attack log details",
       "description": "Requires public key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "log",
@@ -5376,6 +5650,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get bounties",
       "description": "<b>Globally cached selection.</b><br><br>Requires public key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -5410,6 +5686,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get calendar information",
       "description": "Requires public access key. <br> Get the details about competitions & events in the running year.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5432,6 +5710,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get crimes information",
       "description": "Requires public access key. <br> Return the details about released crimes.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5454,6 +5734,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get education information",
       "description": "Requires public access key.<br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5476,6 +5758,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current standings for all elimination teams",
       "description": "Requires public key.",
+      "keyLevel": "public",
+      "stability": "Unstable",
       "query": [
         {
           "name": "timestamp",
@@ -5498,6 +5782,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get players in a specific elimination team",
       "description": "Requires public key.",
+      "keyLevel": "public",
+      "stability": "Unstable",
       "query": [
         {
           "name": "limit",
@@ -5537,6 +5823,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get faction hall of fame positions for a specific category",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -5583,6 +5871,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get full faction tree",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5605,6 +5895,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all honors",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -5656,6 +5948,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get player hall of fame positions for a specific category",
       "description": "Requires public key.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -5713,6 +6007,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get information about ammo",
       "description": "Requires public key.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5735,6 +6031,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get information about a specific item",
       "description": "Requires public key.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5762,6 +6060,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get information about weapon upgrades",
       "description": "Requires public key.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5784,6 +6084,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get information about items",
       "description": "Requires public key.<br>Default category is 'All'.<br>Details are not populated when requesting the category 'All'.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -5861,6 +6163,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get available log categories",
       "description": "Requires public key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5883,6 +6187,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all available log ids",
       "description": "Requires public key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5911,6 +6217,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all medals",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5939,6 +6247,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all merits",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5961,6 +6271,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get organized crimes information",
       "description": "Requires public access key. <br> Return the details about released faction organized crimes.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -5983,6 +6295,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get properties details",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -6005,6 +6319,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all stocks",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -6033,6 +6349,8 @@ export const ENDPOINTS = {
       "requiresId": true,
       "summary": "Get Subcrimes information",
       "description": "Requires public access key. <br> Return the details about possible actions for a specific crime.",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -6060,6 +6378,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get territory details",
       "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "ids",
@@ -10210,6 +10530,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get all available torn selections",
       "description": "Requires public key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -10232,6 +10554,8 @@ export const ENDPOINTS = {
       "requiresId": false,
       "summary": "Get current server time",
       "description": "Requires public key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",

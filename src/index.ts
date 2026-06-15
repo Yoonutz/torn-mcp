@@ -5,6 +5,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { z } from "zod";
 import {
   buildUrl,
+  endpointBadges,
   ensureKey,
   parseTornError,
   paramsHint,
@@ -30,7 +31,7 @@ import { registerCustomTools } from "./custom/tools.js";
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.4.0";
+const VERSION = "0.5.0";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -64,7 +65,7 @@ function describeTag(tag: TornTag): string {
   const lines = Object.entries(map).map(([name, def]) => {
     const summary = (def.summary ?? "").replace(/\s+/g, " ").slice(0, 90);
     const idNote = def.requiresId ? " (requires id)" : "";
-    return `- ${name}${idNote}: ${summary}${paramsHint(def)}`;
+    return `- ${name}${idNote}: ${summary}${paramsHint(def)}${endpointBadges(def)}`;
   });
   return (
     `Fetch Torn ${tag} data (Torn API v2). Set 'endpoint' to one of:\n` +

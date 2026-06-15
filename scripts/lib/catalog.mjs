@@ -92,11 +92,19 @@ export function buildCatalog(spec) {
     const pathParam = params.find((p) => p.in === "path");
     const query = params.filter((p) => p.in === "query" && !(p.in === "query" && p.name === "key"));
 
+    // Access level is encoded in the key param's $ref name (ApiKeyMinimal etc.),
+    // which deref loses — read it from the raw refs. Stability is a vendor ext.
+    const keyRef = (op.parameters || []).map((pr) => pr.$ref || "").find((r) => r.includes("ApiKey"));
+    const keyLevel = keyRef ? keyRef.split("/").pop().replace("ApiKey", "").toLowerCase() : undefined;
+    const stability = op["x-stability"];
+
     tags[tag] = tags[tag] || {};
     const entry = tags[tag][name] || {
       requiresId: false,
       summary: (op.summary || "").trim() || undefined,
       description: (op.description || "").trim() || undefined,
+      keyLevel,
+      stability,
       query,
     };
     if (hasParam) {
@@ -111,6 +119,8 @@ export function buildCatalog(spec) {
       entry.path = rawPath;
       entry.summary = (op.summary || "").trim() || entry.summary;
       entry.description = (op.description || "").trim() || entry.description;
+      entry.keyLevel = keyLevel ?? entry.keyLevel;
+      entry.stability = stability ?? entry.stability;
       entry.query = query;
     }
     tags[tag][name] = entry;
@@ -169,6 +179,10 @@ export interface EndpointDef {
   summary?: string;
   /** Operation description from the spec. */
   description?: string;
+  /** Minimum API key access level: public | minimal | limited | full. */
+  keyLevel?: string;
+  /** Torn contract stability: "Stable" | "Unstable" (x-stability). */
+  stability?: string;
   /** Accepted query parameters (auth key excluded). */
   query: QueryParam[];
 }
