@@ -11,17 +11,38 @@ A remote [Model Context Protocol](https://modelcontextprotocol.io) server for th
 > [!NOTE]
 > Read-only. The Torn API v2 exposes only `GET` endpoints — this server can never modify your account or take in-game actions.
 
-## Use it (client setup)
+## Install
 
-The deployed endpoint is:
+Live endpoint (hosted instance):
 
 ```
 https://torn-mcp.yoonutz.workers.dev/mcp
 ```
 
-(This is the live hosted instance. Or run your own — see [Deploy](#deploy). Add a custom domain later to drop the `workers.dev` host.)
+Pick your client below. Replace `YOUR_TORN_API_KEY` with your key ([get one](#get-a-torn-api-key)). Prefer to self-host? See [Deploy](#deploy).
 
-**VS Code** — user-level `mcp.json` (works from any workspace):
+<details>
+<summary><b>Claude Code</b> (CLI)</summary>
+
+```bash
+claude mcp add --transport http torn https://torn-mcp.yoonutz.workers.dev/mcp \
+  --header "X-Torn-Api-Key: YOUR_TORN_API_KEY"
+```
+
+Check it: `claude mcp list`. Remove: `claude mcp remove torn`.
+
+</details>
+
+<details>
+<summary><b>VS Code</b> (CLI)</summary>
+
+```bash
+code --add-mcp '{"name":"torn","type":"http","url":"https://torn-mcp.yoonutz.workers.dev/mcp","headers":{"X-Torn-Api-Key":"YOUR_TORN_API_KEY"}}'
+```
+
+PowerShell: keep the single quotes around the JSON. Insiders: use `code-insiders`. Then open **Copilot Chat → Agent mode → 🛠️ tools** and enable `torn`.
+
+Manual alternative — user `mcp.json` (Command Palette → _MCP: Open User Configuration_):
 
 ```json
 {
@@ -35,7 +56,101 @@ https://torn-mcp.yoonutz.workers.dev/mcp
 }
 ```
 
-Same `url` + `headers` block works for Claude Desktop, Cursor, Windsurf, and Continue under their `mcpServers`/`servers` config.
+</details>
+
+<details>
+<summary><b>Cursor</b></summary>
+
+Edit `~/.cursor/mcp.json` (global) or `.cursor/mcp.json` (project):
+
+```json
+{
+  "mcpServers": {
+    "torn": {
+      "url": "https://torn-mcp.yoonutz.workers.dev/mcp",
+      "headers": { "X-Torn-Api-Key": "YOUR_TORN_API_KEY" }
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Windsurf</b></summary>
+
+Edit `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "torn": {
+      "serverUrl": "https://torn-mcp.yoonutz.workers.dev/mcp",
+      "headers": { "X-Torn-Api-Key": "YOUR_TORN_API_KEY" }
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Claude Desktop</b></summary>
+
+Settings → Developer → Edit Config (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "torn": {
+      "url": "https://torn-mcp.yoonutz.workers.dev/mcp",
+      "headers": { "X-Torn-Api-Key": "YOUR_TORN_API_KEY" }
+    }
+  }
+}
+```
+
+Restart Claude Desktop.
+
+</details>
+
+<details>
+<summary><b>Visual Studio</b> (2022 17.14+)</summary>
+
+Add a `.mcp.json` to your solution or `%USERPROFILE%\.mcp.json`:
+
+```json
+{
+  "servers": {
+    "torn": {
+      "type": "http",
+      "url": "https://torn-mcp.yoonutz.workers.dev/mcp",
+      "headers": { "X-Torn-Api-Key": "YOUR_TORN_API_KEY" }
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Continue</b></summary>
+
+Edit `~/.continue/config.yaml`:
+
+```yaml
+mcpServers:
+  - name: torn
+    type: streamable-http
+    url: https://torn-mcp.yoonutz.workers.dev/mcp
+    requestOptions:
+      headers:
+        X-Torn-Api-Key: YOUR_TORN_API_KEY
+```
+
+</details>
+
+> Security: putting the key inline lands it in config files / shell history. Where the client supports it (e.g. VS Code `${input:...}` prompts), prefer that over a plaintext key.
 
 ## Get a Torn API Key
 
@@ -45,20 +160,21 @@ Torn → **Settings → [API Keys](https://www.torn.com/preferences.php#tab=api)
 
 One grouped tool per Torn tag, each covering all of that tag's endpoints:
 
-| Tool | Endpoints | Example `endpoint` values |
-|------|-----------|---------------------------|
-| `torn_user` | 64 | `profile`, `battlestats`, `bars`, `cooldowns`, `money`, `events` |
-| `torn_faction` | 34 | `basic`, `members`, `wars`, `attacks`, `chain` |
-| `torn_torn` | 26 | `items`, `stats`, `timestamp`, `territory` |
-| `torn_company` | 10 | `profile`, `employees`, `stock`, `news` |
-| `torn_market` | 8 | `itemmarket`, `bazaar`, `auctionhouse` |
-| `torn_racing` | 8 | `races`, `cars`, `tracks`, `records` |
-| `torn_forum` | 6 | `categories`, `threads`, `posts` |
-| `torn_property` | 2 | `property` |
-| `torn_key` | 2 | `info`, `log` |
-| `torn_list_endpoints` | — | discovery: lists every endpoint per tag |
+| Tool                  | Endpoints | Example `endpoint` values                                        |
+| --------------------- | --------- | ---------------------------------------------------------------- |
+| `torn_user`           | 64        | `profile`, `battlestats`, `bars`, `cooldowns`, `money`, `events` |
+| `torn_faction`        | 34        | `basic`, `members`, `wars`, `attacks`, `chain`                   |
+| `torn_torn`           | 26        | `items`, `stats`, `timestamp`, `territory`                       |
+| `torn_company`        | 10        | `profile`, `employees`, `stock`, `news`                          |
+| `torn_market`         | 8         | `itemmarket`, `bazaar`, `auctionhouse`                           |
+| `torn_racing`         | 8         | `races`, `cars`, `tracks`, `records`                             |
+| `torn_forum`          | 6         | `categories`, `threads`, `posts`                                 |
+| `torn_property`       | 2         | `property`                                                       |
+| `torn_key`            | 2         | `info`, `log`                                                    |
+| `torn_list_endpoints` | —         | discovery: lists every endpoint per tag                          |
 
 Each tool takes:
+
 - `endpoint` (required) — which data type to fetch (full list per tool, or call `torn_list_endpoints`).
 - `id` (optional) — entity id; used when the endpoint is entity-scoped or requires one.
 - `params` (optional) — extra query options (`limit`, `from`, `to`, `sort`, `cat`, …).
@@ -67,62 +183,24 @@ The Torn key is **not** a tool parameter — it comes from the request header, s
 
 ### Intelligence tools
 
-Higher-level tools that aggregate multiple endpoints and return structured summaries instead of raw JSON:
+Higher-level tools that aggregate multiple endpoints and return structured summaries instead:
 
-| Tool | Aggregates | Returns |
-|------|-----------|---------|
-| `analyze_player` | user/profile + personalstats | status, activity, life, social, stats |
-| `summarize_player` | user/profile | condensed one-glance snapshot |
-| `compare_players` | user/profile ×N | side-by-side + level gap to top |
-| `summarize_faction` | faction/basic + members | counts by position and activity |
-| `faction_member_activity` | faction/members | online / idle / offline buckets |
-| `war_readiness_report` | faction/members | availability-based readiness score |
-| `territory_summary` | faction + torn territory | holdings + global sample |
-| `crime_analysis` | faction/crimes | status/difficulty counts, success rate |
-| `summarize_company` | company/profile + employees | profile + headcount |
-| `item_market_analysis` | market/itemmarket + torn/items | depth, price band, market value |
-| `market_analysis` | market/itemmarket ×N | items ranked by spread |
-| `find_profitable_items` | market/itemmarket + torn/items ×N | items ranked by margin |
+| Tool                      | Aggregates                        | Returns                                |
+| ------------------------- | --------------------------------- | -------------------------------------- |
+| `analyze_player`          | user/profile + personalstats      | status, activity, life, social, stats  |
+| `summarize_player`        | user/profile                      | condensed one-glance snapshot          |
+| `compare_players`         | user/profile ×N                   | side-by-side + level gap to top        |
+| `summarize_faction`       | faction/basic + members           | counts by position and activity        |
+| `faction_member_activity` | faction/members                   | online / idle / offline buckets        |
+| `war_readiness_report`    | faction/members                   | availability-based readiness score     |
+| `territory_summary`       | faction + torn territory          | holdings + global sample               |
+| `crime_analysis`          | faction/crimes                    | status/difficulty counts, success rate |
+| `summarize_company`       | company/profile + employees       | profile + headcount                    |
+| `item_market_analysis`    | market/itemmarket + torn/items    | depth, price band, market value        |
+| `market_analysis`         | market/itemmarket ×N              | items ranked by spread                 |
+| `find_profitable_items`   | market/itemmarket + torn/items ×N | items ranked by margin                 |
 
 > War readiness is availability-based (okay/hospital/traveling, online, on-wall, in-OC) — per-member battlestats are not exposed by the Torn API.
-
-## Deploy
-
-Prereqs: Node 18+, a Cloudflare account, `npx wrangler login` once.
-
-```bash
-git clone https://github.com/Yoonutz/torn-mcp.git
-cd torn-mcp
-npm install
-npx wrangler deploy
-```
-
-After the first deploy, wrangler prints your live URL:
-`https://torn-mcp.yoonutz.workers.dev`. The MCP endpoint is that URL + `/mcp`.
-
-### Optional: server-level fallback key
-
-By default the server is multi-tenant — every request must carry `X-Torn-Api-Key`. To set a fallback key used when the header is absent (makes header-less callers single-tenant):
-
-```bash
-npx wrangler secret put TORN_API_KEY
-```
-
-The secret is never exposed to the model and never logged.
-
-### Custom domain (optional)
-
-Default `*.workers.dev` URLs include your account subdomain. To use your own domain (must be on Cloudflare), uncomment the `routes` block in [`wrangler.toml`](wrangler.toml), set the pattern, and redeploy. The endpoint becomes `https://<your-pattern>/mcp`.
-
-## Test with MCP Inspector
-
-Before wiring a client, verify the server with the [MCP Inspector](https://github.com/modelcontextprotocol/inspector):
-
-```bash
-npx @modelcontextprotocol/inspector
-```
-
-In the Inspector: transport **Streamable HTTP**, URL = your `/mcp` endpoint, add header `X-Torn-Api-Key: YOUR_TORN_API_KEY`. Connect → list tools → call `torn_torn` with `endpoint=timestamp` to confirm a live response.
 
 ## Security & privacy
 
@@ -130,29 +208,6 @@ In the Inspector: transport **Streamable HTTP**, URL = your `/mcp` endpoint, add
 - Never stored, never logged, never returned in error messages.
 - Upstream calls are pinned to `https://api.torn.com` (SSRF guard) with `User-Agent: torn-mcp`.
 - Per-key rate limiting (~100 req/min, Torn's cap) via a Durable Object — returns a clear error instead of hammering Torn.
-
-## Development
-
-```bash
-npm run dev        # local dev server (wrangler dev)
-npm run test       # unit tests (vitest)
-npm run typecheck  # tsc --noEmit
-npm run deploy     # wrangler deploy
-npm run cf-typegen # regenerate Worker binding types
-```
-
-| File | Purpose |
-|------|---------|
-| [`src/index.ts`](src/index.ts) | Worker entry: MCP agent, tool wiring, shared fetch core, header auth |
-| [`src/torn.ts`](src/torn.ts) | Pure Torn path/URL/error helpers (unit-tested) |
-| [`src/custom/services.ts`](src/custom/services.ts) | 12 intelligence aggregation services (unit-tested) |
-| [`src/custom/tools.ts`](src/custom/tools.ts) | Registers the intelligence tools on the MCP server |
-| [`src/rateLimiter.ts`](src/rateLimiter.ts) | Per-key rate-limit Durable Object |
-| [`src/generated/endpoints.ts`](src/generated/endpoints.ts) | Auto-generated endpoint catalog (do not edit) |
-| [`scripts/sync-openapi.mjs`](scripts/sync-openapi.mjs) | Download spec + regenerate the catalog |
-| [`wrangler.toml`](wrangler.toml) | Worker name, DO bindings, migrations |
-
-Run `npm run sync-openapi` to pull the latest Torn spec and regenerate `src/generated/endpoints.ts`.
 
 ## Scope & roadmap
 
