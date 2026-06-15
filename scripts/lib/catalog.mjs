@@ -74,10 +74,12 @@ function makeResolver(spec) {
 export function buildCatalog(spec) {
   const { describeParam } = makeResolver(spec);
   const tags = {};
+  let rawOps = 0;
 
   for (const rawPath of Object.keys(spec.paths || {})) {
     const op = spec.paths[rawPath].get;
     if (!op) continue;
+    rawOps++;
     const tag = ((op.tags && op.tags[0]) || "untagged").toLowerCase();
 
     const segs = rawPath.split("/").filter(Boolean);
@@ -123,6 +125,7 @@ export function buildCatalog(spec) {
     tagList,
     openapiVersion: spec?.info?.version ?? "unknown",
     endpoints,
+    rawOps,
   };
 }
 
@@ -181,6 +184,7 @@ export function renderManifestTs(catalog, specHash) {
     `  specHash: ${JSON.stringify(specHash)},\n` +
     `  tags: ${catalog.tagList.length},\n` +
     `  endpoints: ${catalog.endpoints},\n` +
+    `  rawOperations: ${catalog.rawOps},\n` +
     `} as const;\n`
   );
 }
@@ -225,6 +229,18 @@ export function diffCatalogs(oldCat, newCat) {
 
   const oldTags = new Set(oldCat.tagList);
   const newTags = new Set(newCat.tagList);
+  const tagOf = (key) => key.split("/")[0];
+  const allTags = [...new Set([...oldCat.tagList, ...newCat.tagList])];
+  const perTag = allTags
+    .map((tag) => ({
+      tag,
+      endpoints: Object.keys(newCat.tags[tag] || {}).length,
+      added: added.filter((k) => tagOf(k) === tag).length,
+      removed: removed.filter((k) => tagOf(k) === tag).length,
+      changed: changed.filter((k) => tagOf(k) === tag).length,
+    }))
+    .sort((a, b) => b.endpoints - a.endpoints || a.tag.localeCompare(b.tag));
+
   return {
     oldVersion: oldCat.openapiVersion,
     newVersion: newCat.openapiVersion,
@@ -237,6 +253,9 @@ export function diffCatalogs(oldCat, newCat) {
     unchanged,
     oldCount: oldMap.size,
     newCount: newMap.size,
+    rawOld: oldCat.rawOps ?? 0,
+    rawNew: newCat.rawOps ?? 0,
+    perTag,
     hasChanges:
       added.length > 0 ||
       removed.length > 0 ||
@@ -245,22 +264,44 @@ export function diffCatalogs(oldCat, newCat) {
   };
 }
 
-/** Render a human-readable change report (Markdown). */
+/** Render a human-readable change report (Markdown) with a per-category table. */
 export function renderReport(diff) {
-  const lines = [];
-  const v = diff.versionChanged
-    ? `${diff.oldVersion} → ${diff.newVersion}`
-    : `${diff.newVersion} (unchanged)`;
-  lines.push(`**OpenAPI version:** ${v}`);
-  lines.push(
-    `**Endpoints:** ${diff.oldCount} → ${diff.newCount} ` +
-      `(+${diff.added.length} added, -${diff.removed.length} removed, ` +
-      `${diff.changed.length} changed, ${diff.unchanged} unchanged)`,
+  const L = [];
+  L.push(
+    `**OpenAPI version:** ${
+      diff.versionChanged ? `${diff.oldVersion} → ${diff.newVersion}` : `${diff.newVersion} (unchanged)`
+    }`,
   );
-  if (diff.addedTags.length) lines.push(`**New tags:** ${diff.addedTags.join(", ")}`);
-  if (diff.removedTags.length) lines.push(`**Removed tags:** ${diff.removedTags.join(", ")}`);
-  if (diff.added.length) lines.push(`**Added:** ${diff.added.join(", ")}`);
-  if (diff.removed.length) lines.push(`**Removed:** ${diff.removed.join(", ")}`);
-  if (diff.changed.length) lines.push(`**Changed (params/enums):** ${diff.changed.join(", ")}`);
-  return lines.join("\n");
+  if (diff.hasChanges) {
+    L.push(
+      `**Endpoints:** ${diff.oldCount} → ${diff.newCount} catalog ` +
+        `(from ${diff.rawOld} → ${diff.rawNew} raw operations) — ` +
+        `+${diff.added.length} −${diff.removed.length} ~${diff.changed.length}, ${diff.unchanged} unchanged`,
+    );
+  } else {
+    L.push(
+      `**Endpoints:** ${diff.newCount} catalog (from ${diff.rawNew} raw operations) — no changes`,
+    );
+  }
+
+  L.push("");
+  L.push("| Category | Endpoints | + Added | − Removed | ~ Changed |");
+  L.push("|----------|-----------|---------|-----------|-----------|");
+  const cell = (n, sign) => (n > 0 ? `${sign}${n}` : "0");
+  for (const r of diff.perTag) {
+    L.push(
+      `| ${r.tag} | ${r.endpoints} | ${cell(r.added, "+")} | ${cell(r.removed, "−")} | ${r.changed} |`,
+    );
+  }
+  L.push(
+    `| **Total** | **${diff.newCount}** | **${cell(diff.added.length, "+")}** | ` +
+      `**${cell(diff.removed.length, "−")}** | **${diff.changed.length}** |`,
+  );
+
+  if (diff.addedTags.length) L.push(`\n**New tags:** ${diff.addedTags.join(", ")}`);
+  if (diff.removedTags.length) L.push(`**Removed tags:** ${diff.removedTags.join(", ")}`);
+  if (diff.added.length) L.push(`\n**Added:** ${diff.added.join(", ")}`);
+  if (diff.removed.length) L.push(`**Removed:** ${diff.removed.join(", ")}`);
+  if (diff.changed.length) L.push(`**Changed (params/enums):** ${diff.changed.join(", ")}`);
+  return L.join("\n");
 }

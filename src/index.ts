@@ -317,6 +317,7 @@ export default {
           openapi: MANIFEST.openapiVersion,
           specHash: MANIFEST.specHash,
           endpoints: MANIFEST.endpoints,
+          rawOperations: MANIFEST.rawOperations,
           tags: MANIFEST.tags,
         }),
         { headers: { "content-type": "application/json" } },

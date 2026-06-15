@@ -7,4 +7,5 @@ export const MANIFEST = {
   specHash: "6f7930ac7742e850c3004afa3b26539cf09b7a9a9bf8661fb2e300c31834cca0",
   tags: 9,
   endpoints: 160,
+  rawOperations: 205,
 } as const;
