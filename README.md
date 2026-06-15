@@ -253,6 +253,10 @@ Higher-level tools that aggregate multiple endpoints and return structured summa
 - Upstream calls are pinned to `https://api.torn.com` (SSRF guard) with `User-Agent: torn-mcp`.
 - Per-key rate limiting (~100 req/min, Torn's cap) via a Durable Object — returns a clear error instead of hammering Torn.
 
+### Dependency advisories
+
+Dev/build tooling (`vitest`, `vite`, `esbuild`) and a transitive (`jsondiffpatch`) are pinned to patched versions. The remaining Dependabot alerts live in the `agents` SDK chain (`@ai-sdk/provider-utils`, `ai`, and `agents`' own AI-Playground / OAuth-callback / email-routing advisories). None are reachable here — this server exposes no playground, OAuth flow, or email routing — and the only offered upgrade (`agents@0.16`) forces a `zod` 3→4 major that conflicts with the MCP SDK. They are tracked, not exploitable, and will be cleared when `agents` ships a zod-3-compatible patch.
+
 ## Scope & roadmap
 
 Covered: all 9 Torn tags (160 endpoints / all 205 paths) as raw JSON, plus 12 intelligence tools and a discovery tool. Still on the roadmap from the retired Fastify/Docker design ([superseded spec](docs/superpowers/specs/2026-06-14-torn-mcp-server-design.md)): MCP resources, prompts, and richer per-endpoint output typing.
