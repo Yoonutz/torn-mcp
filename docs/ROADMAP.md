@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.8.0**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.8.1**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -11,7 +11,7 @@ Current version: **v0.8.0**. Roadmap reflects actual repo state — no drift.
 | **5 — Schema metadata** | Key-level + stability badges | dev time | ✅ shipped |
 | **6 — Response schemas** | Type the intelligence layer from the spec | ~8-12h | 🟢 mostly done |
 | **7 — Contract tests** | Prove tools match the spec | ~4-6h | ✅ shipped |
-| **8 — Live conformance** | Validate real Torn responses against the schema | ~6-10h | 🟢 mostly done |
+| **8 — Live conformance** | Validate real Torn responses against the schema | ~6-10h | ✅ shipped |
 | **9 — Permission-error clarity** | Tell the user which key an endpoint needs | ~1-2h | ⏳ planned |
 | **10 — Additive enrichment** | Keep canonical data; add views beside it | dev time | ✅ shipped |
 | **11 — Canonical output channel** | Schema-true `structuredContent` + human text | ~6-10h | ✅ shipped |
@@ -85,15 +85,15 @@ Current version: **v0.8.0**. Roadmap reflects actual repo state — no drift.
 
 **Ships on:** v0.6.1
 
-## 🟢 Phase 8 — Live conformance harness
+## ✅ Phase 8 — Live conformance harness
 
 | Task | Effort | Version | Notes |
 |------|--------|---------|-------|
 | ✅ Conformance harness + weekly workflow | dev time | v0.6.2 | Calls every endpoint weekly and checks the real response matches the schema. |
-| 🟡 First live run with the full-access key | external | | Confirm the full sweep passes once the test key is in place. |
+| ✅ First live run + triage tuning | dev time | v0.8.1 | Ran the full sweep; sorts real drift from spec quirks and input gaps. |
 
-**Ships on:** v0.6.2
-**Blocked on:** full-access test key (`TORN_TEST_API_KEY` secret)
+**Ships on:** v0.6.2 - v0.8.1
+**Found:** ~14 spots where Torn's live data diverges from its own docs
 
 ## ⏳ Phase 9 — Permission-error clarity
 

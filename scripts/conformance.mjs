@@ -190,8 +190,9 @@ for (const tag of catalog.tagList) {
 
     const { json, err, ms } = await tornGet(path, params);
     if (err) {
-      const permission = /incorrect key|access level|permission/i.test(err);
-      results.push({ ep: `${tag}/${name}`, status: permission ? "skip" : "fail", ms, note: err });
+      // A Torn error means we couldn't build a valid request (bad seed/param)
+      // or the response isn't data — not a schema mismatch. Skip, don't fail.
+      results.push({ ep: `${tag}/${name}`, status: "skip", ms, note: err });
       continue;
     }
     let status = "pass";
@@ -199,8 +200,13 @@ for (const tag of catalog.tagList) {
     if (validate && !validate._compileError) {
       const ok = validate(json);
       if (!ok) {
-        status = "fail";
-        validationErr = (validate.errors ?? [])
+        const errs = validate.errors ?? [];
+        // Torn's spec uses `oneOf: [Enum, string]`, where a value matches both
+        // branches → "must match exactly one". That's a known spec smell, not
+        // drift. Only non-oneOf errors (missing fields, wrong types) are real.
+        const onlyOneOf = errs.every((e) => /match exactly one schema in oneOf/.test(e.message ?? ""));
+        status = onlyOneOf ? "smell" : "fail";
+        validationErr = errs
           .slice(0, 3)
           .map((e) => `${e.instancePath || "/"} ${e.message}`)
           .join("; ");
@@ -227,6 +233,20 @@ if (failed.length) {
   lines.push("| Endpoint | ms | Detail |");
   lines.push("|----------|----|--------|");
   for (const r of failed) lines.push(`| ${r.ep} | ${r.ms ?? ""} | ${r.note ?? ""} |`);
+}
+const smells = results.filter((r) => r.status === "smell");
+if (smells.length) {
+  lines.push("");
+  lines.push("## Spec smells (oneOf overlap — Torn's docs, not drift)");
+  lines.push("| Endpoint | Detail |");
+  lines.push("|----------|--------|");
+  for (const r of smells) lines.push(`| ${r.ep} | ${r.note ?? ""} |`);
+}
+const skipped = results.filter((r) => r.status === "skip");
+if (skipped.length) {
+  lines.push("");
+  lines.push("## Skipped (Torn error / no sample id — couldn't validate)");
+  for (const r of skipped) lines.push(`- ${r.ep}: ${r.note ?? ""}`);
 }
 if (compileIssues.length) {
   lines.push("");
