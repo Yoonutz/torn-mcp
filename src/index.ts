@@ -1,6 +1,7 @@
 // @license MIT
-import { McpAgent } from "agents/mcp";
+import { DurableObject } from "cloudflare:workers";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
 import {
   buildUrl,
@@ -31,7 +32,7 @@ import { registerCustomTools } from "./custom/tools.js";
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.2.0";
+const VERSION = "0.3.0";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -42,10 +43,17 @@ interface Env {
   TORN_API_KEY?: string;
 }
 
-/** Per-request props injected by the fetch handler from the header. */
-interface Props {
-  apiKey: string;
-  [key: string]: unknown;
+/**
+ * Read the Torn API key from the per-request headers (the SDK passes them on
+ * `extra.requestInfo.headers`), falling back to the env key. Headers are
+ * lowercased; values may be string or string[].
+ */
+function keyFromExtra(extra: unknown, env: Env): string {
+  const headers = (extra as { requestInfo?: { headers?: Record<string, unknown> } })
+    ?.requestInfo?.headers;
+  const raw = headers?.["x-torn-api-key"];
+  const key = typeof raw === "string" ? raw : Array.isArray(raw) ? String(raw[0]) : undefined;
+  return key ?? env.TORN_API_KEY ?? "";
 }
 
 function endpointNames(tag: TornTag): [string, ...string[]] {
@@ -68,41 +76,61 @@ function describeTag(tag: TornTag): string {
   );
 }
 
-export class TornMCP extends McpAgent<Env, unknown, Props> {
-  server = new McpServer({ name: `Torn MCP v${VERSION}`, version: VERSION });
+/**
+ * One MCP session per Durable Object instance. Owns an McpServer plus the SDK's
+ * Workers-native Streamable HTTP transport; the Worker routes each session
+ * (by Mcp-Session-Id) to the same DO.
+ */
+export class TornMCP extends DurableObject<Env> {
+  private mcp: McpServer;
+  private transport: WebStandardStreamableHTTPServerTransport | null = null;
 
-  async init(): Promise<void> {
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env);
+    this.mcp = new McpServer({ name: `Torn MCP v${VERSION}`, version: VERSION });
+    this.registerTools();
+  }
+
+  async fetch(request: Request): Promise<Response> {
+    if (!this.transport) {
+      // The Worker supplies this session's id (X-DO-Session); the transport
+      // echoes it back to the client as Mcp-Session-Id.
+      const sessionId = request.headers.get("X-DO-Session") ?? crypto.randomUUID();
+      this.transport = new WebStandardStreamableHTTPServerTransport({
+        sessionIdGenerator: () => sessionId,
+      });
+      await this.mcp.connect(this.transport);
+    }
+    return this.transport.handleRequest(request);
+  }
+
+  private registerTools(): void {
     // Generated layer: one grouped tool per Torn tag.
     for (const tag of TAGS) {
-      this.server.tool(
+      this.mcp.tool(
         `torn_${tag}`,
         describeTag(tag),
         {
-          endpoint: z
-            .enum(endpointNames(tag))
-            .describe(`The ${tag} data type to fetch.`),
-          id: z
-            .string()
-            .optional()
-            .describe("Optional entity id (player/faction/item/etc.)."),
+          endpoint: z.enum(endpointNames(tag)).describe(`The ${tag} data type to fetch.`),
+          id: z.string().optional().describe("Optional entity id (player/faction/item/etc.)."),
           params: z
             .record(z.union([z.string(), z.number()]))
             .optional()
             .describe("Optional extra query parameters."),
         },
-        async ({ endpoint, id, params }) =>
-          this.callTorn(tag, endpoint, id, params),
+        async ({ endpoint, id, params }, extra) =>
+          this.callTorn(keyFromExtra(extra, this.env), tag, endpoint, id, params),
       );
     }
 
-    // Intelligence layer: 12 aggregation tools sharing the same fetch core.
-    registerCustomTools(this.server, (tag, endpoint, id, params) =>
-      this.call(tag, endpoint, id, params),
-    );
+    // Intelligence layer: each tool binds the per-request key from its `extra`.
+    registerCustomTools(this.mcp, (extra: unknown) => {
+      const apiKey = keyFromExtra(extra, this.env);
+      return (tag, endpoint, id, params) => this.call(apiKey, tag, endpoint, id, params);
+    });
 
-    // Discovery tool. With a tag: full per-endpoint metadata; without: a
-    // compact index of every tag and its endpoint names.
-    this.server.tool(
+    // Discovery tool (no key needed).
+    this.mcp.tool(
       "torn_list_endpoints",
       "Discover Torn endpoints. Pass a 'tag' for that tag's full endpoint " +
         "details (summary, description, accepted query params). Omit 'tag' for " +
@@ -110,9 +138,7 @@ export class TornMCP extends McpAgent<Env, unknown, Props> {
       { tag: z.enum(TAGS).optional().describe("Optional tag to filter by.") },
       async ({ tag }) => {
         if (tag) return textResult(JSON.stringify(ENDPOINTS[tag], null, 2));
-        const index = Object.fromEntries(
-          TAGS.map((t) => [t, Object.keys(ENDPOINTS[t])]),
-        );
+        const index = Object.fromEntries(TAGS.map((t) => [t, Object.keys(ENDPOINTS[t])]));
         return textResult(JSON.stringify(index, null, 2));
       },
     );
@@ -120,19 +146,21 @@ export class TornMCP extends McpAgent<Env, unknown, Props> {
 
   /** Resolve + fetch (paginated, merged) parsed JSON for services. Throws on error. */
   private async call(
+    apiKey: string,
     tag: string,
     endpoint: string,
     id?: string,
     params?: Record<string, string | number>,
   ): Promise<any> {
     const path = resolveEndpointPath(tag, endpoint, id);
-    const fetched = await this.fetchMerged(path, params);
+    const fetched = await this.fetchMerged(apiKey, path, params);
     if (!fetched.ok) throw new Error(fetched.error);
     return fetched.data;
   }
 
   /** Generated-tool handler: fetch merged JSON, then filter/annotate/truncate. */
   private async callTorn(
+    apiKey: string,
     tag: TornTag,
     endpoint: string,
     id: string | undefined,
@@ -148,19 +176,18 @@ export class TornMCP extends McpAgent<Env, unknown, Props> {
     const paramErr = validateParams(tag, endpoint, resolved);
     if (paramErr) return errorResult(paramErr);
 
-    const fetched = await this.fetchMerged(path, resolved);
+    const fetched = await this.fetchMerged(apiKey, path, resolved);
     if (!fetched.ok) return errorResult(fetched.error);
 
     let result: any = filterByTimeWindow(fetched.data, { from: resolved.from, to: resolved.to });
 
     // Empty-window re-fetch: window set but nothing came back → widen once.
-    // Note: this fallback re-runs pagination, costing up to MAX_PAGES extra requests.
     const hasWindow = resolved.from !== undefined || resolved.to !== undefined;
     if (hasWindow && isEmptyPayload(result)) {
       const widened: Record<string, string | number> = { ...resolved };
       delete widened.from;
       delete widened.to;
-      const refetched = await this.fetchMerged(path, widened);
+      const refetched = await this.fetchMerged(apiKey, path, widened);
       if (refetched.ok && !isEmptyPayload(refetched.data)) {
         result = refetched.data;
         result._note = WINDOW_NOTE;
@@ -174,12 +201,11 @@ export class TornMCP extends McpAgent<Env, unknown, Props> {
   }
 
   /**
-   * Fetch one absolute Torn URL: per-key rate-limit, transient retry (Torn
-   * throws intermittent 504s), parse. Re-attaches the key (follow links omit
-   * it). Throws on any error — the key never appears in the message.
+   * Fetch one absolute Torn URL: per-key rate-limit, transient retry, parse.
+   * Re-attaches the key (follow links omit it). Throws on any error — the key
+   * never appears in the message.
    */
-  private async rateLimitedFetch(url: string): Promise<any> {
-    const apiKey = this.props.apiKey;
+  private async rateLimitedFetch(apiKey: string, url: string): Promise<any> {
     if (!apiKey) {
       throw new Error("Missing Torn API key. Send it in the X-Torn-Api-Key request header.");
     }
@@ -237,23 +263,23 @@ export class TornMCP extends McpAgent<Env, unknown, Props> {
   }
 
   /**
-   * Shared fetch core for raw tools and intelligence services: resolve relative
-   * time, fetch page 1, follow pagination, return merged JSON. Relative-time
-   * resolution is idempotent, so callTorn may also resolve beforehand.
+   * Shared fetch core: resolve relative time, fetch page 1, follow pagination,
+   * return merged JSON.
    */
   private async fetchMerged(
+    apiKey: string,
     path: string,
     params: Record<string, string | number> | undefined,
   ): Promise<{ ok: true; data: any; partial: boolean } | { ok: false; error: string }> {
-    if (!this.props.apiKey) {
+    if (!apiKey) {
       return {
         ok: false,
         error: "Missing Torn API key. Send it in the X-Torn-Api-Key request header.",
       };
     }
     const resolved = resolveTimeParams(params, Date.now());
-    const firstUrl = buildUrl(path, resolved, this.props.apiKey);
-    const fetchUrl = (url: string) => this.rateLimitedFetch(url);
+    const firstUrl = buildUrl(path, resolved, apiKey);
+    const fetchUrl = (url: string) => this.rateLimitedFetch(apiKey, url);
     let firstPage: any;
     try {
       firstPage = await fetchUrl(firstUrl);
@@ -266,23 +292,26 @@ export class TornMCP extends McpAgent<Env, unknown, Props> {
 }
 
 export default {
-  async fetch(
-    request: Request,
-    env: Env,
-    ctx: ExecutionContext,
-  ): Promise<Response> {
+  async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/mcp") {
-      const apiKey =
-        request.headers.get("X-Torn-Api-Key") ?? env.TORN_API_KEY ?? "";
-      // Pass the key to the agent out-of-band so it never becomes a tool param.
-      (ctx as ExecutionContext & { props: Props }).props = { apiKey };
-      return TornMCP.serve("/mcp").fetch(request, env, ctx);
+      // Sticky-route each MCP session to its own Durable Object.
+      const sessionId = request.headers.get("Mcp-Session-Id") ?? crypto.randomUUID();
+      const stub = env.MCP_OBJECT.get(env.MCP_OBJECT.idFromName(sessionId));
+      const headers = new Headers(request.headers);
+      headers.set("X-DO-Session", sessionId);
+      return stub.fetch(new Request(request, { headers }));
     }
 
     if (url.pathname === "/health") {
       return new Response("ok", { status: 200 });
+    }
+
+    if (url.pathname === "/version") {
+      return new Response(JSON.stringify({ name: "torn-mcp", version: VERSION }), {
+        headers: { "content-type": "application/json" },
+      });
     }
 
     return new Response("Not found", { status: 404 });
