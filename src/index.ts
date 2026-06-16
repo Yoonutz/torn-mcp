@@ -32,7 +32,7 @@ import { registerCustomTools } from "./custom/tools.js";
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.9.5";
+const VERSION = "0.9.6";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -65,7 +65,9 @@ function describeTag(tag: TornTag): string {
   const map = ENDPOINTS[tag] as Record<string, EndpointDef>;
   const lines = Object.entries(map).map(([name, def]) => {
     const summary = (def.summary ?? "").replace(/\s+/g, " ").slice(0, 90);
-    const idNote = def.requiresId ? " (requires id)" : "";
+    // Name the actual path param (e.g. tradeId) so id-scoped endpoints like
+    // `trade` read clearly against their list sibling `trades`.
+    const idNote = def.requiresId ? ` (requires ${def.idParam?.name ?? "id"})` : "";
     return `- ${name}${idNote}: ${summary}${paramsHint(def)}${returnsHint(def)}${endpointBadges(def)}`;
   });
   return (

@@ -84,7 +84,7 @@ const PARAM_SEEDS = {
 // verified 2026-06), so it's reported quietly. A skip NOT listed here is
 // unexpected — a seed broke, or a new endpoint needs one — and gets surfaced.
 const DOCUMENTED_SKIPS = {
-  "user/trade": "test account has no active trades to reference",
+  "user/trade": "transient — tested when an active trade exists, quietly skipped when there are none",
   "torn/eliminationteam": "seasonal elimination event; team id rejected off-season (Torn 'Incorrect ID')",
   "company/snapshot": "returns CSV, not JSON — outside schema scope",
 };
