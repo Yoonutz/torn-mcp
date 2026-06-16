@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.9.1**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.9.2**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -93,8 +93,10 @@ Current version: **v0.9.1**. Roadmap reflects actual repo state — no drift.
 | ✅ Plain-English report | dev time | v0.8.2 | Says which field is wrong and why, grouped so a human can scan it. |
 | ✅ Known-drift baseline | dev time | v0.8.3 | Records Torn's standing bugs so the run fails only on new drift, not existing. |
 | ✅ One-click baseline refresh | ~1h | v0.9.1 | Manual workflow re-snapshots accepted drift and commits it, with a diff in the run summary. |
+| ✅ Documented-skip triage | ~1h | v0.9.2 | Splits expected un-seedable skips from unexpected ones; flags any that become testable. |
+| ✅ Upstream spec-issue report | dev time | v0.9.2 | Wrote up the 18 baselined Torn spec bugs for reporting back to Torn. |
 
-**Ships on:** v0.6.2 - v0.9.1
+**Ships on:** v0.6.2 - v0.9.2
 **Found:** ~18 spots where Torn's live data diverges from its own docs (baselined)
 
 ## ✅ Phase 9 — Additive enrichment

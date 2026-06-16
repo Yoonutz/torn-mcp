@@ -61,6 +61,20 @@ const SEEDS = {
   "torn/eliminationteam": { kind: "list", source: "torn/elimination" },
 };
 
+// ── Documented skips ────────────────────────────────────────────────
+// Endpoints that can't be live-validated with the test key, and why. Like the
+// drift baseline: a skip listed here is EXPECTED (account state or no id source,
+// verified 2026-06), so it's reported quietly. A skip NOT listed here is
+// unexpected — a seed broke, or a new endpoint needs one — and gets surfaced.
+const DOCUMENTED_SKIPS = {
+  "user/trade": "test account has no trades to reference",
+  "torn/itemdetails": "needs an owned-item UID; test account inventory is empty",
+  "user/crimes": "needs a personal-crime id; organized-crime ids are rejected (Torn 'Incorrect ID')",
+  "torn/subcrimes": "torn/organizedcrimes items carry no id to seed a subcrime",
+  "user/attacklog": "needs an attack-log code; no list endpoint exposes one",
+  "company/snapshot": "returns CSV, not JSON — outside schema scope",
+};
+
 // ── Throttle (≈90/min, under Torn's 100/min) ────────────────────────
 let lastCall = 0;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -290,6 +304,18 @@ for (const [ep, reasons] of Object.entries(baseline)) {
 const pass = results.filter((r) => r.status === "pass");
 const smells = results.filter((r) => r.status === "smell");
 const skips = results.filter((r) => r.status === "skip");
+// Split skips like drift: documented (expected, can't-seed) vs unexpected (a
+// seed broke or a new endpoint needs one — worth a look).
+const documentedSkips = skips.filter((r) => DOCUMENTED_SKIPS[r.ep]);
+const unexpectedSkips = skips.filter((r) => !DOCUMENTED_SKIPS[r.ep]);
+// Documented skips that now return data → they could be validated; nudge to
+// drop them from DOCUMENTED_SKIPS (mirror of the baseline's "resolved").
+const nowTestable = COMPILE_ONLY
+  ? []
+  : Object.keys(DOCUMENTED_SKIPS).filter((ep) => {
+      const r = results.find((x) => x.ep === ep);
+      return r && r.status !== "skip";
+    });
 
 const lines = [];
 lines.push(`# Torn conformance report`);
@@ -298,7 +324,8 @@ lines.push(`OpenAPI ${catalog.openapiVersion} · ${results.length} endpoints · 
 lines.push("");
 lines.push(
   `**${pass.length} ok** · **${newDrift.length} NEW drift** · ` +
-    `${knownDrift.length} known drift · ${smells.length} spec smell · ${skips.length} not tested`,
+    `${knownDrift.length} known drift · ${smells.length} spec smell · ` +
+    `${skips.length} not tested (${unexpectedSkips.length} unexpected)`,
 );
 
 if (newDrift.length) {
@@ -335,14 +362,33 @@ if (smells.length) {
   );
 }
 
-if (skips.length) {
+if (unexpectedSkips.length) {
   lines.push("");
-  lines.push(`## ⏭️ Not tested — couldn't build a valid request (${skips.length})`);
-  lines.push("Usually a missing sample id or a category the test didn't supply.");
+  lines.push(`## ⏭️ Unexpected skips — look at these (${unexpectedSkips.length})`);
+  lines.push("Not documented as un-seedable — a seed broke or a new endpoint needs one.");
   lines.push("");
   lines.push("| Endpoint | Why |");
   lines.push("|----------|-----|");
-  for (const r of skips) lines.push(`| \`${r.ep}\` | ${r.note ?? ""} |`);
+  for (const r of unexpectedSkips) lines.push(`| \`${r.ep}\` | ${r.note ?? ""} |`);
+}
+
+if (nowTestable.length) {
+  lines.push("");
+  lines.push(`## 🔓 Now testable — drop from DOCUMENTED_SKIPS (${nowTestable.length})`);
+  lines.push(
+    "These documented skips returned data this run, so they can be validated: " +
+      nowTestable.map((ep) => `\`${ep}\``).join(", "),
+  );
+}
+
+if (documentedSkips.length) {
+  lines.push("");
+  lines.push(`## 🟦 Expected skips — known un-seedable on the test account (${documentedSkips.length})`);
+  lines.push("| Endpoint | Reason | Torn said |");
+  lines.push("|----------|--------|-----------|");
+  for (const r of documentedSkips) {
+    lines.push(`| \`${r.ep}\` | ${DOCUMENTED_SKIPS[r.ep]} | ${r.note ?? ""} |`);
+  }
 }
 
 if (compileIssues.length) {
@@ -365,6 +411,8 @@ writeFileSync(
         resolved: resolved.length,
         smell: smells.length,
         skip: skips.length,
+        unexpectedSkip: unexpectedSkips.length,
+        documentedSkip: documentedSkips.length,
       },
       results,
     },
