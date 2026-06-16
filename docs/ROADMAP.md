@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.9.9**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.10.0**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -35,7 +35,7 @@ Tracks shipped features and future ideas. Ideas land as ⏳ Proposed; flip to �
 
 | Feature | Status | Version | Notes |
 |---------|--------|---------|-------|
-| Reality-derived response shapes in discovery | 🟡 In progress | v0.9.3 | Manual live-shape overrides shipped; auto-deriving from conformance still open |
+| Reality-derived response shapes in discovery | ✅ Shipped | v0.10.0 | Conformance auto-derives structural-drift shapes into discovery; manual overrides stay the curated authority for nested renames |
 
 ## ✅ Phase 1 — Core server & tools
 

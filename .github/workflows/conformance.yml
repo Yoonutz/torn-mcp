@@ -58,20 +58,24 @@ jobs:
         env:
           TORN_TEST_API_KEY: ${{ secrets.TORN_TEST_API_KEY }}
         run: |
+          # Live run snapshots the baseline AND writes auto-derived overrides;
+          # then bake those overrides into the committed catalog.
           node scripts/conformance.mjs --update-baseline
-          if [ -z "$(git status --porcelain conformance-baseline.json)" ]; then
-            echo "Baseline unchanged — nothing to commit." | tee -a "$GITHUB_STEP_SUMMARY"
+          node scripts/generate-endpoints.mjs
+          FILES="conformance-baseline.json scripts/lib/returns-overrides.generated.json src/generated/endpoints.ts"
+          if [ -z "$(git status --porcelain $FILES)" ]; then
+            echo "Baseline and overrides unchanged — nothing to commit." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           {
-            echo "### Conformance baseline refreshed"
-            echo "Review the accepted-drift changes below before trusting the next run:"
+            echo "### Conformance refresh"
+            echo "Review the accepted drift and auto-derived shapes below before trusting the next run:"
             echo '```diff'
-            git --no-pager diff conformance-baseline.json
+            git --no-pager diff $FILES
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           git config user.name "torn-mcp-conformance"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add conformance-baseline.json
-          git commit -m "Refresh conformance baseline with current known Torn drift"
+          git add $FILES
+          git commit -m "Refresh conformance baseline and auto-derived overrides"
           git push

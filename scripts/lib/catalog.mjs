@@ -6,7 +6,21 @@
 // dereference the spec ($ref / allOf / oneOf / anyOf) and build, per tag, an
 // authoritative catalog of endpoints with summaries, path id, and query params.
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import { RETURNS_OVERRIDES } from "./returns-overrides.mjs";
+
+// Auto-derived overrides, emitted by the live conformance run when an endpoint's
+// real response structurally diverges from the spec. Optional — empty until the
+// conformance harness has written it. Manual overrides take precedence.
+let GENERATED_OVERRIDES = {};
+try {
+  const p = join(dirname(fileURLToPath(import.meta.url)), "returns-overrides.generated.json");
+  GENERATED_OVERRIDES = JSON.parse(readFileSync(p, "utf8"));
+} catch {
+  /* none yet */
+}
 
 function makeResolver(spec) {
   const resolveRef = (ref) => {
@@ -121,7 +135,7 @@ function makeResolver(spec) {
 }
 
 /** Build the tag → endpoint catalog from a parsed OpenAPI spec. */
-export function buildCatalog(spec) {
+export function buildCatalog(spec, { skipOverrides = false } = {}) {
   const { describeParam, describeReturns } = makeResolver(spec);
   const tags = {};
   let rawOps = 0;
@@ -187,8 +201,13 @@ export function buildCatalog(spec) {
       e.requiresId = !e.path && !!e.idPath;
       // Reality-derived correction: for endpoints whose spec response shape is
       // wrong, replace the spec-derived `returns` with the real live shape so
-      // discovery doesn't mislead agents.
-      const ov = RETURNS_OVERRIDES[`${tag}/${nm}`];
+      // discovery doesn't mislead agents. Manual overrides are the curated
+      // authority; auto-derived ones fill in newly-found structural drifts.
+      // `skipOverrides` yields the pure spec shape (used by conformance to
+      // detect drift without comparing against its own corrections).
+      const ov = skipOverrides
+        ? undefined
+        : RETURNS_OVERRIDES[`${tag}/${nm}`] ?? GENERATED_OVERRIDES[`${tag}/${nm}`];
       if (ov) {
         e.returns = ov.returns;
         if (ov.note) e.returnsNote = ov.note;

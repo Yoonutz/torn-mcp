@@ -3,13 +3,16 @@
 //
 // Phase 6 derives each endpoint's `returns` (envelope keys + one level of nested
 // field names) from the OpenAPI spec. For a few endpoints the spec is wrong (see
-// docs/torn-spec-issues.md and conformance-baseline.json), so the spec-derived
-// shape would mislead an agent reading the discovery output. These overrides
-// replace the spec shape with the ACTUAL live response shape, captured from the
-// real API. Keyed by "<tag>/<endpoint>". Applied in buildCatalog().
+// conformance-baseline.json), so the spec-derived shape would mislead an agent
+// reading the discovery output. These overrides replace the spec shape with the
+// ACTUAL live response shape, captured from the real API. Keyed by
+// "<tag>/<endpoint>". Applied in buildCatalog().
 //
-// Keep in sync with reality: if Torn fixes one of these (the conformance run
-// flags it "Resolved"), drop the entry so discovery reverts to the spec.
+// This file is the CURATED authority for nested-field corrections (e.g. a field
+// rename the live data can't disambiguate from a missing optional). Structural
+// drifts (wrong container type, different envelope key) are caught automatically
+// by the conformance run into returns-overrides.generated.json. Manual wins on
+// conflict. If Torn fixes one (conformance flags it "Resolved"), drop the entry.
 export const RETURNS_OVERRIDES = {
   "faction/raidreport": {
     note: "Spec declares an array; the live response is a single object.",

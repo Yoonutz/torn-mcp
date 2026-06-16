@@ -11,10 +11,13 @@ import { dirname, join } from "node:path";
 import Ajv from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import { buildCatalog } from "./lib/catalog.mjs";
+import { RETURNS_OVERRIDES } from "./lib/returns-overrides.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const spec = JSON.parse(readFileSync(join(root, "openapi.json"), "utf8"));
 const catalog = buildCatalog(spec);
+// Pure spec shapes (no overrides) — the baseline we detect live drift against.
+const specCatalog = buildCatalog(spec, { skipOverrides: true });
 const KEY = process.env.TORN_TEST_API_KEY;
 const COMPILE_ONLY = process.argv.includes("--compile") || !KEY;
 
@@ -238,6 +241,57 @@ function fillId(template, id) {
   return template.replace(/\{[^}]+\}/, encodeURIComponent(id));
 }
 
+// ── Auto-derived overrides ──────────────────────────────────────────
+// When a real response structurally diverges from the spec — a different
+// top-level container type, or a different envelope key set — capture the live
+// shape so discovery reflects reality. STRUCTURAL drift only; never nested
+// field-set differences, which are account-dependent (missing optional data
+// must not narrow a documented shape). Endpoints already corrected manually are
+// left to the curated manual overrides.
+const generatedOverrides = {};
+
+const normType = (t) => (t === "array" ? "array" : t === "object" ? "object" : "scalar");
+
+/** Top-level response shape from a live JSON body: envelope keys + one nested level. */
+function liveShape(json) {
+  if (!json || typeof json !== "object" || Array.isArray(json)) return null;
+  const out = [];
+  for (const k of Object.keys(json)) {
+    if (k.startsWith("_")) continue; // pagination / enrichment metadata
+    const v = json[k];
+    const type = Array.isArray(v) ? "array" : v && typeof v === "object" ? "object" : typeof v;
+    const item = Array.isArray(v) ? v[0] : v;
+    const fields = item && typeof item === "object" && !Array.isArray(item) ? Object.keys(item) : [];
+    const entry = { name: k, type };
+    if (fields.length) entry.fields = fields;
+    out.push(entry);
+  }
+  return out.length ? out : null;
+}
+
+/** True only for structural drift: a different top-level key set, or a key whose container type differs. */
+function structuralDrift(specReturns, live) {
+  const sk = specReturns.map((r) => r.name).sort();
+  const lk = live.map((r) => r.name).sort();
+  if (JSON.stringify(sk) !== JSON.stringify(lk)) return true;
+  const lt = Object.fromEntries(live.map((r) => [r.name, r.type]));
+  return specReturns.some((r) => normType(r.type) !== normType(lt[r.name]));
+}
+
+/** Record an auto-override when a live response structurally drifts from the spec. */
+function recordOverride(tag, name, json) {
+  if (RETURNS_OVERRIDES[`${tag}/${name}`]) return; // manual is the authority
+  const live = liveShape(json);
+  if (!live) return; // no data on the test account — don't override
+  const specReturns = specCatalog.tags[tag]?.[name]?.returns;
+  if (!specReturns) return; // selection-based or no documented shape
+  if (!structuralDrift(specReturns, live)) return;
+  generatedOverrides[`${tag}/${name}`] = {
+    note: "auto-derived from live response (structural drift vs spec)",
+    returns: live,
+  };
+}
+
 // ── Main ────────────────────────────────────────────────────────────
 const results = [];
 const compileIssues = [];
@@ -286,6 +340,7 @@ for (const tag of catalog.tagList) {
       results.push({ ep: `${tag}/${name}`, status: "skip", ms, note: err });
       continue;
     }
+    recordOverride(tag, name, json); // capture live shape if it structurally drifts
     let status = "pass";
     let reasons = [];
     if (validate && !validate._compileError) {
@@ -304,6 +359,18 @@ for (const tag of catalog.tagList) {
     }
     results.push({ ep: `${tag}/${name}`, status, ms, reasons, note });
   }
+}
+
+// ── Emit auto-derived overrides ─────────────────────────────────────
+// Write the structural-drift shapes captured this run (live mode only). Sorted,
+// no timestamps → stable diffs. `npm run generate` bakes these into the catalog.
+if (!COMPILE_ONLY) {
+  const sorted = {};
+  for (const k of Object.keys(generatedOverrides).sort()) sorted[k] = generatedOverrides[k];
+  writeFileSync(
+    join(root, "scripts", "lib", "returns-overrides.generated.json"),
+    JSON.stringify(sorted, null, 2) + "\n",
+  );
 }
 
 // ── Baseline reconciliation ─────────────────────────────────────────
