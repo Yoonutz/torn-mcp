@@ -53,7 +53,12 @@ const SEEDS = {
   "faction/territorywarreport": { kind: "list", source: "faction/territorywars" },
   "forum/thread": { kind: "list", source: "forum/threads" },
   "forum/posts": { kind: "list", source: "forum/threads" },
-  "racing/race": { kind: "list", source: "racing/races" },
+  "racing/race": {
+    kind: "list",
+    source: "racing/races",
+    sourceParams: { sort: "ASC" }, // oldest races are finished; race detail needs a finished race
+    where: { status: "finished" },
+  },
   "racing/records": { kind: "list", source: "racing/tracks" },
   "torn/subcrimes": { kind: "list", source: "torn/organizedcrimes" },
   "user/crimes": { kind: "list", source: "user/organizedcrimes" },
@@ -71,7 +76,8 @@ const DOCUMENTED_SKIPS = {
   "torn/itemdetails": "needs an owned-item UID; test account inventory is empty",
   "user/crimes": "needs a personal-crime id; organized-crime ids are rejected (Torn 'Incorrect ID')",
   "torn/subcrimes": "torn/organizedcrimes items carry no id to seed a subcrime",
-  "user/attacklog": "needs an attack-log code; no list endpoint exposes one",
+  "torn/attacklog": "needs an attack-log code; no list endpoint exposes one",
+  "torn/eliminationteam": "seasonal elimination event; team id rejected off-season (Torn 'Incorrect ID')",
   "company/snapshot": "returns CSV, not JSON — outside schema scope",
 };
 
@@ -146,11 +152,17 @@ function explain(e) {
   }
 }
 
-function firstArrayItem(json) {
+// First item of the first non-meta array. With `where` (field→value map), pick
+// the first item matching all conditions instead of just [0].
+function firstArrayItem(json, where) {
   if (!json || typeof json !== "object") return undefined;
   for (const k of Object.keys(json)) {
     if (k.startsWith("_")) continue;
-    if (Array.isArray(json[k]) && json[k].length) return json[k][0];
+    if (Array.isArray(json[k]) && json[k].length) {
+      const arr = json[k];
+      if (!where) return arr[0];
+      return arr.find((it) => it && Object.entries(where).every(([f, v]) => it[f] === v));
+    }
   }
   return undefined;
 }
@@ -191,7 +203,8 @@ async function resolveId(tag, name) {
     const def = catalog.tags[seed.source.split("/")[0]]?.[seed.source.split("/")[1]];
     if (!def) return null;
     const path = def.path ?? def.idPath;
-    const item = firstArrayItem((await tornGet(path, defaultParams(def))).json);
+    const params = { ...defaultParams(def), ...(seed.sourceParams ?? {}) };
+    const item = firstArrayItem((await tornGet(path, params)).json, seed.where);
     const id = item?.[seed.field ?? "id"] != null ? String(item[seed.field ?? "id"]) : null;
     if (id) cache.set(seed.source, id);
     return id;

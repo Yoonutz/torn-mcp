@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.9.3**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.9.4**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -22,7 +22,7 @@ Tracks shipped fixes and open bugs. New bugs land as ⏳ Proposed; flip to ✅ w
 | Bug | Status | Version | Notes |
 |-----|--------|---------|-------|
 | Discovery return-shape wrong for drifted endpoints | ✅ Fixed | v0.9.3 | Live-verified overrides correct auctionhouselisting, raidreport, territorywarreport, enlistedcars |
-| Conformance seeds broke on three endpoints | ⏳ Proposed | | racing/race, attacklog, eliminationteam now skip — fix seed or mark expected |
+| Conformance seeds broke on three endpoints | ✅ Fixed | v0.9.4 | racing/race seeds a finished race; attacklog + eliminationteam documented as expected skips |
 
 ## ✨ Features
 
