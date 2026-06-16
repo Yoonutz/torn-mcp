@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.8.2**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.8.3**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -92,9 +92,10 @@ Current version: **v0.8.2**. Roadmap reflects actual repo state — no drift.
 | ✅ Conformance harness + weekly workflow | dev time | v0.6.2 | Calls every endpoint weekly and checks the real response matches the schema. |
 | ✅ First live run + triage tuning | dev time | v0.8.1 | Ran the full sweep; sorts real drift from spec quirks and input gaps. |
 | ✅ Plain-English report | dev time | v0.8.2 | Says which field is wrong and why, grouped so a human can scan it. |
+| ✅ Known-drift baseline | dev time | v0.8.3 | Records Torn's standing bugs so the run fails only on new drift, not existing. |
 
-**Ships on:** v0.6.2 - v0.8.2
-**Found:** ~14 spots where Torn's live data diverges from its own docs
+**Ships on:** v0.6.2 - v0.8.3
+**Found:** ~18 spots where Torn's live data diverges from its own docs (baselined)
 
 ## ⏳ Phase 9 — Permission-error clarity
 

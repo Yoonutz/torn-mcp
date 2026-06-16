@@ -5,7 +5,7 @@
 //
 //   node scripts/conformance.mjs              # full live run (needs the key)
 //   node scripts/conformance.mjs --compile    # compile every validator, no calls
-import { readFileSync, writeFileSync, appendFileSync } from "node:fs";
+import { readFileSync, writeFileSync, appendFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import Ajv from "ajv/dist/2020.js";
@@ -246,9 +246,48 @@ for (const tag of catalog.tagList) {
   }
 }
 
+// ── Baseline reconciliation ─────────────────────────────────────────
+// Known drift (Torn's standing spec bugs) is recorded in conformance-baseline.json
+// so the run fails only on NEW drift, not Torn's existing mistakes.
+const BASELINE_PATH = join(root, "conformance-baseline.json");
+const driftResults = results.filter((r) => r.status === "fail");
+
+// --update-baseline: snapshot current drift as accepted, then exit.
+if (process.argv.includes("--update-baseline")) {
+  const out = {};
+  for (const r of driftResults) out[r.ep] = r.reasons ?? [];
+  writeFileSync(BASELINE_PATH, JSON.stringify(out, null, 2) + "\n");
+  console.log(`Baseline updated: ${Object.keys(out).length} endpoints recorded as known drift.`);
+  process.exit(0);
+}
+
+const baseline = existsSync(BASELINE_PATH) ? JSON.parse(readFileSync(BASELINE_PATH, "utf8")) : {};
+// Normalize for matching so minor formatting (dashes, spacing, case) in the
+// baseline doesn't false-flag; field names + paths still must match.
+const norm = (s) => s.toLowerCase().replace(/[—–]/g, "-").replace(/\s+/g, " ").trim();
+const newDrift = []; // drift not in the baseline → fail the run
+const knownDrift = []; // drift already accepted → reported, not fatal
+for (const r of driftResults) {
+  const accepted = (baseline[r.ep] ?? []).map(norm);
+  const fresh = (r.reasons ?? []).filter((x) => !accepted.includes(norm(x)));
+  if (fresh.length) {
+    r.newReasons = fresh;
+    newDrift.push(r);
+  } else {
+    knownDrift.push(r);
+  }
+}
+// Resolved: baseline entries Torn has since fixed → prompt to prune the baseline.
+const resolved = [];
+for (const [ep, reasons] of Object.entries(baseline)) {
+  const cur = results.find((r) => r.ep === ep);
+  const stillThere = (cur?.status === "fail" ? (cur.reasons ?? []) : []).map(norm);
+  const gone = reasons.filter((x) => !stillThere.includes(norm(x)));
+  if (gone.length) resolved.push({ ep, gone });
+}
+
 // ── Report (human-first) ────────────────────────────────────────────
 const pass = results.filter((r) => r.status === "pass");
-const fails = results.filter((r) => r.status === "fail");
 const smells = results.filter((r) => r.status === "smell");
 const skips = results.filter((r) => r.status === "skip");
 
@@ -258,18 +297,32 @@ lines.push("");
 lines.push(`OpenAPI ${catalog.openapiVersion} · ${results.length} endpoints · mode: ${COMPILE_ONLY ? "compile-check (no calls)" : "live"}`);
 lines.push("");
 lines.push(
-  `**${pass.length} ok** · **${fails.length} real drift** · ` +
-    `${smells.length} spec smell · ${skips.length} not tested`,
+  `**${pass.length} ok** · **${newDrift.length} NEW drift** · ` +
+    `${knownDrift.length} known drift · ${smells.length} spec smell · ${skips.length} not tested`,
 );
 
-if (fails.length) {
+if (newDrift.length) {
   lines.push("");
-  lines.push(`## ❌ Real drift — Torn's live data doesn't match its own docs (${fails.length})`);
-  lines.push("These are the ones to look at. Each row says which field and what's wrong.");
+  lines.push(`## ❌ NEW drift — fails the run, look at these (${newDrift.length})`);
+  lines.push("Not in the baseline — something changed since it was accepted.");
   lines.push("");
+  lines.push("| Endpoint | What's new |");
+  lines.push("|----------|-----------|");
+  for (const r of newDrift) lines.push(`| \`${r.ep}\` | ${(r.newReasons ?? []).join("<br>") || "—"} |`);
+}
+
+if (resolved.length) {
+  lines.push("");
+  lines.push(`## ✅ Resolved — Torn fixed these; prune the baseline (${resolved.length})`);
+  for (const r of resolved) lines.push(`- \`${r.ep}\`: ${r.gone.join("; ")}`);
+}
+
+if (knownDrift.length) {
+  lines.push("");
+  lines.push(`## 🟡 Known drift — accepted Torn spec bugs, not failing (${knownDrift.length})`);
   lines.push("| Endpoint | What's wrong |");
   lines.push("|----------|--------------|");
-  for (const r of fails) lines.push(`| \`${r.ep}\` | ${(r.reasons ?? []).join("<br>") || "—"} |`);
+  for (const r of knownDrift) lines.push(`| \`${r.ep}\` | ${(r.reasons ?? []).join("<br>") || "—"} |`);
 }
 
 if (smells.length) {
@@ -303,10 +356,24 @@ console.log(report);
 writeFileSync(join(root, "conformance-report.md"), report + "\n");
 writeFileSync(
   join(root, "conformance.json"),
-  JSON.stringify({ summary: { pass: pass.length, fail: fails.length, smell: smells.length, skip: skips.length }, results }, null, 2),
+  JSON.stringify(
+    {
+      summary: {
+        pass: pass.length,
+        newDrift: newDrift.length,
+        knownDrift: knownDrift.length,
+        resolved: resolved.length,
+        smell: smells.length,
+        skip: skips.length,
+      },
+      results,
+    },
+    null,
+    2,
+  ),
 );
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, report + "\n");
 
-// Fail the run only on real drift.
-console.log(`\n${fails.length} real drift failure(s).`);
-process.exit(fails.length > 0 ? 1 : 0);
+// Fail the run ONLY on new drift — known Torn spec bugs don't break the pipeline.
+console.log(`\n${newDrift.length} new drift failure(s); ${knownDrift.length} known (accepted).`);
+process.exit(newDrift.length > 0 ? 1 : 0);
