@@ -8,6 +8,7 @@ import {
   paramsHint,
   parseTornError,
   resolveEndpointPath,
+  returnsHint,
   validateParams,
 } from "./torn.js";
 import { ENDPOINTS } from "./generated/endpoints.js";
@@ -102,6 +103,23 @@ describe("paramsHint", () => {
   });
   it("shows required enum params", () => {
     expect(paramsHint(ENDPOINTS.faction.news)).toMatch(/requires cat=/);
+  });
+});
+
+describe("returnsHint", () => {
+  it("lists the top-level response key", () => {
+    expect(returnsHint(ENDPOINTS.user.ammo)).toBe(" → returns: ammo");
+  });
+  it("omits nested field names (those live in the catalog)", () => {
+    expect(returnsHint(ENDPOINTS.user.ammo)).not.toMatch(/types/);
+  });
+  it("reports selection-based endpoints as varying", () => {
+    const sel = { selectionBased: true, requiresId: false, query: [] } as any;
+    expect(returnsHint(sel)).toBe(" → returns: varies by selection");
+  });
+  it("returns empty when no response shape is known", () => {
+    const none = { requiresId: false, query: [] } as any;
+    expect(returnsHint(none)).toBe("");
   });
 });
 

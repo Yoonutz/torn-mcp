@@ -10,6 +10,7 @@ import {
   parseTornError,
   paramsHint,
   resolveEndpointPath,
+  returnsHint,
   sha256Hex,
   validateParams,
 } from "./torn.js";
@@ -31,7 +32,7 @@ import { registerCustomTools } from "./custom/tools.js";
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.8.3";
+const VERSION = "0.9.0";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -65,7 +66,7 @@ function describeTag(tag: TornTag): string {
   const lines = Object.entries(map).map(([name, def]) => {
     const summary = (def.summary ?? "").replace(/\s+/g, " ").slice(0, 90);
     const idNote = def.requiresId ? " (requires id)" : "";
-    return `- ${name}${idNote}: ${summary}${paramsHint(def)}${endpointBadges(def)}`;
+    return `- ${name}${idNote}: ${summary}${paramsHint(def)}${returnsHint(def)}${endpointBadges(def)}`;
   });
   return (
     `Fetch Torn ${tag} data (Torn API v2). Set 'endpoint' to one of:\n` +
@@ -142,8 +143,9 @@ export class TornMCP extends DurableObject<Env> {
     this.mcp.tool(
       "torn_list_endpoints",
       "Discover Torn endpoints. Pass a 'tag' for that tag's full endpoint " +
-        "details (summary, description, accepted query params). Omit 'tag' for " +
-        "a compact index of every tag and its endpoint names.",
+        "details (summary, description, accepted query params, and the response " +
+        "fields each endpoint returns). Omit 'tag' for a compact index of every " +
+        "tag and its endpoint names.",
       { tag: z.enum(TAGS).optional().describe("Optional tag to filter by.") },
       async ({ tag }) => {
         if (tag) return textResult(JSON.stringify(ENDPOINTS[tag], null, 2));

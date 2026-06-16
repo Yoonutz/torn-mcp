@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.8.3**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.9.0**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -9,12 +9,11 @@ Current version: **v0.8.3**. Roadmap reflects actual repo state — no drift.
 | **3 — Lean runtime** | Drop heavy framework, native transport | dev time | ✅ shipped |
 | **4 — Observability & ops** | Version reporting, weekly sync, CI, protection | dev time | ✅ shipped |
 | **5 — Schema metadata** | Key-level + stability badges | dev time | ✅ shipped |
-| **6 — Response schemas** | Type the intelligence layer from the spec | ~8-12h | 🟢 mostly done |
+| **6 — Response schemas** | Type the intelligence layer; expose return shapes | ~8-12h | ✅ shipped |
 | **7 — Contract tests** | Prove tools match the spec | ~4-6h | ✅ shipped |
 | **8 — Live conformance** | Validate real Torn responses against the schema | ~6-10h | ✅ shipped |
-| **9 — Permission-error clarity** | Tell the user which key an endpoint needs | ~1-2h | ⏳ planned |
-| **10 — Additive enrichment** | Keep canonical data; add views beside it | dev time | ✅ shipped |
-| **11 — Canonical output channel** | Schema-true `structuredContent` + human text | ~6-10h | ✅ shipped |
+| **9 — Additive enrichment** | Keep canonical data; add views beside it | dev time | ✅ shipped |
+| **10 — Canonical output channel** | Schema-true `structuredContent` + human text | ~6-10h | ✅ shipped |
 
 ## ✅ Phase 1 — Core server & tools
 
@@ -67,15 +66,15 @@ Current version: **v0.8.3**. Roadmap reflects actual repo state — no drift.
 
 **Ships on:** v0.5.0
 
-## 🟢 Phase 6 — Response schemas
+## ✅ Phase 6 — Response schemas
 
 | Task | Effort | Version | Notes |
 |------|--------|---------|-------|
 | ✅ Type the intelligence tools from response shapes | dev time | v0.6.0 | Catch Torn field renames automatically instead of letting summaries quietly go blank. |
-| ⏳ Tell the model what each tool returns | ~3-4h | | Expose expected fields so the model knows results before calling. |
+| ✅ Tell the model what each tool returns | ~3-4h | v0.9.0 | Discovery lists each endpoint's response fields; tool descriptions show the return keys. |
 
-**Ships on:** v0.6.0
-**Unlocks:** rename-proof intelligence tools
+**Ships on:** v0.6.0 - v0.9.0
+**Unlocks:** model knows the result shape before calling
 
 ## ✅ Phase 7 — Contract tests
 
@@ -97,15 +96,7 @@ Current version: **v0.8.3**. Roadmap reflects actual repo state — no drift.
 **Ships on:** v0.6.2 - v0.8.3
 **Found:** ~18 spots where Torn's live data diverges from its own docs (baselined)
 
-## ⏳ Phase 9 — Permission-error clarity
-
-| Task | Effort | Version | Notes |
-|------|--------|---------|-------|
-| ⏳ Add the needed key level to access errors | ~1-2h | | When a call is refused, tell the user which key level the endpoint needs. |
-
-**Trigger to start:** next session
-
-## ✅ Phase 10 — Additive enrichment
+## ✅ Phase 9 — Additive enrichment
 
 | Task | Effort | Version | Notes |
 |------|--------|---------|-------|
@@ -114,7 +105,7 @@ Current version: **v0.8.3**. Roadmap reflects actual repo state — no drift.
 **Ships on:** v0.7.0
 **Unlocks:** tool output stays close to the validated schema
 
-## ✅ Phase 11 — Canonical output channel
+## ✅ Phase 10 — Canonical output channel
 
 | Task | Effort | Version | Notes |
 |------|--------|---------|-------|

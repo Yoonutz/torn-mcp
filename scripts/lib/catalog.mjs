@@ -67,12 +67,61 @@ function makeResolver(spec) {
     if (enumVals.length > 0) out.enum = enumVals;
     return out;
   };
-  return { describeParam };
+
+  // Merge an allOf chain into a single object schema (union of properties), so
+  // composed response envelopes expose their fields. Non-allOf passes through.
+  const flattenAllOf = (schema) => {
+    const s = deref(schema);
+    if (!Array.isArray(s.allOf)) return s;
+    const props = {};
+    for (const part of s.allOf) Object.assign(props, flattenAllOf(part).properties || {});
+    return { type: "object", properties: props };
+  };
+
+  // Coarse response-field type for discovery: array / object / oneOf|anyOf / scalar.
+  const respType = (schema) => {
+    const s = deref(schema);
+    if (s.type === "array") return "array";
+    if (Array.isArray(s.allOf)) return "object";
+    if (Array.isArray(s.oneOf)) return "oneOf";
+    if (Array.isArray(s.anyOf)) return "anyOf";
+    return s.type || "object";
+  };
+
+  // One level of nested field names: array-item props, or object props.
+  const nestedFields = (schema) => {
+    const s = deref(schema);
+    const target = s.type === "array" ? flattenAllOf(s.items) : flattenAllOf(s);
+    return target.properties ? Object.keys(target.properties) : [];
+  };
+
+  // Top-level response shape of an operation's 200 body. Returns either
+  // { selectionBased: true } when the body is a oneOf/anyOf union (the shape
+  // varies by `selections`), or { returns: [{name,type,fields?}] } with the
+  // envelope keys (minus pagination `_metadata`) and one level of nested fields.
+  const describeReturns = (op) => {
+    const r = deref(op.responses?.["200"]);
+    const sch = flattenAllOf(r.content?.["application/json"]?.schema);
+    if (Array.isArray(sch.oneOf) || Array.isArray(sch.anyOf)) return { selectionBased: true };
+    if (!sch.properties) return {};
+    const returns = [];
+    for (const [name, raw] of Object.entries(sch.properties)) {
+      if (name === "_metadata") continue;
+      const pv = deref(raw);
+      const field = { name, type: respType(pv) };
+      const nested = nestedFields(pv);
+      if (nested.length > 0) field.fields = nested;
+      returns.push(field);
+    }
+    return returns.length > 0 ? { returns } : {};
+  };
+
+  return { describeParam, describeReturns };
 }
 
 /** Build the tag → endpoint catalog from a parsed OpenAPI spec. */
 export function buildCatalog(spec) {
-  const { describeParam } = makeResolver(spec);
+  const { describeParam, describeReturns } = makeResolver(spec);
   const tags = {};
   let rawOps = 0;
 
@@ -97,6 +146,7 @@ export function buildCatalog(spec) {
     const keyRef = (op.parameters || []).map((pr) => pr.$ref || "").find((r) => r.includes("ApiKey"));
     const keyLevel = keyRef ? keyRef.split("/").pop().replace("ApiKey", "").toLowerCase() : undefined;
     const stability = op["x-stability"];
+    const { returns, selectionBased } = describeReturns(op);
 
     tags[tag] = tags[tag] || {};
     const entry = tags[tag][name] || {
@@ -107,6 +157,8 @@ export function buildCatalog(spec) {
       stability,
       query,
     };
+    if (returns) entry.returns = returns;
+    if (selectionBased) entry.selectionBased = true;
     if (hasParam) {
       entry.idPath = rawPath;
       if (pathParam)
@@ -122,6 +174,8 @@ export function buildCatalog(spec) {
       entry.keyLevel = keyLevel ?? entry.keyLevel;
       entry.stability = stability ?? entry.stability;
       entry.query = query;
+      if (returns) entry.returns = returns;
+      if (selectionBased) entry.selectionBased = true;
     }
     tags[tag][name] = entry;
   }
@@ -166,6 +220,15 @@ export interface QueryParam {
   description?: string;
 }
 
+export interface ResponseField {
+  /** Top-level response key (pagination '_metadata' excluded). */
+  name: string;
+  /** Coarse shape: "array" | "object" | "oneOf" | "anyOf" | scalar type. */
+  type: string;
+  /** One level of nested field names (array-item or object props). */
+  fields?: string[];
+}
+
 export interface EndpointDef {
   /** Path without an id (when the endpoint supports it). */
   path?: string;
@@ -185,6 +248,10 @@ export interface EndpointDef {
   stability?: string;
   /** Accepted query parameters (auth key excluded). */
   query: QueryParam[];
+  /** Top-level response shape: envelope keys + one level of nested fields. */
+  returns?: ResponseField[];
+  /** True when the 200 body is a oneOf/anyOf union — shape varies by 'selections'. */
+  selectionBased?: boolean;
 }
 `;
   out += `\nexport const ENDPOINTS = ${JSON.stringify(tags, null, 2)} as const satisfies Record<string, Record<string, EndpointDef>>;\n`;

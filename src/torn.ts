@@ -1,7 +1,12 @@
 // @license MIT
 // Pure helpers for talking to the Torn City API v2. No Worker globals here so
 // these stay unit-testable in plain Node.
-import { ENDPOINTS, type EndpointDef, type QueryParam, type TornTag } from "./generated/endpoints.js";
+import {
+  ENDPOINTS,
+  type EndpointDef,
+  type QueryParam,
+  type TornTag,
+} from "./generated/endpoints.js";
 
 /** Fixed Torn API host. Never user-controlled (SSRF guard). */
 export const TORN_API_BASE = "https://api.torn.com/v2";
@@ -102,6 +107,19 @@ export function paramsHint(def: EndpointDef): string {
     .map(fmtEnum);
   if (optEnums.length) segs.push(`filter ${optEnums.join(", ")}`);
   return segs.length ? ` · ${segs.join(" · ")}` : "";
+}
+
+/**
+ * Compact return hint for a tool description: the top-level response key(s) the
+ * endpoint yields, so the model knows the result shape before calling. Nested
+ * field names are omitted here (too heavy for always-on descriptions) — they
+ * live in the full `returns` catalog via torn_list_endpoints. Selection-based
+ * endpoints (oneOf/anyOf body) report "varies by selection".
+ */
+export function returnsHint(def: EndpointDef): string {
+  if (def.selectionBased) return " → returns: varies by selection";
+  if (!def.returns || def.returns.length === 0) return "";
+  return ` → returns: ${def.returns.map((r) => r.name).join(", ")}`;
 }
 
 /**

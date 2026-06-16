@@ -12,6 +12,15 @@ export interface QueryParam {
   description?: string;
 }
 
+export interface ResponseField {
+  /** Top-level response key (pagination '_metadata' excluded). */
+  name: string;
+  /** Coarse shape: "array" | "object" | "oneOf" | "anyOf" | scalar type. */
+  type: string;
+  /** One level of nested field names (array-item or object props). */
+  fields?: string[];
+}
+
 export interface EndpointDef {
   /** Path without an id (when the endpoint supports it). */
   path?: string;
@@ -31,6 +40,10 @@ export interface EndpointDef {
   stability?: string;
   /** Accepted query parameters (auth key excluded). */
   query: QueryParam[];
+  /** Top-level response shape: envelope keys + one level of nested fields. */
+  returns?: ResponseField[];
+  /** True when the 200 body is a oneOf/anyOf union — shape varies by 'selections'. */
+  selectionBased?: boolean;
 }
 
 export const ENDPOINTS = {
@@ -55,6 +68,17 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "ammo",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "types"
+          ]
         }
       ],
       "path": "/user/ammo"
@@ -124,6 +148,30 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "attacks",
+          "type": "array",
+          "fields": [
+            "id",
+            "code",
+            "started",
+            "ended",
+            "attacker",
+            "defender",
+            "result",
+            "respect_gain",
+            "respect_loss",
+            "chain",
+            "is_interrupted",
+            "is_stealthed",
+            "is_raid",
+            "is_ranked_war",
+            "finishing_hit_effects",
+            "modifiers"
+          ]
+        }
+      ],
       "path": "/user/attacks"
     },
     "attacksfull": {
@@ -191,6 +239,23 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "attacks",
+          "type": "array",
+          "fields": [
+            "id",
+            "code",
+            "started",
+            "ended",
+            "attacker",
+            "defender",
+            "result",
+            "respect_gain",
+            "respect_loss"
+          ]
+        }
+      ],
       "path": "/user/attacksfull"
     },
     "bars": {
@@ -213,6 +278,19 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "bars",
+          "type": "object",
+          "fields": [
+            "energy",
+            "nerve",
+            "happy",
+            "life",
+            "chain"
+          ]
         }
       ],
       "path": "/user/bars"
@@ -250,6 +328,19 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "profile",
+          "type": "object",
+          "fields": [
+            "id",
+            "name",
+            "level",
+            "gender",
+            "status"
+          ]
+        }
+      ],
       "path": "/user/basic",
       "idPath": "/user/{id}/basic",
       "idParam": {
@@ -280,6 +371,19 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "battlestats",
+          "type": "object",
+          "fields": [
+            "strength",
+            "defense",
+            "speed",
+            "dexterity",
+            "total"
+          ]
+        }
+      ],
       "path": "/user/battlestats"
     },
     "bounties": {
@@ -302,6 +406,32 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "bounties",
+          "type": "array",
+          "fields": [
+            "target_id",
+            "target_name",
+            "target_level",
+            "lister_id",
+            "lister_name",
+            "reward",
+            "reason",
+            "quantity",
+            "is_anonymous",
+            "valid_until"
+          ]
+        },
+        {
+          "name": "bounties_timestamp",
+          "type": "integer"
+        },
+        {
+          "name": "bounties_delay",
+          "type": "integer"
         }
       ],
       "path": "/user/bounties",
@@ -334,6 +464,15 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "calendar",
+          "type": "object",
+          "fields": [
+            "start_time"
+          ]
+        }
+      ],
       "path": "/user/calendar"
     },
     "casino": {
@@ -358,6 +497,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "casino",
+          "type": "object",
+          "fields": [
+            "tokens",
+            "streak"
+          ]
+        }
+      ],
       "path": "/user/casino"
     },
     "competition": {
@@ -380,6 +529,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "competition",
+          "type": "oneOf"
         }
       ],
       "path": "/user/competition",
@@ -412,6 +567,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "cooldowns",
+          "type": "object",
+          "fields": [
+            "drug",
+            "medical",
+            "booster"
+          ]
+        }
+      ],
       "path": "/user/cooldowns"
     },
     "crimes": {
@@ -434,6 +600,21 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "crimes",
+          "type": "object",
+          "fields": [
+            "nerve_spent",
+            "skill",
+            "progression_bonus",
+            "rewards",
+            "attempts",
+            "uniques",
+            "miscellaneous"
+          ]
         }
       ],
       "idPath": "/user/{crimeId}/crimes",
@@ -463,6 +644,16 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "discord",
+          "type": "object",
+          "fields": [
+            "discord_id",
+            "user_id"
+          ]
         }
       ],
       "path": "/user/discord",
@@ -495,6 +686,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "education",
+          "type": "object",
+          "fields": [
+            "complete",
+            "current"
+          ]
+        }
+      ],
       "path": "/user/education"
     },
     "enlistedcars": {
@@ -519,6 +720,32 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "enlistedcars",
+          "type": "array",
+          "fields": [
+            "car_item_id",
+            "car_item_name",
+            "top_speed",
+            "acceleration",
+            "braking",
+            "dirt",
+            "handling",
+            "safety",
+            "tarmac",
+            "class",
+            "id",
+            "name",
+            "worth",
+            "points_spent",
+            "races_entered",
+            "races_won",
+            "is_removed",
+            "parts"
+          ]
+        }
+      ],
       "path": "/user/enlistedcars"
     },
     "equipment": {
@@ -541,6 +768,35 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "equipment",
+          "type": "array",
+          "fields": [
+            "uid",
+            "stats",
+            "bonuses",
+            "rarity",
+            "id",
+            "name",
+            "type",
+            "sub_type",
+            "slot",
+            "mods",
+            "ammo"
+          ]
+        },
+        {
+          "name": "clothing",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "uid",
+            "type"
+          ]
         }
       ],
       "path": "/user/equipment"
@@ -598,6 +854,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "events",
+          "type": "array",
+          "fields": [
+            "id",
+            "timestamp",
+            "event"
+          ]
+        }
+      ],
       "path": "/user/events"
     },
     "faction": {
@@ -620,6 +887,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "faction",
+          "type": "oneOf"
         }
       ],
       "path": "/user/faction",
@@ -652,6 +925,22 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "forumFeed",
+          "type": "array",
+          "fields": [
+            "thread_id",
+            "post_id",
+            "user",
+            "title",
+            "text",
+            "timestamp",
+            "is_seen",
+            "type"
+          ]
+        }
+      ],
       "path": "/user/forumfeed"
     },
     "forumfriends": {
@@ -674,6 +963,22 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "forumFriends",
+          "type": "array",
+          "fields": [
+            "thread_id",
+            "post_id",
+            "user",
+            "title",
+            "text",
+            "timestamp",
+            "is_seen",
+            "type"
+          ]
         }
       ],
       "path": "/user/forumfriends"
@@ -742,6 +1047,28 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "forumPosts",
+          "type": "array",
+          "fields": [
+            "id",
+            "thread_id",
+            "author",
+            "is_legacy",
+            "is_topic",
+            "is_edited",
+            "is_pinned",
+            "created_time",
+            "edited_by",
+            "has_quote",
+            "quoted_post_id",
+            "content",
+            "likes",
+            "dislikes"
+          ]
+        }
+      ],
       "path": "/user/forumposts",
       "idPath": "/user/{id}/forumposts",
       "idParam": {
@@ -770,6 +1097,19 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "forumSubscribedThreads",
+          "type": "array",
+          "fields": [
+            "id",
+            "forum_id",
+            "author",
+            "title",
+            "posts"
+          ]
         }
       ],
       "path": "/user/forumsubscribedthreads"
@@ -827,6 +1167,28 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "forumThreads",
+          "type": "array",
+          "fields": [
+            "id",
+            "title",
+            "forum_id",
+            "posts",
+            "rating",
+            "views",
+            "author",
+            "last_poster",
+            "first_post_time",
+            "last_post_time",
+            "has_poll",
+            "is_locked",
+            "is_sticky",
+            "new_posts"
+          ]
+        }
+      ],
       "path": "/user/forumthreads",
       "idPath": "/user/{id}/forumthreads",
       "idParam": {
@@ -855,6 +1217,29 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "hof",
+          "type": "object",
+          "fields": [
+            "attacks",
+            "busts",
+            "defends",
+            "networth",
+            "offences",
+            "revives",
+            "level",
+            "rank",
+            "awards",
+            "racing_skill",
+            "racing_points",
+            "racing_wins",
+            "travel_time",
+            "working_stats",
+            "battle_stats"
+          ]
         }
       ],
       "path": "/user/hof",
@@ -887,6 +1272,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "honors",
+          "type": "array",
+          "fields": [
+            "id",
+            "timestamp"
+          ]
+        }
+      ],
       "path": "/user/honors"
     },
     "icons": {
@@ -909,6 +1304,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "icons",
+          "type": "oneOf"
         }
       ],
       "path": "/user/icons",
@@ -987,6 +1388,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "inventory",
+          "type": "object",
+          "fields": [
+            "items",
+            "timestamp"
+          ]
+        }
+      ],
       "path": "/user/inventory"
     },
     "itemmarket": {
@@ -1017,6 +1428,21 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "itemmarket",
+          "type": "array",
+          "fields": [
+            "id",
+            "price",
+            "average_price",
+            "amount",
+            "is_anonymous",
+            "available",
+            "item"
+          ]
+        }
+      ],
       "path": "/user/itemmarket"
     },
     "itemmods": {
@@ -1041,6 +1467,18 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "itemmods",
+          "type": "array",
+          "fields": [
+            "id",
+            "title",
+            "equipped",
+            "equipped_item_uid"
+          ]
+        }
+      ],
       "path": "/user/itemmods"
     },
     "job": {
@@ -1063,6 +1501,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "job",
+          "type": "oneOf"
         }
       ],
       "path": "/user/job",
@@ -1095,6 +1539,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "jobpoints",
+          "type": "object",
+          "fields": [
+            "jobs",
+            "companies"
+          ]
+        }
+      ],
       "path": "/user/jobpoints"
     },
     "jobranks": {
@@ -1117,6 +1571,20 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "jobranks",
+          "type": "object",
+          "fields": [
+            "army",
+            "grocer",
+            "casino",
+            "medical",
+            "law",
+            "education"
+          ]
         }
       ],
       "path": "/user/jobranks"
@@ -1189,6 +1657,20 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "list",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "level",
+            "faction_id",
+            "last_action",
+            "status"
+          ]
+        }
+      ],
       "path": "/user/list"
     },
     "log": {
@@ -1254,6 +1736,19 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "log",
+          "type": "array",
+          "fields": [
+            "id",
+            "timestamp",
+            "details",
+            "data",
+            "params"
+          ]
+        }
+      ],
       "path": "/user/log"
     },
     "medals": {
@@ -1278,6 +1773,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "medals",
+          "type": "array",
+          "fields": [
+            "id",
+            "timestamp"
+          ]
+        }
+      ],
       "path": "/user/medals"
     },
     "merits": {
@@ -1300,6 +1805,19 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "merits",
+          "type": "object",
+          "fields": [
+            "upgrades",
+            "available",
+            "used",
+            "medals",
+            "honors"
+          ]
         }
       ],
       "path": "/user/merits"
@@ -1357,6 +1875,21 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "messages",
+          "type": "array",
+          "fields": [
+            "id",
+            "sender",
+            "timestamp",
+            "topic",
+            "type",
+            "seen",
+            "read"
+          ]
+        }
+      ],
       "path": "/user/messages"
     },
     "missions": {
@@ -1381,6 +1914,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "missions",
+          "type": "object",
+          "fields": [
+            "credits",
+            "givers",
+            "rewards"
+          ]
+        }
+      ],
       "path": "/user/missions"
     },
     "money": {
@@ -1403,6 +1947,22 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "money",
+          "type": "object",
+          "fields": [
+            "points",
+            "wallet",
+            "company",
+            "vault",
+            "cayman_bank",
+            "city_bank",
+            "faction",
+            "daily_networth"
+          ]
         }
       ],
       "path": "/user/money"
@@ -1440,6 +2000,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "events",
+          "type": "array",
+          "fields": [
+            "id",
+            "timestamp",
+            "event"
+          ]
+        }
+      ],
       "path": "/user/newevents"
     },
     "newmessages": {
@@ -1462,6 +2033,21 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "messages",
+          "type": "array",
+          "fields": [
+            "id",
+            "sender",
+            "timestamp",
+            "topic",
+            "type",
+            "seen",
+            "read"
+          ]
         }
       ],
       "path": "/user/newmessages"
@@ -1488,6 +2074,18 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "notifications",
+          "type": "object",
+          "fields": [
+            "messages",
+            "events",
+            "awards",
+            "competition"
+          ]
+        }
+      ],
       "path": "/user/notifications"
     },
     "organizedcrime": {
@@ -1512,6 +2110,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "organizedCrime",
+          "type": "oneOf"
+        }
+      ],
       "path": "/user/organizedcrime"
     },
     "organizedcrimes": {
@@ -1534,6 +2138,26 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "organizedcrimes",
+          "type": "array",
+          "fields": [
+            "id",
+            "previous_crime_id",
+            "name",
+            "difficulty",
+            "status",
+            "created_at",
+            "planning_at",
+            "ready_at",
+            "expired_at",
+            "executed_at",
+            "slots",
+            "rewards"
+          ]
         }
       ],
       "path": "/user/organizedcrimes"
@@ -1819,6 +2443,7 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "selectionBased": true,
       "path": "/user/personalstats",
       "idPath": "/user/{id}/personalstats",
       "idParam": {
@@ -1858,6 +2483,38 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "profile",
+          "type": "object",
+          "fields": [
+            "id",
+            "name",
+            "level",
+            "rank",
+            "title",
+            "donator_status",
+            "age",
+            "signed_up",
+            "faction_id",
+            "honor_id",
+            "property",
+            "image",
+            "gender",
+            "revivable",
+            "role",
+            "status",
+            "spouse",
+            "awards",
+            "friends",
+            "enemies",
+            "forum_posts",
+            "karma",
+            "last_action",
+            "life"
+          ]
         }
       ],
       "path": "/user/profile",
@@ -1913,6 +2570,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "properties",
+          "type": "array"
+        }
+      ],
       "path": "/user/properties",
       "idPath": "/user/{id}/properties",
       "idParam": {
@@ -1941,6 +2604,23 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "property",
+          "type": "object",
+          "fields": [
+            "id",
+            "owner",
+            "property",
+            "happy",
+            "upkeep",
+            "market_price",
+            "modifications",
+            "staff",
+            "used_by"
+          ]
         }
       ],
       "path": "/user/property",
@@ -2015,6 +2695,26 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "races",
+          "type": "array",
+          "fields": [
+            "id",
+            "title",
+            "track_id",
+            "creator_id",
+            "status",
+            "laps",
+            "participants",
+            "schedule",
+            "requirements",
+            "is_official",
+            "results",
+            "skill_gain"
+          ]
+        }
+      ],
       "path": "/user/races"
     },
     "racingrecords": {
@@ -2039,6 +2739,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "racingrecords",
+          "type": "array",
+          "fields": [
+            "track",
+            "records"
+          ]
+        }
+      ],
       "path": "/user/racingrecords"
     },
     "refills": {
@@ -2061,6 +2771,18 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "refills",
+          "type": "object",
+          "fields": [
+            "energy",
+            "nerve",
+            "token",
+            "special_count"
+          ]
         }
       ],
       "path": "/user/refills"
@@ -2134,6 +2856,20 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "reports",
+          "type": "array",
+          "fields": [
+            "type",
+            "target_id",
+            "reporter_id",
+            "faction_id",
+            "timestamp",
+            "report"
+          ]
         }
       ],
       "path": "/user/reports"
@@ -2214,6 +2950,20 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "revives",
+          "type": "array",
+          "fields": [
+            "id",
+            "reviver",
+            "target",
+            "success_chance",
+            "result",
+            "timestamp"
+          ]
+        }
+      ],
       "path": "/user/revives"
     },
     "revivesFull": {
@@ -2292,6 +3042,20 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "revives",
+          "type": "array",
+          "fields": [
+            "id",
+            "reviver",
+            "target",
+            "success_chance",
+            "result",
+            "timestamp"
+          ]
+        }
+      ],
       "path": "/user/revivesFull"
     },
     "skills": {
@@ -2316,6 +3080,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "skills",
+          "type": "array",
+          "fields": [
+            "slug",
+            "name",
+            "level"
+          ]
+        }
+      ],
       "path": "/user/skills"
     },
     "stocks": {
@@ -2338,6 +3113,18 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "stocks",
+          "type": "array",
+          "fields": [
+            "id",
+            "shares",
+            "transactions",
+            "bonus"
+          ]
         }
       ],
       "path": "/user/stocks"
@@ -2406,6 +3193,18 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "trades",
+          "type": "array",
+          "fields": [
+            "id",
+            "timestamp",
+            "user",
+            "trader"
+          ]
+        }
+      ],
       "path": "/user/trades"
     },
     "trade": {
@@ -2428,6 +3227,19 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "trade",
+          "type": "object",
+          "fields": [
+            "id",
+            "timestamp",
+            "user",
+            "trader",
+            "items"
+          ]
         }
       ],
       "idPath": "/user/{tradeId}/trade",
@@ -2459,6 +3271,19 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "travel",
+          "type": "object",
+          "fields": [
+            "destination",
+            "method",
+            "departed_at",
+            "arrival_at",
+            "time_left"
+          ]
+        }
+      ],
       "path": "/user/travel"
     },
     "virus": {
@@ -2481,6 +3306,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "virus",
+          "type": "oneOf"
         }
       ],
       "path": "/user/virus"
@@ -2507,6 +3338,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "weaponexp",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "exp"
+          ]
+        }
+      ],
       "path": "/user/weaponexp"
     },
     "workstats": {
@@ -2529,6 +3371,18 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "workstats",
+          "type": "object",
+          "fields": [
+            "endurance",
+            "intelligence",
+            "manual_labor",
+            "total"
+          ]
         }
       ],
       "path": "/user/workstats"
@@ -2555,6 +3409,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "selections",
+          "type": "array"
+        }
+      ],
       "path": "/user/lookup"
     },
     "timestamp": {
@@ -2577,6 +3437,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "timestamp",
+          "type": "integer"
         }
       ],
       "path": "/user/timestamp"
@@ -2603,6 +3469,19 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "applications",
+          "type": "array",
+          "fields": [
+            "id",
+            "user",
+            "message",
+            "valid_until",
+            "status"
+          ]
         }
       ],
       "path": "/faction/applications"
@@ -2672,6 +3551,30 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "attacks",
+          "type": "array",
+          "fields": [
+            "id",
+            "code",
+            "started",
+            "ended",
+            "attacker",
+            "defender",
+            "result",
+            "respect_gain",
+            "respect_loss",
+            "chain",
+            "is_interrupted",
+            "is_stealthed",
+            "is_raid",
+            "is_ranked_war",
+            "finishing_hit_effects",
+            "modifiers"
+          ]
+        }
+      ],
       "path": "/faction/attacks"
     },
     "attacksfull": {
@@ -2739,6 +3642,23 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "attacks",
+          "type": "array",
+          "fields": [
+            "id",
+            "code",
+            "started",
+            "ended",
+            "attacker",
+            "defender",
+            "result",
+            "respect_gain",
+            "respect_loss"
+          ]
+        }
+      ],
       "path": "/faction/attacksfull"
     },
     "balance": {
@@ -2774,6 +3694,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "balance",
+          "type": "object",
+          "fields": [
+            "faction",
+            "members"
+          ]
+        }
+      ],
       "path": "/faction/balance"
     },
     "basic": {
@@ -2796,6 +3726,29 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "basic",
+          "type": "object",
+          "fields": [
+            "id",
+            "name",
+            "tag",
+            "tag_image",
+            "banner_image",
+            "leader_id",
+            "co_leader_id",
+            "respect",
+            "days_old",
+            "capacity",
+            "members",
+            "is_enlisted",
+            "rank",
+            "best_chain",
+            "note"
+          ]
         }
       ],
       "path": "/faction/basic",
@@ -2826,6 +3779,22 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "chain",
+          "type": "object",
+          "fields": [
+            "id",
+            "current",
+            "max",
+            "timeout",
+            "modifier",
+            "cooldown",
+            "start",
+            "end"
+          ]
         }
       ],
       "path": "/faction/chain",
@@ -2889,6 +3858,19 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "chains",
+          "type": "array",
+          "fields": [
+            "id",
+            "chain",
+            "respect",
+            "start",
+            "end"
+          ]
+        }
+      ],
       "path": "/faction/chains",
       "idPath": "/faction/{id}/chains",
       "idParam": {
@@ -2917,6 +3899,22 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "chainreport",
+          "type": "object",
+          "fields": [
+            "id",
+            "faction_id",
+            "start",
+            "end",
+            "details",
+            "bonuses",
+            "attackers",
+            "non_attackers"
+          ]
         }
       ],
       "path": "/faction/chainreport",
@@ -3012,6 +4010,18 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "contributors",
+          "type": "array",
+          "fields": [
+            "id",
+            "username",
+            "value",
+            "in_faction"
+          ]
+        }
+      ],
       "path": "/faction/contributors"
     },
     "crimes": {
@@ -3103,6 +4113,26 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "crimes",
+          "type": "array",
+          "fields": [
+            "id",
+            "previous_crime_id",
+            "name",
+            "difficulty",
+            "status",
+            "created_at",
+            "planning_at",
+            "ready_at",
+            "expired_at",
+            "executed_at",
+            "slots",
+            "rewards"
+          ]
+        }
+      ],
       "path": "/faction/crimes"
     },
     "crime": {
@@ -3125,6 +4155,26 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "crime",
+          "type": "object",
+          "fields": [
+            "id",
+            "previous_crime_id",
+            "name",
+            "difficulty",
+            "status",
+            "created_at",
+            "planning_at",
+            "ready_at",
+            "expired_at",
+            "executed_at",
+            "slots",
+            "rewards"
+          ]
         }
       ],
       "idPath": "/faction/{crimeId}/crime",
@@ -3154,6 +4204,17 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "hof",
+          "type": "object",
+          "fields": [
+            "rank",
+            "respect",
+            "chain"
+          ]
         }
       ],
       "path": "/faction/hof",
@@ -3195,6 +4256,26 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "members",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "position",
+            "level",
+            "days_in_faction",
+            "is_revivable",
+            "is_on_wall",
+            "is_in_oc",
+            "has_early_discharge",
+            "last_action",
+            "status",
+            "revive_setting"
+          ]
         }
       ],
       "path": "/faction/members",
@@ -3290,6 +4371,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "news",
+          "type": "array",
+          "fields": [
+            "id",
+            "text",
+            "timestamp"
+          ]
+        }
+      ],
       "path": "/faction/news"
     },
     "positions": {
@@ -3312,6 +4404,17 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "positions",
+          "type": "array",
+          "fields": [
+            "name",
+            "is_default",
+            "abilities"
+          ]
         }
       ],
       "path": "/faction/positions"
@@ -3338,6 +4441,20 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "rackets",
+          "type": "array",
+          "fields": [
+            "name",
+            "level",
+            "description",
+            "reward",
+            "created_at",
+            "changed_at"
+          ]
+        }
+      ],
       "path": "/faction/rackets"
     },
     "raidreport": {
@@ -3360,6 +4477,19 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "raidreport",
+          "type": "array",
+          "fields": [
+            "id",
+            "start",
+            "end",
+            "aggressor",
+            "defender"
+          ]
         }
       ],
       "idPath": "/faction/{raidWarId}/raidreport",
@@ -3420,6 +4550,19 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "raids",
+          "type": "array",
+          "fields": [
+            "id",
+            "start",
+            "end",
+            "aggressor",
+            "defender"
+          ]
         }
       ],
       "path": "/faction/raids",
@@ -3489,6 +4632,20 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "rankedwars",
+          "type": "array",
+          "fields": [
+            "id",
+            "start",
+            "end",
+            "target",
+            "winner",
+            "factions"
+          ]
+        }
+      ],
       "path": "/faction/rankedwars",
       "idPath": "/faction/{id}/rankedwars",
       "idParam": {
@@ -3517,6 +4674,20 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "rankedwarreport",
+          "type": "object",
+          "fields": [
+            "id",
+            "start",
+            "end",
+            "winner",
+            "forfeit",
+            "factions"
+          ]
         }
       ],
       "idPath": "/faction/{rankedWarId}/rankedwarreport",
@@ -3597,6 +4768,20 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "reports",
+          "type": "array",
+          "fields": [
+            "type",
+            "target_id",
+            "reporter_id",
+            "faction_id",
+            "timestamp",
+            "report"
+          ]
+        }
+      ],
       "path": "/faction/reports"
     },
     "revives": {
@@ -3673,6 +4858,20 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "revives",
+          "type": "array",
+          "fields": [
+            "id",
+            "reviver",
+            "target",
+            "success_chance",
+            "result",
+            "timestamp"
+          ]
         }
       ],
       "path": "/faction/revives"
@@ -3753,6 +4952,20 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "revives",
+          "type": "array",
+          "fields": [
+            "id",
+            "reviver",
+            "target",
+            "success_chance",
+            "result",
+            "timestamp"
+          ]
+        }
+      ],
       "path": "/faction/revivesFull"
     },
     "search": {
@@ -3809,6 +5022,26 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "search",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "respect",
+            "members",
+            "members_max",
+            "leader",
+            "co_leader",
+            "image",
+            "tag_image",
+            "tag",
+            "is_destroyed",
+            "is_recruiting"
+          ]
+        }
+      ],
       "path": "/faction/search"
     },
     "stats": {
@@ -3833,6 +5066,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "stats",
+          "type": "array",
+          "fields": [
+            "name",
+            "value"
+          ]
+        }
+      ],
       "path": "/faction/stats"
     },
     "territory": {
@@ -3855,6 +5098,23 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "territory",
+          "type": "array",
+          "fields": [
+            "id",
+            "acquired_at",
+            "sector",
+            "size",
+            "density",
+            "slots",
+            "respect",
+            "coordinates",
+            "racket"
+          ]
         }
       ],
       "path": "/faction/territory",
@@ -3897,6 +5157,18 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "territoryOwnership",
+          "type": "array",
+          "fields": [
+            "id",
+            "irradiated",
+            "owned_by",
+            "acquired_at"
+          ]
         }
       ],
       "path": "/faction/territoryownership"
@@ -3954,6 +5226,21 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "territorywars",
+          "type": "array",
+          "fields": [
+            "id",
+            "territory",
+            "start",
+            "end",
+            "target",
+            "result",
+            "factions"
+          ]
+        }
+      ],
       "path": "/faction/territorywars",
       "idPath": "/faction/{id}/territorywars",
       "idParam": {
@@ -3984,6 +5271,21 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "territorywarreport",
+          "type": "array",
+          "fields": [
+            "id",
+            "territory",
+            "started_at",
+            "ended_at",
+            "winner",
+            "result",
+            "factions"
+          ]
+        }
+      ],
       "idPath": "/faction/{territoryWarId}/territorywarreport",
       "idParam": {
         "name": "territoryWarId",
@@ -4011,6 +5313,21 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "upgrades",
+          "type": "object",
+          "fields": [
+            "core",
+            "peace",
+            "war"
+          ]
+        },
+        {
+          "name": "state",
+          "type": "string"
         }
       ],
       "path": "/faction/upgrades"
@@ -4082,6 +5399,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "warfare",
+          "type": "oneOf"
+        }
+      ],
       "path": "/faction/warfare"
     },
     "wars": {
@@ -4104,6 +5427,26 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "pacts",
+          "type": "array",
+          "fields": [
+            "faction_id",
+            "faction_name",
+            "until"
+          ]
+        },
+        {
+          "name": "wars",
+          "type": "object",
+          "fields": [
+            "ranked",
+            "raids",
+            "territory"
+          ]
         }
       ],
       "path": "/faction/wars",
@@ -4135,6 +5478,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "selections",
+          "type": "array"
+        }
+      ],
       "path": "/faction/lookup"
     },
     "timestamp": {
@@ -4157,6 +5506,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "timestamp",
+          "type": "integer"
         }
       ],
       "path": "/faction/timestamp"
@@ -4183,6 +5538,18 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "applications",
+          "type": "array",
+          "fields": [
+            "player",
+            "message",
+            "expires_at",
+            "status"
+          ]
         }
       ],
       "path": "/company/applications"
@@ -4218,6 +5585,20 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "employees",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "position",
+            "days_in_company",
+            "status",
+            "last_action"
+          ]
         }
       ],
       "path": "/company/employees",
@@ -4306,6 +5687,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "news",
+          "type": "array",
+          "fields": [
+            "id",
+            "text",
+            "timestamp"
+          ]
+        }
+      ],
       "path": "/company/news"
     },
     "companies": {
@@ -4353,6 +5745,34 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "companies",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "created_at",
+            "days_old",
+            "image",
+            "type",
+            "rating",
+            "director",
+            "employees",
+            "income",
+            "customers",
+            "applications_allowed"
+          ]
+        },
+        {
+          "name": "companies_timestamp",
+          "type": "integer"
+        },
+        {
+          "name": "companies_delay",
+          "type": "integer"
+        }
+      ],
       "idPath": "/company/{typeId}/companies",
       "idParam": {
         "name": "typeId",
@@ -4391,6 +5811,26 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "profile",
+          "type": "object",
+          "fields": [
+            "id",
+            "name",
+            "created_at",
+            "days_old",
+            "image",
+            "type",
+            "rating",
+            "director",
+            "employees",
+            "income",
+            "customers",
+            "applications_allowed"
+          ]
         }
       ],
       "path": "/company/profile",
@@ -4453,6 +5893,25 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "search",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "created_at",
+            "days_old",
+            "image",
+            "type",
+            "rating",
+            "employees",
+            "income",
+            "customers",
+            "applications_allowed"
+          ]
+        }
+      ],
       "path": "/company/search"
     },
     "snapshot": {
@@ -4501,6 +5960,23 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "stock",
+          "type": "array",
+          "fields": [
+            "name",
+            "id",
+            "cost",
+            "rrp",
+            "price",
+            "in_stock",
+            "on_order",
+            "sold_amount",
+            "sold_worth"
+          ]
+        }
+      ],
       "path": "/company/stock"
     },
     "lookup": {
@@ -4522,6 +5998,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "selections",
+          "type": "array"
         }
       ],
       "path": "/company/lookup"
@@ -4548,6 +6030,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "timestamp",
+          "type": "integer"
+        }
+      ],
       "path": "/company/timestamp"
     }
   },
@@ -4572,6 +6060,18 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "categories",
+          "type": "array",
+          "fields": [
+            "id",
+            "title",
+            "acronym",
+            "threads"
+          ]
         }
       ],
       "path": "/forum/categories"
@@ -4640,6 +6140,28 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "posts",
+          "type": "array",
+          "fields": [
+            "id",
+            "thread_id",
+            "author",
+            "is_legacy",
+            "is_topic",
+            "is_edited",
+            "is_pinned",
+            "created_time",
+            "edited_by",
+            "has_quote",
+            "quoted_post_id",
+            "content",
+            "likes",
+            "dislikes"
+          ]
+        }
+      ],
       "idPath": "/forum/{threadId}/posts",
       "idParam": {
         "name": "threadId",
@@ -4667,6 +6189,30 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "thread",
+          "type": "object",
+          "fields": [
+            "id",
+            "title",
+            "forum_id",
+            "posts",
+            "rating",
+            "views",
+            "author",
+            "last_poster",
+            "first_post_time",
+            "last_post_time",
+            "has_poll",
+            "is_locked",
+            "is_sticky",
+            "content",
+            "content_raw",
+            "poll"
+          ]
         }
       ],
       "idPath": "/forum/{threadId}/thread",
@@ -4729,6 +6275,27 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "threads",
+          "type": "array",
+          "fields": [
+            "id",
+            "title",
+            "forum_id",
+            "posts",
+            "rating",
+            "views",
+            "author",
+            "last_poster",
+            "first_post_time",
+            "last_post_time",
+            "has_poll",
+            "is_locked",
+            "is_sticky"
+          ]
+        }
+      ],
       "path": "/forum/threads",
       "idPath": "/forum/{categoryIds}/threads",
       "idParam": {
@@ -4759,6 +6326,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "selections",
+          "type": "array"
+        }
+      ],
       "path": "/forum/lookup"
     },
     "timestamp": {
@@ -4781,6 +6354,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "timestamp",
+          "type": "integer"
         }
       ],
       "path": "/forum/timestamp"
@@ -4821,6 +6400,20 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "log",
+          "type": "array",
+          "fields": [
+            "timestamp",
+            "type",
+            "selections",
+            "id",
+            "comment",
+            "ip"
+          ]
+        }
+      ],
       "path": "/key/log"
     },
     "info": {
@@ -4843,6 +6436,17 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "info",
+          "type": "object",
+          "fields": [
+            "selections",
+            "user",
+            "access"
+          ]
         }
       ],
       "path": "/key/info"
@@ -4869,6 +6473,44 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "id",
+          "type": "integer"
+        },
+        {
+          "name": "seller",
+          "type": "object",
+          "fields": [
+            "id",
+            "name"
+          ]
+        },
+        {
+          "name": "buyer",
+          "type": "object",
+          "fields": [
+            "id",
+            "name"
+          ]
+        },
+        {
+          "name": "timestamp",
+          "type": "integer"
+        },
+        {
+          "name": "price",
+          "type": "integer"
+        },
+        {
+          "name": "bids",
+          "type": "integer"
+        },
+        {
+          "name": "item",
+          "type": "oneOf"
         }
       ],
       "idPath": "/market/{id}/auctionhouselisting",
@@ -4929,6 +6571,21 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "auctionhouse",
+          "type": "array",
+          "fields": [
+            "id",
+            "seller",
+            "buyer",
+            "timestamp",
+            "price",
+            "bids",
+            "item"
+          ]
         }
       ],
       "idPath": "/market/{id}/auctionhouse",
@@ -4992,6 +6649,15 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "bazaar",
+          "type": "object",
+          "fields": [
+            "specialized"
+          ]
         }
       ],
       "path": "/market/bazaar",
@@ -5116,6 +6782,18 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "itemmarket",
+          "type": "object",
+          "fields": [
+            "item",
+            "listings",
+            "cache_timestamp",
+            "cache_delay"
+          ]
+        }
+      ],
       "idPath": "/market/{id}/itemmarket",
       "idParam": {
         "name": "id",
@@ -5166,6 +6844,24 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "properties",
+          "type": "object",
+          "fields": [
+            "listings",
+            "property"
+          ]
+        },
+        {
+          "name": "properties_timestamp",
+          "type": "integer"
+        },
+        {
+          "name": "properties_delay",
+          "type": "integer"
         }
       ],
       "idPath": "/market/{propertyTypeId}/properties",
@@ -5220,6 +6916,24 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "rentals",
+          "type": "object",
+          "fields": [
+            "listings",
+            "property"
+          ]
+        },
+        {
+          "name": "rentals_timestamp",
+          "type": "integer"
+        },
+        {
+          "name": "rentals_delay",
+          "type": "integer"
+        }
+      ],
       "idPath": "/market/{propertyTypeId}/rentals",
       "idParam": {
         "name": "propertyTypeId",
@@ -5249,6 +6963,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "selections",
+          "type": "array"
+        }
+      ],
       "path": "/market/lookup"
     },
     "timestamp": {
@@ -5271,6 +6991,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "timestamp",
+          "type": "integer"
         }
       ],
       "path": "/market/timestamp"
@@ -5299,6 +7025,24 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "cars",
+          "type": "array",
+          "fields": [
+            "car_item_id",
+            "car_item_name",
+            "top_speed",
+            "acceleration",
+            "braking",
+            "dirt",
+            "handling",
+            "safety",
+            "tarmac",
+            "class"
+          ]
+        }
+      ],
       "path": "/racing/cars"
     },
     "carupgrades": {
@@ -5321,6 +7065,22 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "carupgrades",
+          "type": "array",
+          "fields": [
+            "id",
+            "class_required",
+            "name",
+            "description",
+            "category",
+            "subcategory",
+            "effects",
+            "cost"
+          ]
         }
       ],
       "path": "/racing/carupgrades"
@@ -5389,6 +7149,24 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "races",
+          "type": "array",
+          "fields": [
+            "id",
+            "title",
+            "track_id",
+            "creator_id",
+            "status",
+            "laps",
+            "participants",
+            "schedule",
+            "requirements",
+            "is_official"
+          ]
+        }
+      ],
       "path": "/racing/races"
     },
     "race": {
@@ -5411,6 +7189,25 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "race",
+          "type": "object",
+          "fields": [
+            "id",
+            "title",
+            "track_id",
+            "creator_id",
+            "status",
+            "laps",
+            "participants",
+            "schedule",
+            "requirements",
+            "is_official",
+            "results"
+          ]
         }
       ],
       "idPath": "/racing/{raceId}/race",
@@ -5456,6 +7253,19 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "records",
+          "type": "array",
+          "fields": [
+            "driver_id",
+            "driver_name",
+            "car_item_id",
+            "lap_time",
+            "car_item_name"
+          ]
+        }
+      ],
       "idPath": "/racing/{trackId}/records",
       "idParam": {
         "name": "trackId",
@@ -5485,6 +7295,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "tracks",
+          "type": "array",
+          "fields": [
+            "id",
+            "title",
+            "description"
+          ]
+        }
+      ],
       "path": "/racing/tracks"
     },
     "lookup": {
@@ -5509,6 +7330,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "selections",
+          "type": "array"
+        }
+      ],
       "path": "/racing/lookup"
     },
     "timestamp": {
@@ -5531,6 +7358,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "timestamp",
+          "type": "integer"
         }
       ],
       "path": "/racing/timestamp"
@@ -5559,6 +7392,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "selections",
+          "type": "array"
+        }
+      ],
       "path": "/property/lookup"
     },
     "timestamp": {
@@ -5581,6 +7420,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "timestamp",
+          "type": "integer"
         }
       ],
       "path": "/property/timestamp"
@@ -5644,6 +7489,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "attacklog",
+          "type": "object",
+          "fields": [
+            "log",
+            "summary"
+          ]
+        }
+      ],
       "path": "/torn/attacklog"
     },
     "bounties": {
@@ -5680,6 +7535,32 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "bounties",
+          "type": "array",
+          "fields": [
+            "target_id",
+            "target_name",
+            "target_level",
+            "lister_id",
+            "lister_name",
+            "reward",
+            "reason",
+            "quantity",
+            "is_anonymous",
+            "valid_until"
+          ]
+        },
+        {
+          "name": "bounties_timestamp",
+          "type": "integer"
+        },
+        {
+          "name": "bounties_delay",
+          "type": "integer"
+        }
+      ],
       "path": "/torn/bounties"
     },
     "calendar": {
@@ -5702,6 +7583,16 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "calendar",
+          "type": "object",
+          "fields": [
+            "competitions",
+            "events"
+          ]
         }
       ],
       "path": "/torn/calendar"
@@ -5728,6 +7619,23 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "crimes",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "category_id",
+            "category_name",
+            "enhancer_id",
+            "enhancer_name",
+            "unique_outcomes_count",
+            "unique_outcomes_ids",
+            "notes"
+          ]
+        }
+      ],
       "path": "/torn/crimes"
     },
     "education": {
@@ -5752,6 +7660,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "education",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "courses"
+          ]
+        }
+      ],
       "path": "/torn/education"
     },
     "elimination": {
@@ -5774,6 +7693,25 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "elimination",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "participants",
+            "position",
+            "score",
+            "lives",
+            "wins",
+            "losses",
+            "eliminated",
+            "eliminated_timestamp",
+            "leaders"
+          ]
         }
       ],
       "path": "/torn/elimination"
@@ -5810,6 +7748,21 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "eliminationteam",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "level",
+            "last_action",
+            "status",
+            "attacks",
+            "score"
+          ]
         }
       ],
       "idPath": "/torn/{id}/eliminationteam",
@@ -5865,6 +7818,20 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "factionhof",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "members",
+            "position",
+            "rank",
+            "values"
+          ]
+        }
+      ],
       "path": "/torn/factionhof"
     },
     "factiontree": {
@@ -5887,6 +7854,16 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "factionTree",
+          "type": "array",
+          "fields": [
+            "name",
+            "branches"
+          ]
         }
       ],
       "path": "/torn/factiontree"
@@ -5934,6 +7911,22 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "honors",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "description",
+            "type",
+            "circulation",
+            "equipped",
+            "rarity",
+            "crimes_version"
+          ]
         }
       ],
       "path": "/torn/honors",
@@ -6001,6 +7994,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "hof",
+          "type": "array"
+        }
+      ],
       "path": "/torn/hof"
     },
     "itemammo": {
@@ -6025,6 +8024,18 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "itemammo",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "price",
+            "types"
+          ]
+        }
+      ],
       "path": "/torn/itemammo"
     },
     "itemdetails": {
@@ -6047,6 +8058,22 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "itemdetails",
+          "type": "object",
+          "fields": [
+            "uid",
+            "stats",
+            "bonuses",
+            "rarity",
+            "id",
+            "name",
+            "type",
+            "sub_type"
+          ]
         }
       ],
       "idPath": "/torn/{id}/itemdetails",
@@ -6076,6 +8103,20 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "itemmods",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "image",
+            "description",
+            "dual_fit",
+            "weapons"
+          ]
         }
       ],
       "path": "/torn/itemmods"
@@ -6151,6 +8192,28 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "items",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "description",
+            "effect",
+            "requirement",
+            "image",
+            "type",
+            "sub_type",
+            "is_masked",
+            "is_tradable",
+            "is_found_in_city",
+            "value",
+            "circulation",
+            "details"
+          ]
+        }
+      ],
       "path": "/torn/items",
       "idPath": "/torn/{ids}/items",
       "idParam": {
@@ -6181,6 +8244,16 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "logcategories",
+          "type": "array",
+          "fields": [
+            "id",
+            "title"
+          ]
+        }
+      ],
       "path": "/torn/logcategories"
     },
     "logtypes": {
@@ -6203,6 +8276,16 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "logtypes",
+          "type": "array",
+          "fields": [
+            "id",
+            "title"
+          ]
         }
       ],
       "path": "/torn/logtypes",
@@ -6235,6 +8318,21 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "medals",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "description",
+            "type",
+            "circulation",
+            "rarity",
+            "crimes_version"
+          ]
+        }
+      ],
       "path": "/torn/medals",
       "idPath": "/torn/{ids}/medals",
       "idParam": {
@@ -6265,6 +8363,17 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "merits",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "description"
+          ]
+        }
+      ],
       "path": "/torn/merits"
     },
     "organizedcrimes": {
@@ -6287,6 +8396,21 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "organizedcrimes",
+          "type": "array",
+          "fields": [
+            "name",
+            "description",
+            "difficulty",
+            "spawn",
+            "scope",
+            "prerequisite",
+            "slots"
+          ]
         }
       ],
       "path": "/torn/organizedcrimes"
@@ -6313,6 +8437,21 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "properties",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "cost",
+            "happy",
+            "upkeep",
+            "modifications",
+            "staff"
+          ]
+        }
+      ],
       "path": "/torn/properties"
     },
     "stocks": {
@@ -6335,6 +8474,21 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "stocks",
+          "type": "object",
+          "fields": [
+            "id",
+            "name",
+            "acronym",
+            "images",
+            "market",
+            "bonus",
+            "chart"
+          ]
         }
       ],
       "path": "/torn/stocks",
@@ -6365,6 +8519,17 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "subcrimes",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "nerve_cost"
+          ]
         }
       ],
       "idPath": "/torn/{crimeId}/subcrimes",
@@ -10524,6 +12689,22 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "territory",
+          "type": "array",
+          "fields": [
+            "id",
+            "sector",
+            "size",
+            "density",
+            "slots",
+            "respect",
+            "coordinates",
+            "neighbors"
+          ]
+        }
+      ],
       "path": "/torn/territory"
     },
     "lookup": {
@@ -10548,6 +12729,12 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "returns": [
+        {
+          "name": "selections",
+          "type": "array"
+        }
+      ],
       "path": "/torn/lookup"
     },
     "timestamp": {
@@ -10570,6 +12757,12 @@ export const ENDPOINTS = {
           "required": false,
           "type": "string",
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "timestamp",
+          "type": "integer"
         }
       ],
       "path": "/torn/timestamp"
