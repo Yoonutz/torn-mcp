@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.9.2**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.9.3**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -14,6 +14,23 @@ Current version: **v0.9.2**. Roadmap reflects actual repo state — no drift.
 | **8 — Live conformance** | Validate real Torn responses against the schema | ~6-10h | ✅ shipped |
 | **9 — Additive enrichment** | Keep canonical data; add views beside it | dev time | ✅ shipped |
 | **10 — Canonical output channel** | Schema-true `structuredContent` + human text | ~6-10h | ✅ shipped |
+
+## 🐞 Bug Fixes
+
+Tracks shipped fixes and open bugs. New bugs land as ⏳ Proposed; flip to ✅ with the ship version when fixed.
+
+| Bug | Status | Version | Notes |
+|-----|--------|---------|-------|
+| Discovery return-shape wrong for drifted endpoints | ✅ Fixed | v0.9.3 | Live-verified overrides correct auctionhouselisting, raidreport, territorywarreport, enlistedcars |
+| Conformance seeds broke on three endpoints | ⏳ Proposed | | racing/race, attacklog, eliminationteam now skip — fix seed or mark expected |
+
+## ✨ Features
+
+Tracks shipped features and future ideas. Ideas land as ⏳ Proposed; flip to ✅ with the ship version when done.
+
+| Feature | Status | Version | Notes |
+|---------|--------|---------|-------|
+| Reality-derived response shapes in discovery | 🟡 In progress | v0.9.3 | Manual live-shape overrides shipped; auto-deriving from conformance still open |
 
 ## ✅ Phase 1 — Core server & tools
 

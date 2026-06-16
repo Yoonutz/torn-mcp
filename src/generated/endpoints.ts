@@ -42,6 +42,8 @@ export interface EndpointDef {
   query: QueryParam[];
   /** Top-level response shape: envelope keys + one level of nested fields. */
   returns?: ResponseField[];
+  /** Why the live shape differs from the spec, when 'returns' was corrected from reality. */
+  returnsNote?: string;
   /** True when the 200 body is a oneOf/anyOf union — shape varies by 'selections'. */
   selectionBased?: boolean;
 }
@@ -725,18 +727,18 @@ export const ENDPOINTS = {
           "name": "enlistedcars",
           "type": "array",
           "fields": [
+            "id",
             "car_item_id",
             "car_item_name",
+            "car_name",
             "top_speed",
             "acceleration",
             "braking",
-            "dirt",
             "handling",
             "safety",
+            "dirt",
             "tarmac",
             "class",
-            "id",
-            "name",
             "worth",
             "points_spent",
             "races_entered",
@@ -746,7 +748,8 @@ export const ENDPOINTS = {
           ]
         }
       ],
-      "path": "/user/enlistedcars"
+      "path": "/user/enlistedcars",
+      "returnsNote": "Spec lists 'name'; the live item uses 'car_name' and 'car_item_name'."
     },
     "equipment": {
       "requiresId": false,
@@ -4482,7 +4485,7 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "raidreport",
-          "type": "array",
+          "type": "object",
           "fields": [
             "id",
             "start",
@@ -4497,7 +4500,8 @@ export const ENDPOINTS = {
         "name": "raidWarId",
         "type": "integer",
         "description": "Raid war id"
-      }
+      },
+      "returnsNote": "Spec declares an array; the live response is a single object."
     },
     "raids": {
       "requiresId": false,
@@ -5274,7 +5278,7 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "territorywarreport",
-          "type": "array",
+          "type": "object",
           "fields": [
             "id",
             "territory",
@@ -5291,7 +5295,8 @@ export const ENDPOINTS = {
         "name": "territoryWarId",
         "type": "integer",
         "description": "Territory war id"
-      }
+      },
+      "returnsNote": "Spec declares an array; the live response is a single object."
     },
     "upgrades": {
       "requiresId": false,
@@ -6477,40 +6482,17 @@ export const ENDPOINTS = {
       ],
       "returns": [
         {
-          "name": "id",
-          "type": "integer"
-        },
-        {
-          "name": "seller",
+          "name": "auctionhouselisting",
           "type": "object",
           "fields": [
             "id",
-            "name"
+            "seller",
+            "buyer",
+            "timestamp",
+            "price",
+            "bids",
+            "item"
           ]
-        },
-        {
-          "name": "buyer",
-          "type": "object",
-          "fields": [
-            "id",
-            "name"
-          ]
-        },
-        {
-          "name": "timestamp",
-          "type": "integer"
-        },
-        {
-          "name": "price",
-          "type": "integer"
-        },
-        {
-          "name": "bids",
-          "type": "integer"
-        },
-        {
-          "name": "item",
-          "type": "oneOf"
         }
       ],
       "idPath": "/market/{id}/auctionhouselisting",
@@ -6518,7 +6500,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Listing id"
-      }
+      },
+      "returnsNote": "Spec puts the listing fields at the root; the live response wraps them under 'auctionhouselisting'."
     },
     "auctionhouse": {
       "requiresId": false,

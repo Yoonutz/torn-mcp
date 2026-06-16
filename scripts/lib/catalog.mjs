@@ -6,6 +6,7 @@
 // dereference the spec ($ref / allOf / oneOf / anyOf) and build, per tag, an
 // authoritative catalog of endpoints with summaries, path id, and query params.
 import { createHash } from "node:crypto";
+import { RETURNS_OVERRIDES } from "./returns-overrides.mjs";
 
 function makeResolver(spec) {
   const resolveRef = (ref) => {
@@ -184,6 +185,15 @@ export function buildCatalog(spec) {
     for (const nm of Object.keys(tags[tag])) {
       const e = tags[tag][nm];
       e.requiresId = !e.path && !!e.idPath;
+      // Reality-derived correction: for endpoints whose spec response shape is
+      // wrong, replace the spec-derived `returns` with the real live shape so
+      // discovery doesn't mislead agents.
+      const ov = RETURNS_OVERRIDES[`${tag}/${nm}`];
+      if (ov) {
+        e.returns = ov.returns;
+        if (ov.note) e.returnsNote = ov.note;
+        delete e.selectionBased;
+      }
     }
   }
 
@@ -250,6 +260,8 @@ export interface EndpointDef {
   query: QueryParam[];
   /** Top-level response shape: envelope keys + one level of nested fields. */
   returns?: ResponseField[];
+  /** Why the live shape differs from the spec, when 'returns' was corrected from reality. */
+  returnsNote?: string;
   /** True when the 200 body is a oneOf/anyOf union — shape varies by 'selections'. */
   selectionBased?: boolean;
 }

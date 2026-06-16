@@ -123,6 +123,31 @@ describe("returnsHint", () => {
   });
 });
 
+describe("reality-corrected returns (spec drift overrides)", () => {
+  it("unwraps faction/raidreport from array to the real object", () => {
+    const def = ENDPOINTS.faction.raidreport as any;
+    expect(def.returns[0]).toMatchObject({ name: "raidreport", type: "object" });
+    expect(def.returnsNote).toMatch(/single object/);
+  });
+  it("corrects faction/territorywarreport to an object", () => {
+    const def = ENDPOINTS.faction.territorywarreport as any;
+    expect(def.returns[0].type).toBe("object");
+    expect(def.returns[0].fields).toContain("factions");
+  });
+  it("wraps market/auctionhouselisting under its real envelope key", () => {
+    const def = ENDPOINTS.market.auctionhouselisting as any;
+    expect(def.returns[0].name).toBe("auctionhouselisting");
+    expect(returnsHint(def)).toBe(" → returns: auctionhouselisting");
+  });
+  it("uses the real car fields for user/enlistedcars (not the spec's 'name')", () => {
+    const def = ENDPOINTS.user.enlistedcars as any;
+    const fields = def.returns[0].fields as string[];
+    expect(fields).toContain("car_name");
+    expect(fields).toContain("car_item_name");
+    expect(fields).not.toContain("name");
+  });
+});
+
 describe("endpointBadges", () => {
   const def = (keyLevel?: string, stability?: string) =>
     ({ keyLevel, stability, requiresId: false, query: [] }) as any;
