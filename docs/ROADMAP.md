@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.9.8**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.9.9**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -27,6 +27,7 @@ Tracks shipped fixes and open bugs. New bugs land as ⏳ Proposed; flip to ✅ w
 | Id-scoped endpoints unclear vs list siblings | ✅ Fixed | v0.9.6 | Tool descriptions name the path param (e.g. `trade (requires tradeId)`) instead of generic id |
 | Workflows missing least-privilege permissions | ✅ Fixed | v0.9.7 | Add `contents: read` to all three workflows; resolves 4 CodeQL alerts |
 | Dev-tooling dependency vulnerabilities (ws, js-yaml) | ✅ Fixed | v0.9.8 | Pin patched transitive versions via package.json overrides; npm audit clean |
+| Deprecated Node-20 workflow actions | ✅ Fixed | v0.9.9 | Bump checkout/setup-node to v6, upload-artifact to v7 (Node 24 runtime) |
 
 ## ✨ Features
 

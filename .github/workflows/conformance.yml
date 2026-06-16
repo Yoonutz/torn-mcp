@@ -24,12 +24,12 @@ jobs:
   conformance:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           # Needed only by the baseline-refresh path to push to main (ruleset
           # bypassed via the admin PAT); harmless for the read-only check run.
           token: ${{ secrets.GH_PAT }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
@@ -44,7 +44,7 @@ jobs:
         run: node scripts/conformance.mjs
       - name: Upload report
         if: ${{ always() && inputs.update_baseline != true }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: conformance-report
           path: |
