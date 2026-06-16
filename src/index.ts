@@ -32,7 +32,7 @@ import { registerCustomTools } from "./custom/tools.js";
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.9.4";
+const VERSION = "0.9.5";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 

@@ -46,7 +46,9 @@ const SEEDS = {
   "market/rentals": { kind: "const", value: "1" },
   "market/itemmarket": { kind: "item" },
   "market/auctionhouselisting": { kind: "list", source: "market/auctionhouse" },
-  "torn/itemdetails": { kind: "item" },
+  // itemdetails needs a specific item UID (instance), not the item type id; pull
+  // one from a live auction-house listing's nested item.uid.
+  "torn/itemdetails": { kind: "list", source: "market/auctionhouse", field: "item.uid" },
   "faction/crime": { kind: "list", source: "faction/crimes" },
   "faction/raidreport": { kind: "list", source: "faction/raids" },
   "faction/rankedwarreport": { kind: "list", source: "faction/rankedwars" },
@@ -60,10 +62,20 @@ const SEEDS = {
     where: { status: "finished" },
   },
   "racing/records": { kind: "list", source: "racing/tracks" },
-  "torn/subcrimes": { kind: "list", source: "torn/organizedcrimes" },
-  "user/crimes": { kind: "list", source: "user/organizedcrimes" },
+  // crimes & subcrimes key off a crime TYPE id (1-13 from torn/crimes), not an
+  // organized-crime id.
+  "torn/subcrimes": { kind: "list", source: "torn/crimes" },
+  "user/crimes": { kind: "list", source: "torn/crimes" },
   "user/trade": { kind: "list", source: "user/trades" },
   "torn/eliminationteam": { kind: "list", source: "torn/elimination" },
+};
+
+// ── Param seeds ─────────────────────────────────────────────────────
+// Some endpoints need a required QUERY param whose value must come from live
+// data (not an enum default and not a path id). Resolve it from a list source.
+const PARAM_SEEDS = {
+  // attacklog needs a 'log' code; every user/attacks row carries one.
+  "torn/attacklog": { param: "log", source: "user/attacks", field: "code" },
 };
 
 // ── Documented skips ────────────────────────────────────────────────
@@ -72,11 +84,7 @@ const SEEDS = {
 // verified 2026-06), so it's reported quietly. A skip NOT listed here is
 // unexpected — a seed broke, or a new endpoint needs one — and gets surfaced.
 const DOCUMENTED_SKIPS = {
-  "user/trade": "test account has no trades to reference",
-  "torn/itemdetails": "needs an owned-item UID; test account inventory is empty",
-  "user/crimes": "needs a personal-crime id; organized-crime ids are rejected (Torn 'Incorrect ID')",
-  "torn/subcrimes": "torn/organizedcrimes items carry no id to seed a subcrime",
-  "torn/attacklog": "needs an attack-log code; no list endpoint exposes one",
+  "user/trade": "test account has no active trades to reference",
   "torn/eliminationteam": "seasonal elimination event; team id rejected off-season (Torn 'Incorrect ID')",
   "company/snapshot": "returns CSV, not JSON — outside schema scope",
 };
@@ -167,6 +175,28 @@ function firstArrayItem(json, where) {
   return undefined;
 }
 
+// Read a possibly-nested field by dot path (e.g. "item.uid").
+function getPath(obj, path) {
+  return path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), obj);
+}
+
+// Fetch a list source once and pluck `field` (dot path) from the first item
+// matching `where`. Cached by source+field so two consumers of the same source
+// (e.g. auctionhouselisting wants id, itemdetails wants item.uid) don't collide.
+async function pluckFromSource(source, field = "id", sourceParams, where) {
+  const ck = `pluck:${source}:${field}`;
+  if (cache.has(ck)) return cache.get(ck);
+  const def = catalog.tags[source.split("/")[0]]?.[source.split("/")[1]];
+  if (!def) return null;
+  const path = def.path ?? def.idPath;
+  const params = { ...defaultParams(def), ...(sourceParams ?? {}) };
+  const item = firstArrayItem((await tornGet(path, params)).json, where);
+  const val = getPath(item, field);
+  const out = val != null ? String(val) : null;
+  if (out) cache.set(ck, out);
+  return out;
+}
+
 let ctx; // { userId, factionId, companyId }
 async function bootstrap() {
   const basic = (await tornGet("/user/basic", {})).json;
@@ -199,15 +229,7 @@ async function resolveId(tag, name) {
     return id;
   }
   if (seed.kind === "list") {
-    if (cache.has(seed.source)) return cache.get(seed.source);
-    const def = catalog.tags[seed.source.split("/")[0]]?.[seed.source.split("/")[1]];
-    if (!def) return null;
-    const path = def.path ?? def.idPath;
-    const params = { ...defaultParams(def), ...(seed.sourceParams ?? {}) };
-    const item = firstArrayItem((await tornGet(path, params)).json, seed.where);
-    const id = item?.[seed.field ?? "id"] != null ? String(item[seed.field ?? "id"]) : null;
-    if (id) cache.set(seed.source, id);
-    return id;
+    return pluckFromSource(seed.source, seed.field ?? "id", seed.sourceParams, seed.where);
   }
   return null;
 }
@@ -244,6 +266,17 @@ for (const tag of catalog.tagList) {
         continue;
       }
       path = fillId(def.idPath, id);
+    }
+
+    // Inject a required query param whose value must come from live data.
+    const pseed = PARAM_SEEDS[`${tag}/${name}`];
+    if (pseed) {
+      const val = await pluckFromSource(pseed.source, pseed.field ?? "id", pseed.sourceParams, pseed.where);
+      if (val == null) {
+        results.push({ ep: `${tag}/${name}`, status: "skip", note: `no '${pseed.param}' seed from ${pseed.source}` });
+        continue;
+      }
+      params = { ...params, [pseed.param]: val };
     }
 
     const { json, err, ms } = await tornGet(path, params);
