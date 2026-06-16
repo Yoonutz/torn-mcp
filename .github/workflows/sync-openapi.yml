@@ -10,6 +10,11 @@ on:
     - cron: "0 6 * * 1" # Mondays 06:00 UTC
   workflow_dispatch: {}
 
+# Least privilege: the default token only reads. The sync commit/push
+# authenticates with GH_PAT (persisted by checkout), not GITHUB_TOKEN.
+permissions:
+  contents: read
+
 jobs:
   sync:
     runs-on: ubuntu-latest

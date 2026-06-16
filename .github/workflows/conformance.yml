@@ -15,6 +15,11 @@ on:
         type: boolean
         default: false
 
+# Least privilege: the default token only reads. The baseline-refresh push
+# authenticates with GH_PAT (persisted by checkout), not GITHUB_TOKEN.
+permissions:
+  contents: read
+
 jobs:
   conformance:
     runs-on: ubuntu-latest

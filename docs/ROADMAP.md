@@ -1,6 +1,6 @@
 # Torn MCP — Roadmap
 
-Current version: **v0.9.6**. Roadmap reflects actual repo state — no drift.
+Current version: **v0.9.7**. Roadmap reflects actual repo state — no drift.
 
 | Phase | Focus | Effort | Status |
 |-------|-------|--------|--------|
@@ -25,6 +25,7 @@ Tracks shipped fixes and open bugs. New bugs land as ⏳ Proposed; flip to ✅ w
 | Conformance seeds broke on three endpoints | ✅ Fixed | v0.9.4 | racing/race seeds a finished race; attacklog + eliminationteam documented as expected skips |
 | Four endpoints wrongly marked un-seedable | ✅ Fixed | v0.9.5 | crimes/subcrimes use crime-type ids, itemdetails seeds a UID, attacklog injects a log code |
 | Id-scoped endpoints unclear vs list siblings | ✅ Fixed | v0.9.6 | Tool descriptions name the path param (e.g. `trade (requires tradeId)`) instead of generic id |
+| Workflows missing least-privilege permissions | ✅ Fixed | v0.9.7 | Add `contents: read` to all three workflows; resolves 4 CodeQL alerts |
 
 ## ✨ Features
 

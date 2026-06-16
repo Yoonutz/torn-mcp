@@ -7,7 +7,7 @@ version receives security fixes.
 
 | Version | Supported |
 |---------|-----------|
-| latest (`0.5.x`) | ✅ |
+| latest (`0.9.x`) | ✅ |
 | older | ❌ |
 
 ## Reporting a vulnerability
@@ -60,6 +60,15 @@ Use the lowest-scope Torn key that covers your needs.
 Dependencies are monitored with Dependabot. Advisories with no runtime impact
 (dev/build tooling, or unused features of a dependency) are tracked and
 documented rather than force-upgraded when the upgrade would break the build.
+
+The deployed Worker's only runtime dependencies are `@modelcontextprotocol/sdk`
+and `zod`; both are clean. Current accepted advisories are all dev/build-only:
+
+- **`ws`** (high) — transitive via `wrangler` → `miniflare` (local dev server
+  and deploy tooling). Not reachable at runtime; the only offered fix downgrades
+  `wrangler`, breaking the toolchain. Tracked for an upstream fix.
+- **`js-yaml`** (moderate) — transitive via `openapi-typescript` →
+  `@redocly/openapi-core`, used only to generate response types at build time.
 
 ## Scope
 
