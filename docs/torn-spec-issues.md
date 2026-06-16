@@ -39,6 +39,8 @@ The schema constrains a field to a type the live value doesn't match.
 | `user/stocks` | `/stocks/*/bonus/progress` | `integer` | non-integer |
 | `user/stocks` | `/stocks/*/bonus/frequency` | `integer` | non-integer |
 | `torn/factiontree` | `/factionTree/*/branches/*/upgrades/*/challenge` | `null` | returned as a non-null object |
+| `user/trades` | `/trades/*/timestamp` | `integer` | returned as boolean `false` on a pending trade |
+| `user/trade` | `/trade/timestamp` | `integer` | returned as boolean `false` on a pending trade |
 
 ---
 
@@ -65,6 +67,7 @@ either the field was removed/renamed, or it shouldn't be required.
 | `torn/medals` | `equipped` | `/medals/*` |
 | `user/enlistedcars` | `name` | `/enlistedcars/*` |
 | `user/organizedcrimes` | `_metadata` | `(root)` |
+| `user/trades` | `items` | `/trades/*` (absent on a pending trade) |
 
 ---
 

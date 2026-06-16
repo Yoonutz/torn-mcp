@@ -66,5 +66,12 @@
     "wrong type at /stocks/*/bonus/increment — schema expects integer",
     "wrong type at /stocks/*/bonus/progress — schema expects integer",
     "wrong type at /stocks/*/bonus/frequency — schema expects integer"
+  ],
+  "user/trade": [
+    "wrong type at /trade/timestamp — schema expects integer"
+  ],
+  "user/trades": [
+    "missing required field 'items' (at /trades/*)",
+    "wrong type at /trades/*/timestamp — schema expects integer"
   ]
 }
