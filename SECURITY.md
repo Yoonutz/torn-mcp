@@ -62,13 +62,11 @@ Dependencies are monitored with Dependabot. Advisories with no runtime impact
 documented rather than force-upgraded when the upgrade would break the build.
 
 The deployed Worker's only runtime dependencies are `@modelcontextprotocol/sdk`
-and `zod`; both are clean. Current accepted advisories are all dev/build-only:
-
-- **`ws`** (high) — transitive via `wrangler` → `miniflare` (local dev server
-  and deploy tooling). Not reachable at runtime; the only offered fix downgrades
-  `wrangler`, breaking the toolchain. Tracked for an upstream fix.
-- **`js-yaml`** (moderate) — transitive via `openapi-typescript` →
-  `@redocly/openapi-core`, used only to generate response types at build time.
+and `zod`; both are clean. Transitive advisories in dev/build tooling are pinned
+to patched versions via `overrides` in `package.json` — surgically, without
+downgrading the direct dependency. Currently pinned: `ws` (via
+`wrangler`→`miniflare`), `js-yaml` (via `openapi-typescript`→`@redocly`), and
+`esbuild`. `npm audit` reports zero vulnerabilities.
 
 ## Scope
 
