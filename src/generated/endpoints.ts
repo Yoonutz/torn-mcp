@@ -536,7 +536,12 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "competition",
-          "type": "oneOf"
+          "type": "object",
+          "fields": [
+            "name",
+            "status",
+            "hp"
+          ]
         }
       ],
       "path": "/user/competition",
@@ -545,7 +550,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "returnsNote": "auto-derived from live response (structural drift vs spec)"
     },
     "cooldowns": {
       "requiresId": false,
@@ -895,7 +901,15 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "faction",
-          "type": "oneOf"
+          "type": "object",
+          "fields": [
+            "id",
+            "name",
+            "tag",
+            "tag_image",
+            "position",
+            "days_in_faction"
+          ]
         }
       ],
       "path": "/user/faction",
@@ -904,7 +918,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "returnsNote": "auto-derived from live response (structural drift vs spec)"
     },
     "forumfeed": {
       "requiresId": false,
@@ -1312,7 +1327,13 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "icons",
-          "type": "oneOf"
+          "type": "array",
+          "fields": [
+            "id",
+            "title",
+            "description",
+            "until"
+          ]
         }
       ],
       "path": "/user/icons",
@@ -1321,7 +1342,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "returnsNote": "auto-derived from live response (structural drift vs spec)"
     },
     "inventory": {
       "requiresId": false,
@@ -1509,7 +1531,16 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "job",
-          "type": "oneOf"
+          "type": "object",
+          "fields": [
+            "type",
+            "id",
+            "type_id",
+            "name",
+            "rating",
+            "position",
+            "days_in_company"
+          ]
         }
       ],
       "path": "/user/job",
@@ -1518,7 +1549,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "returnsNote": "auto-derived from live response (structural drift vs spec)"
     },
     "jobpoints": {
       "requiresId": false,
@@ -2116,10 +2148,25 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "organizedCrime",
-          "type": "oneOf"
+          "type": "object",
+          "fields": [
+            "id",
+            "previous_crime_id",
+            "name",
+            "difficulty",
+            "status",
+            "created_at",
+            "planning_at",
+            "executed_at",
+            "ready_at",
+            "expired_at",
+            "slots",
+            "rewards"
+          ]
         }
       ],
-      "path": "/user/organizedcrime"
+      "path": "/user/organizedcrime",
+      "returnsNote": "auto-derived from live response (structural drift vs spec)"
     },
     "organizedcrimes": {
       "requiresId": false,
@@ -3314,10 +3361,15 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "virus",
-          "type": "oneOf"
+          "type": "object",
+          "fields": [
+            "item",
+            "until"
+          ]
         }
       ],
-      "path": "/user/virus"
+      "path": "/user/virus",
+      "returnsNote": "auto-derived from live response (structural drift vs spec)"
     },
     "weaponexp": {
       "requiresId": false,
@@ -5407,10 +5459,19 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "warfare",
-          "type": "oneOf"
+          "type": "array",
+          "fields": [
+            "id",
+            "start",
+            "end",
+            "target",
+            "winner",
+            "factions"
+          ]
         }
       ],
-      "path": "/faction/warfare"
+      "path": "/faction/warfare",
+      "returnsNote": "auto-derived from live response (structural drift vs spec)"
     },
     "wars": {
       "requiresId": false,
@@ -8462,15 +8523,14 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "stocks",
-          "type": "object",
+          "type": "array",
           "fields": [
             "id",
             "name",
-            "acronym",
             "images",
+            "acronym",
             "market",
-            "bonus",
-            "chart"
+            "bonus"
           ]
         }
       ],
@@ -8480,7 +8540,8 @@ export const ENDPOINTS = {
         "name": "stockId",
         "type": "integer",
         "description": "Stock id"
-      }
+      },
+      "returnsNote": "auto-derived from live response (structural drift vs spec)"
     },
     "subcrimes": {
       "requiresId": true,

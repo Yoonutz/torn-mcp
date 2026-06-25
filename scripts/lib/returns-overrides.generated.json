@@ -1,1 +1,136 @@
-{}
+{
+  "faction/warfare": {
+    "note": "auto-derived from live response (structural drift vs spec)",
+    "returns": [
+      {
+        "name": "warfare",
+        "type": "array",
+        "fields": [
+          "id",
+          "start",
+          "end",
+          "target",
+          "winner",
+          "factions"
+        ]
+      }
+    ]
+  },
+  "torn/stocks": {
+    "note": "auto-derived from live response (structural drift vs spec)",
+    "returns": [
+      {
+        "name": "stocks",
+        "type": "array",
+        "fields": [
+          "id",
+          "name",
+          "images",
+          "acronym",
+          "market",
+          "bonus"
+        ]
+      }
+    ]
+  },
+  "user/competition": {
+    "note": "auto-derived from live response (structural drift vs spec)",
+    "returns": [
+      {
+        "name": "competition",
+        "type": "object",
+        "fields": [
+          "name",
+          "status",
+          "hp"
+        ]
+      }
+    ]
+  },
+  "user/faction": {
+    "note": "auto-derived from live response (structural drift vs spec)",
+    "returns": [
+      {
+        "name": "faction",
+        "type": "object",
+        "fields": [
+          "id",
+          "name",
+          "tag",
+          "tag_image",
+          "position",
+          "days_in_faction"
+        ]
+      }
+    ]
+  },
+  "user/icons": {
+    "note": "auto-derived from live response (structural drift vs spec)",
+    "returns": [
+      {
+        "name": "icons",
+        "type": "array",
+        "fields": [
+          "id",
+          "title",
+          "description",
+          "until"
+        ]
+      }
+    ]
+  },
+  "user/job": {
+    "note": "auto-derived from live response (structural drift vs spec)",
+    "returns": [
+      {
+        "name": "job",
+        "type": "object",
+        "fields": [
+          "type",
+          "id",
+          "type_id",
+          "name",
+          "rating",
+          "position",
+          "days_in_company"
+        ]
+      }
+    ]
+  },
+  "user/organizedcrime": {
+    "note": "auto-derived from live response (structural drift vs spec)",
+    "returns": [
+      {
+        "name": "organizedCrime",
+        "type": "object",
+        "fields": [
+          "id",
+          "previous_crime_id",
+          "name",
+          "difficulty",
+          "status",
+          "created_at",
+          "planning_at",
+          "executed_at",
+          "ready_at",
+          "expired_at",
+          "slots",
+          "rewards"
+        ]
+      }
+    ]
+  },
+  "user/virus": {
+    "note": "auto-derived from live response (structural drift vs spec)",
+    "returns": [
+      {
+        "name": "virus",
+        "type": "object",
+        "fields": [
+          "item",
+          "until"
+        ]
+      }
+    ]
+  }
+}

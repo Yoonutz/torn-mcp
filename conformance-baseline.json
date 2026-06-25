@@ -6,9 +6,6 @@
   "faction/chainreport": [
     "missing required field 'escpaces' (at /chainreport/attackers/*/attacks)"
   ],
-  "faction/raidreport": [
-    "wrong type at /raidreport — schema expects array"
-  ],
   "faction/territorywarreport": [
     "wrong type at /territorywarreport — schema expects array"
   ],
@@ -43,6 +40,10 @@
   "user/enlistedcars": [
     "missing required field 'name' (at /enlistedcars/*)"
   ],
+  "user/equipment": [
+    "wrong type at /equipment/*/ammo — schema expects object",
+    "wrong type at /equipment/*/stats — schema expects object"
+  ],
   "user/forumsubscribedthreads": [
     "missing required field 'forumSbuscribedThreads' (at (root))"
   ],
@@ -66,12 +67,5 @@
     "wrong type at /stocks/*/bonus/increment — schema expects integer",
     "wrong type at /stocks/*/bonus/progress — schema expects integer",
     "wrong type at /stocks/*/bonus/frequency — schema expects integer"
-  ],
-  "user/trade": [
-    "wrong type at /trade/timestamp — schema expects integer"
-  ],
-  "user/trades": [
-    "missing required field 'items' (at /trades/*)",
-    "wrong type at /trades/*/timestamp — schema expects integer"
   ]
 }
