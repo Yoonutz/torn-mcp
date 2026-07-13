@@ -3,7 +3,7 @@
     "info": {
         "title": "Torn API",
         "description": "\n * The development of Torn's API v2 is still ongoing.\n * If selections remain unaltered, they will default to the API v1 version.\n * Unlike API v1, API v2 accepts both selections and IDs as path and query parameters.\n * If any discrepancies or errors are found, please submit a [bug report](https://www.torn.com/forums.php#/p=forums&f=19&b=0&a=0) on the Torn Forums.\n * In case you're using bots to check for changes on openapi.json file, make sure to specificy a custom user-agent header - CloudFlare sometimes prevents requests from default user-agents.",
-        "version": "6.0.0"
+        "version": "6.0.3"
     },
     "servers": [
         {
@@ -5529,7 +5529,7 @@
                         "$ref": "#/components/parameters/ApiFactionSearchFilter"
                     },
                     {
-                        "$ref": "#/components/parameters/ApiLimit50Default20"
+                        "$ref": "#/components/parameters/ApiLimit100Default20"
                     },
                     {
                         "$ref": "#/components/parameters/ApiOffset"
@@ -6797,7 +6797,7 @@
                         "$ref": "#/components/parameters/ApiCompanySearchFilter"
                     },
                     {
-                        "$ref": "#/components/parameters/ApiLimit50Default20"
+                        "$ref": "#/components/parameters/ApiLimit100Default20"
                     },
                     {
                         "$ref": "#/components/parameters/ApiOffset"
@@ -7754,7 +7754,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/AuctionHouseListing"
+                                    "$ref": "#/components/schemas/AuctionHouseListingResponse"
                                 }
                             }
                         }
@@ -8356,7 +8356,7 @@
                                             "$ref": "#/components/schemas/AuctionHouseResponse"
                                         },
                                         {
-                                            "$ref": "#/components/schemas/AuctionHouseListing"
+                                            "$ref": "#/components/schemas/AuctionHouseListingResponse"
                                         },
                                         {
                                             "$ref": "#/components/schemas/MarketPropertiesResponse"
@@ -11793,7 +11793,7 @@
                     "FAD",
                     "FAE",
                     "FAF",
-                    "FAG",
+                    "XAG",
                     "FBA",
                     "FBB",
                     "FBC",
@@ -18585,8 +18585,8 @@
                         "format": "int64"
                     },
                     "price": {
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "number",
+                        "format": "float"
                     },
                     "timestamp": {
                         "type": "integer",
@@ -18661,8 +18661,7 @@
             },
             "UserOrganizedCrimesResponse": {
                 "required": [
-                    "organizedcrimes",
-                    "_metadata"
+                    "organizedcrimes"
                 ],
                 "properties": {
                     "organizedcrimes": {
@@ -18670,9 +18669,6 @@
                         "items": {
                             "$ref": "#/components/schemas/FactionCrime"
                         }
-                    },
-                    "_metadata": {
-                        "$ref": "#/components/schemas/RequestMetadataWithLinks"
                     }
                 },
                 "type": "object"
@@ -19047,7 +19043,14 @@
                                     ],
                                     "properties": {
                                         "type": {
-                                            "$ref": "#/components/schemas/MissionRewardUpgrade"
+                                            "oneOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/MissionRewardUpgrade"
+                                                },
+                                                {
+                                                    "type": "string"
+                                                }
+                                            ]
                                         },
                                         "details": {
                                             "description": "The response depends on the 'type' value.",
@@ -19488,7 +19491,14 @@
                         "type": "string"
                     },
                     "description": {
-                        "type": "string"
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     }
                 },
                 "type": "object"
@@ -20682,7 +20692,10 @@
                                 "type": "string",
                                 "enum": [
                                     "none",
-                                    "in_use"
+                                    "in_use",
+                                    "for_sale",
+                                    "rented",
+                                    "for_rent"
                                 ]
                             }
                         },
@@ -21748,7 +21761,6 @@
                     {
                         "required": [
                             "id",
-                            "name",
                             "worth",
                             "points_spent",
                             "races_entered",
@@ -21852,7 +21864,7 @@
             },
             "UserForumSubscribedThreadsResponse": {
                 "required": [
-                    "forumSbuscribedThreads"
+                    "forumSubscribedThreads"
                 ],
                 "properties": {
                     "forumSubscribedThreads": {
@@ -24310,7 +24322,7 @@
                             "elo",
                             "unarmored_wins",
                             "highest_level_beaten",
-                            "escpaes",
+                            "escapes",
                             "killstreak",
                             "hits",
                             "damage",
@@ -25769,10 +25781,7 @@
                 ],
                 "properties": {
                     "raidreport": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/FactionRaidReport"
-                        }
+                        "$ref": "#/components/schemas/FactionRaidReport"
                     }
                 },
                 "type": "object"
@@ -26391,10 +26400,7 @@
                 ],
                 "properties": {
                     "territorywarreport": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/FactionTerritoryWarReport"
-                        }
+                        "$ref": "#/components/schemas/FactionTerritoryWarReport"
                     }
                 },
                 "type": "object"
@@ -26639,7 +26645,7 @@
                     "ability",
                     "level",
                     "cost",
-                    "unlockedAt"
+                    "unlocked_at"
                 ],
                 "properties": {
                     "id": {
@@ -27978,7 +27984,7 @@
                     "retaliations",
                     "overseas",
                     "draws",
-                    "escpaces",
+                    "escapes",
                     "losses",
                     "war",
                     "bonuses"
@@ -29020,7 +29026,8 @@
                         "type": "string"
                     },
                     "storage_capacity": {
-                        "$ref": "#/components/schemas/CompanyStorageSizeEnum"
+                        "type": "integer",
+                        "format": "int32"
                     }
                 },
                 "type": "object"
@@ -30425,6 +30432,17 @@
                                 "$ref": "#/components/schemas/TornItemDetails"
                             }
                         ]
+                    }
+                },
+                "type": "object"
+            },
+            "AuctionHouseListingResponse": {
+                "required": [
+                    "auctionhouselisting"
+                ],
+                "properties": {
+                    "auctionhouselisting": {
+                        "$ref": "#/components/schemas/AuctionHouseListing"
                     }
                 },
                 "type": "object"
@@ -32387,7 +32405,6 @@
                     "description",
                     "type",
                     "circulation",
-                    "equipped",
                     "rarity"
                 ],
                 "properties": {
@@ -32696,7 +32713,8 @@
                     "honor": {
                         "oneOf": [
                             {
-                                "type": "string"
+                                "type": "integer",
+                                "format": "int32"
                             },
                             {
                                 "type": "null"
@@ -33111,7 +33129,7 @@
                         "oneOf": [
                             {
                                 "type": "integer",
-                                "format": "int32"
+                                "format": "int64"
                             },
                             {
                                 "type": "string"

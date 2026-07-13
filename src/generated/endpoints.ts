@@ -9398,7 +9398,7 @@ export const ENDPOINTS = {
             "FAD",
             "FAE",
             "FAF",
-            "FAG",
+            "XAG",
             "FBA",
             "FBB",
             "FBC",
