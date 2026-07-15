@@ -1,32 +1,4 @@
 {
-  "company/profile": [
-    "wrong type at /profile/upgrades/storage_capacity — schema expects string",
-    "value at /profile/upgrades/storage_capacity is not one of the allowed values"
-  ],
-  "faction/chainreport": [
-    "missing required field 'escpaces' (at /chainreport/attackers/*/attacks)"
-  ],
-  "faction/territorywarreport": [
-    "wrong type at /territorywarreport — schema expects array"
-  ],
-  "faction/upgrades": [
-    "missing required field 'unlockedAt' (at /upgrades/core/upgrades/*)",
-    "missing required field 'unlockedAt' (at /upgrades/peace/*/upgrades/*)",
-    "missing required field 'unlockedAt' (at /upgrades/war/*/upgrades/*)"
-  ],
-  "market/auctionhouselisting": [
-    "missing required field 'id' (at (root))",
-    "missing required field 'seller' (at (root))",
-    "missing required field 'buyer' (at (root))",
-    "missing required field 'timestamp' (at (root))",
-    "missing required field 'price' (at (root))",
-    "missing required field 'bids' (at (root))",
-    "missing required field 'item' (at (root))"
-  ],
-  "torn/education": [
-    "wrong type at /education/*/courses/*/rewards/honor — schema expects string",
-    "wrong type at /education/*/courses/*/rewards/honor — schema expects null"
-  ],
   "torn/factiontree": [
     "value at /factionTree/*/branches/*/upgrades/*/challenge/stat is not one of the allowed values",
     "wrong type at /factionTree/*/branches/*/upgrades/*/challenge — schema expects null"
@@ -34,36 +6,17 @@
   "torn/hof": [
     "wrong type at /hof/*/value — schema expects string"
   ],
-  "torn/medals": [
-    "missing required field 'equipped' (at /medals/*)"
-  ],
-  "user/enlistedcars": [
-    "missing required field 'name' (at /enlistedcars/*)"
+  "torn/organizedcrimes": [
+    "wrong type at /organizedcrimes/*/slots/*/name — schema expects string"
   ],
   "user/equipment": [
     "wrong type at /equipment/*/ammo — schema expects object",
     "wrong type at /equipment/*/stats — schema expects object"
   ],
-  "user/forumsubscribedthreads": [
-    "missing required field 'forumSbuscribedThreads' (at (root))"
-  ],
-  "user/icons": [
-    "wrong type at /icons/*/description — schema expects string"
-  ],
   "user/missions": [
     "value at /missions/rewards/*/details/type is not one of the allowed values"
   ],
-  "user/organizedcrimes": [
-    "missing required field '_metadata' (at (root))"
-  ],
-  "user/personalstats": [
-    "missing required field 'escpaes' (at /personalstats/attacking)"
-  ],
-  "user/properties": [
-    "value at /properties/*/status is not one of the allowed values"
-  ],
   "user/stocks": [
-    "wrong type at /stocks/*/transactions/*/price — schema expects integer",
     "wrong type at /stocks/*/bonus/increment — schema expects integer",
     "wrong type at /stocks/*/bonus/progress — schema expects integer",
     "wrong type at /stocks/*/bonus/frequency — schema expects integer"
