@@ -1,5 +1,25 @@
 # Torn OpenAPI change log
 
+## 2026-07-20 — OpenAPI 6.1.1
+
+**OpenAPI version:** 6.0.3 → 6.1.1
+**Endpoints:** 160 → 161 catalog (from 205 → 206 raw operations) — +1 −0 ~0, 160 unchanged
+
+| Category | Endpoints | + Added | − Removed | ~ Changed |
+|----------|-----------|---------|-----------|-----------|
+| user | 64 | 0 | 0 | 0 |
+| faction | 35 | +1 | 0 | 0 |
+| torn | 26 | 0 | 0 | 0 |
+| company | 10 | 0 | 0 | 0 |
+| market | 8 | 0 | 0 | 0 |
+| racing | 8 | 0 | 0 | 0 |
+| forum | 6 | 0 | 0 | 0 |
+| key | 2 | 0 | 0 | 0 |
+| property | 2 | 0 | 0 | 0 |
+| **Total** | **161** | **+1** | **0** | **0** |
+
+**Added:** faction/snapshot
+
 ## 2026-07-13 — OpenAPI 6.0.3
 
 **OpenAPI version:** 6.0.0 → 6.0.3

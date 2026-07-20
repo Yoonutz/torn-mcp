@@ -1072,7 +1072,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get available slots for organized crimes with status 'Recruiting'
+         * Get your available slots for organized crimes with status 'Recruiting'
          * @description Requires minimal access key. <br>Unlike 'faction' -> 'crimes', this selection only shows empty slots, and only for crimes with the 'Recruiting' status.
          */
         get: operations["getMyAvailableOrganizedCrimes"];
@@ -1264,7 +1264,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get user races
+         * Get your races
          * @description Requires minimal access key. <br>Returns a list of user races, ordered by race start timestamp.
          */
         get: operations["getMyRaces"];
@@ -2236,6 +2236,27 @@ export interface paths {
          * @description Requires public access key. <br>This selection is standalone and cannot be used together with other selections.
          */
         get: operations["getFactionSearch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/faction/snapshot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get daily factions snapshot CSV
+         * @description Requires public access key.<br>Returns a CSV daily snapshot of factions.<br>This selection is standalone and cannot be used together with other selections.<br>
+         *     CSV columns: id, name, tag, tag_image, banner_image, leader_id, co_leader_id, respect, days_old, rank, members, members_max, member_list, recruiting, destroyed_timestamp
+         */
+        get: operations["getFactionsSnapshot"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4248,7 +4269,7 @@ export interface components {
         /** @enum {string} */
         FactionCrimeUserItemOutcomeEnum: "user" | "faction";
         /** @enum {string} */
-        FactionCrimeItemOutcomeEnum: "lost" | "used";
+        FactionCrimeItemOutcomeEnum: "lost" | "used" | "unused";
         /** Format: int32 */
         RaceId: number;
         /** Format: int32 */
@@ -5239,6 +5260,14 @@ export interface components {
             current: number;
             /** Format: int32 */
             maximum: number;
+            /** Format: int32 */
+            increment: number;
+            /** Format: int32 */
+            interval: number;
+            /** Format: int32 */
+            tick_time: number;
+            /** Format: int32 */
+            full_time: number;
         };
         UserBars: {
             energy: components["schemas"]["UserBar"];
@@ -12801,6 +12830,33 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FactionSearchResponse"];
+                };
+            };
+        };
+    };
+    getFactionsSnapshot: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful CSV response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
                 };
             };
         };

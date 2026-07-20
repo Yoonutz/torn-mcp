@@ -2170,7 +2170,7 @@ export const ENDPOINTS = {
     },
     "organizedcrimes": {
       "requiresId": false,
-      "summary": "Get available slots for organized crimes with status 'Recruiting'",
+      "summary": "Get your available slots for organized crimes with status 'Recruiting'",
       "description": "Requires minimal access key. <br>Unlike 'faction' -> 'crimes', this selection only shows empty slots, and only for crimes with the 'Recruiting' status.",
       "keyLevel": "minimal",
       "stability": "Stable",
@@ -2683,7 +2683,7 @@ export const ENDPOINTS = {
     },
     "races": {
       "requiresId": false,
-      "summary": "Get user races",
+      "summary": "Get your races",
       "description": "Requires minimal access key. <br>Returns a list of user races, ordered by race start timestamp.",
       "keyLevel": "minimal",
       "stability": "Stable",
@@ -5099,6 +5099,30 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/faction/search"
+    },
+    "snapshot": {
+      "requiresId": false,
+      "summary": "Get daily factions snapshot CSV",
+      "description": "Requires public access key.<br>Returns a CSV daily snapshot of factions.<br>This selection is standalone and cannot be used together with other selections.<br>\nCSV columns: id, name, tag, tag_image, banner_image, leader_id, co_leader_id, respect, days_old, rank, members, members_max, member_list, recruiting, destroyed_timestamp",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache or get the data in specific point in time"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "path": "/faction/snapshot"
     },
     "stats": {
       "requiresId": false,
