@@ -35,23 +35,39 @@ export { RateLimiter };
 const VERSION = "0.10.0";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+const KEY_HEADER = "x-torn-api-key";
+const KEY_QUERY = "key";
+const MISSING_KEY_ERROR = "Missing Torn API key. Send ?key= or X-Torn-Api-Key header.";
 
 interface Env {
   MCP_OBJECT: DurableObjectNamespace;
   RATE_LIMITER: DurableObjectNamespace;
-  /** Optional fallback key, used only when the request omits the header. */
+  /** Optional fallback key, used only when the request omits the header/query. */
   TORN_API_KEY?: string;
 }
 
+function cloneWithSameQuery(target: string, sourceUrl: URL): string {
+  const out = new URL(target);
+  if (!out.search) out.search = sourceUrl.search;
+  return out.toString();
+}
+
+function keyFromRequest(request: Request, env: Env): string {
+  const headerKey = request.headers.get(KEY_HEADER) ?? request.headers.get("X-Torn-Api-Key");
+  if (headerKey) return headerKey;
+  const queryKey = new URL(request.url).searchParams.get(KEY_QUERY);
+  if (queryKey) return queryKey;
+  return env.TORN_API_KEY ?? "";
+}
+
 /**
- * Read the Torn API key from the per-request headers (the SDK passes them on
- * `extra.requestInfo.headers`), falling back to the env key. Headers are
- * lowercased; values may be string or string[].
+ * Read the Torn API key from per-request headers/query (already normalized by
+ * the Worker fetch handler and propagated through the DO boundary).
  */
 function keyFromExtra(extra: unknown, env: Env): string {
   const headers = (extra as { requestInfo?: { headers?: Record<string, unknown> } })
     ?.requestInfo?.headers;
-  const raw = headers?.["x-torn-api-key"];
+  const raw = headers?.[KEY_HEADER];
   const key = typeof raw === "string" ? raw : Array.isArray(raw) ? String(raw[0]) : undefined;
   return key ?? env.TORN_API_KEY ?? "";
 }
@@ -261,7 +277,7 @@ export class TornMCP extends DurableObject<Env> {
    */
   private async rateLimitedFetch(apiKey: string, url: string): Promise<any> {
     if (!apiKey) {
-      throw new Error("Missing Torn API key. Send it in the X-Torn-Api-Key request header.");
+      throw new Error(MISSING_KEY_ERROR);
     }
 
     const keyHash = await sha256Hex(apiKey);
@@ -328,7 +344,7 @@ export class TornMCP extends DurableObject<Env> {
     if (!apiKey) {
       return {
         ok: false,
-        error: "Missing Torn API key. Send it in the X-Torn-Api-Key request header.",
+        error: MISSING_KEY_ERROR,
       };
     }
     const resolved = resolveTimeParams(params, Date.now());
@@ -355,7 +371,15 @@ export default {
       const stub = env.MCP_OBJECT.get(env.MCP_OBJECT.idFromName(sessionId));
       const headers = new Headers(request.headers);
       headers.set("X-DO-Session", sessionId);
-      return stub.fetch(new Request(request, { headers }));
+
+      // Normalize auth once at ingress (header preferred, then ?key=), then pass
+      // through header for all downstream MCP tool invocations.
+      const apiKey = keyFromRequest(request, env);
+      if (apiKey) headers.set("X-Torn-Api-Key", apiKey);
+
+      // Preserve query string (especially ?key=) when routing to the DO/session.
+      const doUrl = cloneWithSameQuery("https://mcp-session/mcp", url);
+      return stub.fetch(new Request(doUrl, { method: request.method, headers, body: request.body, redirect: request.redirect }));
     }
 
     if (url.pathname === "/health") {
