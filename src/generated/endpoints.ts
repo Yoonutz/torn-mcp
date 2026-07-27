@@ -3250,6 +3250,9 @@ export const ENDPOINTS = {
           "fields": [
             "id",
             "timestamp",
+            "completed_at",
+            "expires_at",
+            "modified_at",
             "user",
             "trader"
           ]
@@ -3286,6 +3289,9 @@ export const ENDPOINTS = {
           "fields": [
             "id",
             "timestamp",
+            "completed_at",
+            "expires_at",
+            "modified_at",
             "user",
             "trader",
             "items"
@@ -8443,6 +8449,41 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/torn/merits"
+    },
+    "museum": {
+      "requiresId": false,
+      "summary": "Get all museum sets",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache or get the data in specific point in time"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "museum",
+          "type": "array",
+          "fields": [
+            "name",
+            "points",
+            "items"
+          ]
+        }
+      ],
+      "path": "/torn/museum"
     },
     "organizedcrimes": {
       "requiresId": false,
