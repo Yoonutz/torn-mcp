@@ -3,7 +3,7 @@
     "info": {
         "title": "Torn API",
         "description": "\n * The development of Torn's API v2 is still ongoing.\n * If selections remain unaltered, they will default to the API v1 version.\n * Unlike API v1, API v2 accepts both selections and IDs as path and query parameters.\n * If any discrepancies or errors are found, please submit a [bug report](https://www.torn.com/forums.php#/p=forums&f=19&b=0&a=0) on the Torn Forums.\n * In case you're using bots to check for changes on openapi.json file, make sure to specificy a custom user-agent header - CloudFlare sometimes prevents requests from default user-agents.",
-        "version": "6.2.0"
+        "version": "6.3.1"
     },
     "servers": [
         {
@@ -3201,6 +3201,46 @@
                     }
                 ],
                 "x-stability": "Stable"
+            }
+        },
+        "/user/snapshot": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get daily active players snapshot CSV",
+                "description": "Requires public access key.<br>Returns a CSV daily snapshot of active players.<br>This selection is standalone and cannot be used together with other selections.<br>\nCSV columns: id, name, gender, role, signed_up, last_action, level, rank, donator, networth, faction, company, spouse, display_case, bazaar, location, fed, fed_reason",
+                "operationId": "getUsersSnapshot",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful CSV response",
+                        "content": {
+                            "text/csv": {
+                                "schema": {
+                                    "type": "string",
+                                    "example": "id,name,gender,role,signed_up,last_action,level,rank,donator,networth,faction,company,spouse,display_case,bazaar,location,fed,fed_reason\\n33,1,Chedburn,Male,Admin,1100521336,1785154349,15,Outstanding,1,299829600590,40992,79286,2103253,1,1,Torn,0,"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
             }
         },
         "/user/stocks": {
@@ -16485,6 +16525,8 @@
                     "is_stealthed",
                     "is_raid",
                     "is_ranked_war",
+                    "is_territory_war",
+                    "territory_war_id",
                     "finishing_hit_effects",
                     "modifiers"
                 ],
@@ -16545,6 +16587,19 @@
                     },
                     "is_ranked_war": {
                         "type": "boolean"
+                    },
+                    "is_territory_war": {
+                        "type": "boolean"
+                    },
+                    "territory_war_id": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/TerritoryWarId"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     },
                     "finishing_hit_effects": {
                         "type": "array",
@@ -22596,6 +22651,7 @@
                             "revives",
                             "revivesfull",
                             "skills",
+                            "snapshot",
                             "stocks",
                             "trades",
                             "trade",

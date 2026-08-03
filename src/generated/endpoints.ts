@@ -169,6 +169,8 @@ export const ENDPOINTS = {
             "is_stealthed",
             "is_raid",
             "is_ranked_war",
+            "is_territory_war",
+            "territory_war_id",
             "finishing_hit_effects",
             "modifiers"
           ]
@@ -3143,6 +3145,30 @@ export const ENDPOINTS = {
       ],
       "path": "/user/skills"
     },
+    "snapshot": {
+      "requiresId": false,
+      "summary": "Get daily active players snapshot CSV",
+      "description": "Requires public access key.<br>Returns a CSV daily snapshot of active players.<br>This selection is standalone and cannot be used together with other selections.<br>\nCSV columns: id, name, gender, role, signed_up, last_action, level, rank, donator, networth, faction, company, spouse, display_case, bazaar, location, fed, fed_reason",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache or get the data in specific point in time"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "path": "/user/snapshot"
+    },
     "stocks": {
       "requiresId": false,
       "summary": "Get your stocks",
@@ -3631,6 +3657,8 @@ export const ENDPOINTS = {
             "is_stealthed",
             "is_raid",
             "is_ranked_war",
+            "is_territory_war",
+            "territory_war_id",
             "finishing_hit_effects",
             "modifiers"
           ]
