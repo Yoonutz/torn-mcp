@@ -1004,6 +1004,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/user/networth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get your networth
+         * @description Requires limited access key. <br>
+         */
+        get: operations["getMyNetworth"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/user/newmessages": {
         parameters: {
             query?: never;
@@ -1013,7 +1033,7 @@ export interface paths {
         };
         /**
          * Get your unseen messages
-         * @description Requires limited access key. <br>
+         * @description Requires limited access key. <br>This selection is cached for 1 hour.
          */
         get: operations["getMyNewMessages"];
         put?: never;
@@ -1076,6 +1096,26 @@ export interface paths {
          * @description Requires minimal access key. <br>Unlike 'faction' -> 'crimes', this selection only shows empty slots, and only for crimes with the 'Recruiting' status.
          */
         get: operations["getMyAvailableOrganizedCrimes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/user/perks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get your current perks
+         * @description Requires minimal access key. <br>
+         */
+        get: operations["getMyPerks"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1408,7 +1448,7 @@ export interface paths {
         /**
          * Get daily active players snapshot CSV
          * @description Requires public access key.<br>Returns a CSV daily snapshot of active players.<br>This selection is standalone and cannot be used together with other selections.<br>
-         *     CSV columns: id, name, gender, role, signed_up, last_action, level, rank, donator, networth, faction, company, spouse, display_case, bazaar, location, fed, fed_reason
+         *     CSV columns: id, name, gender, signed_up, level, rank, donator, faction, company, job, spouse, display_case, bazaar, fed, fed_reason, time_played, awards
          */
         get: operations["getUsersSnapshot"];
         put?: never;
@@ -3176,6 +3216,26 @@ export interface paths {
          * @description <b>Globally cached selection.</b><br><br>Requires public access key. <br>
          */
         get: operations["getMarketProperties"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/market/pointsmarket": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get points market listings
+         * @description Requires public access key. <br>
+         */
+        get: operations["getMarketPoints"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4992,6 +5052,72 @@ export interface components {
             error: string;
         };
         ApiError: components["schemas"]["ErrorUnknown"] | components["schemas"]["ErrorKeyEmpty"] | components["schemas"]["ErrorIncorrectKey"] | components["schemas"]["ErrorWrongType"] | components["schemas"]["ErrorWrongFields"] | components["schemas"]["ErrorTooManyRequests"] | components["schemas"]["ErrorIncorrectId"] | components["schemas"]["ErrorIncorrectIdEntityRelation"] | components["schemas"]["ErrorIpBlocked"] | components["schemas"]["ErrorApiDisabled"] | components["schemas"]["ErrorKeyOwnerInFederalJail"] | components["schemas"]["ErrorKeyChangeCooldown"] | components["schemas"]["ErrorKeyReadError"] | components["schemas"]["ErrorKeyTemporaryDisabled"] | components["schemas"]["ErrorDailyReadLimitReached"] | components["schemas"]["ErrorLogUnavailable"] | components["schemas"]["ErrorAccessLevelTooLow"] | components["schemas"]["ErrorBackendError"] | components["schemas"]["ErrorApiKeyPaused"] | components["schemas"]["ErrorMustMigrateToCrimesV2"] | components["schemas"]["ErrorRaceNotFinished"] | components["schemas"]["ErrorIncorrectCategory"] | components["schemas"]["ErrorOnlyAvailableInApiV1"] | components["schemas"]["ErrorOnlyAvailableInApiV2"] | components["schemas"]["ErrorClosedTemporarily"] | components["schemas"]["ErrorInvalidStatRequested"] | components["schemas"]["ErrorOnlyCategoryOrStatsAllowed"] | components["schemas"]["ErrorMustMigrateToOrganizedCrimesV2"] | components["schemas"]["ErrorIncorrectLogId"] | components["schemas"]["ErrorCategorySelectionUnavailableForInteractionLogs"] | components["schemas"]["ErrorFileDoesNotExist"];
+        UserPerksResponse: {
+            perks: {
+                faction: string[];
+                job: string[];
+                property: string[];
+                education: string[];
+                enhancer: string[];
+                book: string[];
+                stock: string[];
+                merit: string[];
+            };
+        };
+        UserNetworthResponse: {
+            networth: {
+                money: {
+                    /** Format: int64 */
+                    pending: number;
+                    /** Format: int64 */
+                    wallet: number;
+                    /** Format: int64 */
+                    vault: number;
+                    /** Format: int64 */
+                    bookie: number;
+                    /** Format: int64 */
+                    city_bank: number;
+                    /** Format: int64 */
+                    cayman_bank: number;
+                    /** Format: int64 */
+                    piggy_bank: number;
+                    /** Format: int64 */
+                    loans: number;
+                    /** Format: int64 */
+                    unpaid_fees: number;
+                };
+                items: {
+                    /** Format: int64 */
+                    inventory: number;
+                    /** Format: int64 */
+                    display_case: number;
+                    /** Format: int64 */
+                    bazaar: number;
+                    /** Format: int64 */
+                    trades: number;
+                    /** Format: int64 */
+                    item_market: number;
+                    /** Format: int64 */
+                    auction_house: number;
+                    /** Format: int64 */
+                    enlisted_cars: number;
+                };
+                assets: {
+                    /** Format: int64 */
+                    property: number;
+                    /** Format: int64 */
+                    stock_market: number;
+                    /** Format: int64 */
+                    company: number;
+                };
+                /** Format: int64 */
+                points: number;
+                /** Format: int64 */
+                total: number;
+                /** Format: int32 */
+                timestamp: number;
+            };
+        };
         UserItemMod: {
             id: components["schemas"]["ItemModId"];
             title: string;
@@ -6202,7 +6328,7 @@ export interface components {
             list: components["schemas"]["UserList"][];
             _metadata: components["schemas"]["RequestMetadataWithLinks"];
         };
-        UserSelectionName: ("ammo" | "attacks" | "attacksfull" | "bars" | "basic" | "battlestats" | "bounties" | "calendar" | "casino" | "competition" | "cooldowns" | "crimes" | "discord" | "enlistedcars" | "equipment" | "events" | "faction" | "factionbalance" | "forumfeed" | "forumfriends" | "forumposts" | "forumsubscribedthreads" | "forumthreads" | "hof" | "honors" | "icons" | "inventory" | "itemmarket" | "itemmod" | "job" | "jobpoints" | "jobranks" | "list" | "log" | "lookup" | "medals" | "merits" | "messages" | "missions" | "money" | "newevents" | "newmessages" | "notifications" | "organizedcrime" | "personalstats" | "profile" | "properties" | "property" | "races" | "racingrecords" | "refills" | "reports" | "revives" | "revivesfull" | "skills" | "snapshot" | "stocks" | "trades" | "trade" | "travel" | "timestamp" | "weaponexp" | "workstats" | "bazaar" | "criminalrecord" | "display" | "education" | "gym" | "networth" | "perks") | string;
+        UserSelectionName: ("ammo" | "attacks" | "attacksfull" | "bars" | "basic" | "battlestats" | "bounties" | "calendar" | "casino" | "competition" | "cooldowns" | "crimes" | "discord" | "enlistedcars" | "equipment" | "events" | "faction" | "factionbalance" | "forumfeed" | "forumfriends" | "forumposts" | "forumsubscribedthreads" | "forumthreads" | "hof" | "honors" | "icons" | "inventory" | "itemmarket" | "itemmod" | "job" | "jobpoints" | "jobranks" | "list" | "log" | "lookup" | "medals" | "merits" | "messages" | "missions" | "money" | "networth" | "newevents" | "newmessages" | "notifications" | "organizedcrime" | "personalstats" | "profile" | "properties" | "property" | "races" | "racingrecords" | "refills" | "reports" | "revives" | "revivesfull" | "skills" | "snapshot" | "stocks" | "trades" | "trade" | "travel" | "timestamp" | "weaponexp" | "workstats" | "bazaar" | "criminalrecord" | "display" | "education" | "gym" | "perks") | string;
         UserLookupResponse: {
             selections: components["schemas"]["UserSelectionName"][];
         };
@@ -8447,6 +8573,18 @@ export interface components {
             };
         };
         KeySelectionName: ("info" | "log") | string;
+        PointsMarketResponse: {
+            pointsmarket: {
+                /** Format: int32 */
+                id: number;
+                /** Format: int32 */
+                quantity: number;
+                /** Format: int32 */
+                cost: number;
+                /** Format: int64 */
+                total_cost: number;
+            }[];
+        };
         AuctionHouseStackableItem: {
             id: components["schemas"]["ItemId"];
             uid: components["schemas"]["ItemUid"];
@@ -8649,7 +8787,7 @@ export interface components {
             itemmarket: components["schemas"]["ItemMarket"];
             _metadata: components["schemas"]["RequestMetadataWithLinksAndTotal"];
         };
-        MarketSelectionName: ("bazaar" | "itemmarket" | "properties" | "rentals" | "lookup" | "timestamp" | "pointsmarket" | "auctionhouse" | "auctionhouselisting") | string;
+        MarketSelectionName: ("auctionhouse" | "auctionhouselisting" | "bazaar" | "itemmarket" | "pointsmarket" | "properties" | "rentals" | "lookup" | "timestamp") | string;
         MarketLookupResponse: {
             selections: components["schemas"]["MarketSelectionName"][];
         };
@@ -9414,8 +9552,10 @@ export interface components {
         ApiKeyLimited: string;
         /** @description API key (Full).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
         ApiKeyFull: string;
-        /** @description Timestamp to bypass cache or get the data in specific point in time */
+        /** @description Timestamp to bypass cache */
         ApiTimestamp: number | string;
+        /** @description Timestamp to get the data in specific point in time */
+        ApiTimestampSpecificPointInTime: number | string;
         /**
          * @description It's possible to use this query parameter to only get incoming or outgoing attacks / revives. If not specified, this selection will return both incoming and outgoing attacks / revives.
          *     It's also possible to combine this with 'idFilter'. This filter allows using from/to to filter by ids instead of timestamps.
@@ -9480,7 +9620,7 @@ export interface operations {
     getMyAmmo: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9519,7 +9659,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
                 from?: components["parameters"]["ApiFrom"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9558,7 +9698,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
                 from?: components["parameters"]["ApiFrom"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9585,7 +9725,7 @@ export interface operations {
     getMyBars: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9614,7 +9754,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9643,7 +9783,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9673,7 +9813,7 @@ export interface operations {
     getMyBattlestats: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9700,7 +9840,7 @@ export interface operations {
     getMyBounties: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9727,7 +9867,7 @@ export interface operations {
     getUserBounties: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9757,7 +9897,7 @@ export interface operations {
     getMyCalendarTime: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9784,7 +9924,7 @@ export interface operations {
     getMyCasinoStreak: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9811,7 +9951,7 @@ export interface operations {
     getMyCompetitionInfo: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9838,7 +9978,7 @@ export interface operations {
     getUserCompetitionInfo: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9868,7 +10008,7 @@ export interface operations {
     getMyCooldowns: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9895,7 +10035,7 @@ export interface operations {
     getMyCrimes: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9925,7 +10065,7 @@ export interface operations {
     getMyDiscord: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9952,7 +10092,7 @@ export interface operations {
     getUserDiscord: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -9982,7 +10122,7 @@ export interface operations {
     getMyEducation: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10009,7 +10149,7 @@ export interface operations {
     getMyEnlistedCars: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10036,7 +10176,7 @@ export interface operations {
     getMyEquipment: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10070,7 +10210,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10097,7 +10237,7 @@ export interface operations {
     getMyFaction: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10124,7 +10264,7 @@ export interface operations {
     getUserFaction: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10154,7 +10294,7 @@ export interface operations {
     getMyForumFeed: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10181,7 +10321,7 @@ export interface operations {
     getMyForumFriendsUpdates: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10217,7 +10357,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10253,7 +10393,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10283,7 +10423,7 @@ export interface operations {
     getMyForumSubscribedThreads: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10317,7 +10457,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10351,7 +10491,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10381,7 +10521,7 @@ export interface operations {
     getMyHoF: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10408,7 +10548,7 @@ export interface operations {
     getUserHoF: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10438,7 +10578,7 @@ export interface operations {
     getMyHonors: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10465,7 +10605,7 @@ export interface operations {
     getMyIcons: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10492,7 +10632,7 @@ export interface operations {
     getUserIcons: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10526,7 +10666,7 @@ export interface operations {
                 cat?: components["schemas"]["TornInventoryItemType"];
                 offset?: components["parameters"]["ApiOffset"];
                 limit?: components["parameters"]["ApiLimit250Default20"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10554,7 +10694,7 @@ export interface operations {
         parameters: {
             query?: {
                 offset?: components["parameters"]["ApiOffset"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10581,7 +10721,7 @@ export interface operations {
     getMyItemModsInformation: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10608,7 +10748,7 @@ export interface operations {
     getMyJob: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10635,7 +10775,7 @@ export interface operations {
     getUserJob: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10665,7 +10805,7 @@ export interface operations {
     getMyJobPoints: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10692,7 +10832,7 @@ export interface operations {
     getMyJobRanks: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10727,7 +10867,7 @@ export interface operations {
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
                 /** @description Sort rows from newest to oldest<br>Default ordering is ascending */
                 sort?: components["parameters"]["ApiSortAsc"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10765,7 +10905,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
                 from?: components["parameters"]["ApiFrom"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10792,7 +10932,7 @@ export interface operations {
     getMyMedals: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10819,7 +10959,7 @@ export interface operations {
     getMyMerits: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10853,7 +10993,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSort"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10880,7 +11020,7 @@ export interface operations {
     getMyMissions: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10907,7 +11047,7 @@ export interface operations {
     getMyMoney: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10936,7 +11076,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsFalse"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10960,10 +11100,37 @@ export interface operations {
             };
         };
     };
+    getMyNetworth: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Limited).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyLimited"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserNetworthResponse"];
+                };
+            };
+        };
+    };
     getMyNewMessages: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -10990,7 +11157,7 @@ export interface operations {
     getMyNotifications: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11017,7 +11184,7 @@ export interface operations {
     getMyOrganizedCrime: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11044,7 +11211,7 @@ export interface operations {
     getMyAvailableOrganizedCrimes: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11064,6 +11231,33 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserOrganizedCrimesResponse"];
+                };
+            };
+        };
+    };
+    getMyPerks: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPerksResponse"];
                 };
             };
         };
@@ -11137,7 +11331,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11166,7 +11360,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11200,7 +11394,7 @@ export interface operations {
                 filters?: components["parameters"]["ApiFiltersUserProperties"];
                 offset?: components["parameters"]["ApiOffset"];
                 limit?: components["parameters"]["ApiLimit100Default20"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11231,7 +11425,7 @@ export interface operations {
                 filters?: components["parameters"]["ApiFiltersUserProperties"];
                 offset?: components["parameters"]["ApiOffset"];
                 limit?: components["parameters"]["ApiLimit100Default20"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11261,7 +11455,7 @@ export interface operations {
     getMyProperty: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11288,7 +11482,7 @@ export interface operations {
     getUserProperty: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11327,7 +11521,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Category of races returned */
                 cat?: components["schemas"]["RacingRaceTypeEnum"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11354,7 +11548,7 @@ export interface operations {
     getMyRacingRecords: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11381,7 +11575,7 @@ export interface operations {
     getMyRefills: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11416,7 +11610,7 @@ export interface operations {
                 offset?: components["parameters"]["ApiOffset"];
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSortDesc"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11457,7 +11651,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11498,7 +11692,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11525,7 +11719,7 @@ export interface operations {
     getMySkills: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11552,8 +11746,8 @@ export interface operations {
     getUsersSnapshot: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
-                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Timestamp to get the data in specific point in time */
+                timestamp?: components["parameters"]["ApiTimestampSpecificPointInTime"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
                 /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
@@ -11579,7 +11773,7 @@ export interface operations {
     getMyStocks: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11615,7 +11809,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
                 from?: components["parameters"]["ApiFrom"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11642,7 +11836,7 @@ export interface operations {
     getMyDetailedTrade: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11672,7 +11866,7 @@ export interface operations {
     getMyTravelInformation: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11699,7 +11893,7 @@ export interface operations {
     getMyVirusCodingInformation: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11726,7 +11920,7 @@ export interface operations {
     getMyWeaponExp: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11753,7 +11947,7 @@ export interface operations {
     getMyWorkstats: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11780,7 +11974,7 @@ export interface operations {
     getUserLookup: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11807,7 +12001,7 @@ export interface operations {
     getUserTimestamp: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11856,7 +12050,7 @@ export interface operations {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTags"];
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11875,7 +12069,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserCrimesResponse"] | components["schemas"]["UserWeaponExpResponse"] | components["schemas"]["UserAmmoResponse"] | components["schemas"]["UserDiscordResponse"] | components["schemas"]["UserRacesResponse"] | components["schemas"]["UserEnlistedCarsResponse"] | components["schemas"]["UserForumPostsResponse"] | components["schemas"]["UserForumThreadsResponse"] | components["schemas"]["UserForumSubscribedThreadsResponse"] | components["schemas"]["UserForumFeedResponse"] | components["schemas"]["UserForumFriendsResponse"] | components["schemas"]["UserPropertyResponse"] | components["schemas"]["ReportsResponse"] | components["schemas"]["UserHofResponse"] | components["schemas"]["UserCalendarResponse"] | components["schemas"]["UserRacingRecordsResponse"] | components["schemas"]["UserEducationResponse"] | components["schemas"]["UserStocksResponse"] | components["schemas"]["UserBountiesResponse"] | components["schemas"]["UserJobRanksResponse"] | components["schemas"]["UserPropertiesResponse"] | components["schemas"]["UserFactionBalanceResponse"] | components["schemas"]["UserBasicResponse"] | components["schemas"]["RevivesResponse"] | components["schemas"]["UserHonorsResponse"] | components["schemas"]["UserMedalsResponse"] | components["schemas"]["UserMeritsResponse"] | components["schemas"]["RevivesFullResponse"] | components["schemas"]["UserProfileResponse"] | components["schemas"]["UserJobResponse"] | components["schemas"]["UserFactionResponse"] | components["schemas"]["UserCompetitionResponse"] | components["schemas"]["UserIconsResponse"] | components["schemas"]["UserItemMarketResponse"] | components["schemas"]["UserListResponse"] | components["schemas"]["UserEquipmentResponse"] | components["schemas"]["UserMissionsResponse"] | components["schemas"]["UserPersonalStatsResponse"] | components["schemas"]["UserOrganizedCrimeResponse"] | components["schemas"]["UserItemModsResponse"] | components["schemas"]["AttacksResponse"] | components["schemas"]["UserBarsResponse"] | components["schemas"]["UserCooldownsResponse"] | components["schemas"]["UserNotificationsResponse"] | components["schemas"]["UserRefillsResponse"] | components["schemas"]["UserTravelResponse"] | components["schemas"]["UserVirusResponse"] | components["schemas"]["AttacksFullResponse"] | components["schemas"]["UserCasinoResponse"] | components["schemas"]["UserMoneyResponse"] | components["schemas"]["UserJobPointsResponse"] | components["schemas"]["UserWorkStatsResponse"] | components["schemas"]["UserSkillsResponse"] | components["schemas"]["UserBattleStatsResponse"] | components["schemas"]["UserTradeResponse"] | components["schemas"]["UserTradesResponse"] | components["schemas"]["UserNewEventsResponse"] | components["schemas"]["UserEventsResponse"] | components["schemas"]["UserMessagesResponse"] | components["schemas"]["UserNewMessagesResponse"] | components["schemas"]["UserLookupResponse"] | components["schemas"]["UserInventoryResponse"] | components["schemas"]["TimestampResponse"];
+                    "application/json": components["schemas"]["UserCrimesResponse"] | components["schemas"]["UserWeaponExpResponse"] | components["schemas"]["UserAmmoResponse"] | components["schemas"]["UserDiscordResponse"] | components["schemas"]["UserRacesResponse"] | components["schemas"]["UserEnlistedCarsResponse"] | components["schemas"]["UserForumPostsResponse"] | components["schemas"]["UserForumThreadsResponse"] | components["schemas"]["UserForumSubscribedThreadsResponse"] | components["schemas"]["UserForumFeedResponse"] | components["schemas"]["UserForumFriendsResponse"] | components["schemas"]["UserPropertyResponse"] | components["schemas"]["ReportsResponse"] | components["schemas"]["UserHofResponse"] | components["schemas"]["UserCalendarResponse"] | components["schemas"]["UserRacingRecordsResponse"] | components["schemas"]["UserEducationResponse"] | components["schemas"]["UserStocksResponse"] | components["schemas"]["UserBountiesResponse"] | components["schemas"]["UserJobRanksResponse"] | components["schemas"]["UserPropertiesResponse"] | components["schemas"]["UserFactionBalanceResponse"] | components["schemas"]["UserBasicResponse"] | components["schemas"]["RevivesResponse"] | components["schemas"]["UserHonorsResponse"] | components["schemas"]["UserMedalsResponse"] | components["schemas"]["UserMeritsResponse"] | components["schemas"]["RevivesFullResponse"] | components["schemas"]["UserProfileResponse"] | components["schemas"]["UserJobResponse"] | components["schemas"]["UserFactionResponse"] | components["schemas"]["UserCompetitionResponse"] | components["schemas"]["UserIconsResponse"] | components["schemas"]["UserItemMarketResponse"] | components["schemas"]["UserListResponse"] | components["schemas"]["UserEquipmentResponse"] | components["schemas"]["UserMissionsResponse"] | components["schemas"]["UserPersonalStatsResponse"] | components["schemas"]["UserOrganizedCrimeResponse"] | components["schemas"]["UserItemModsResponse"] | components["schemas"]["AttacksResponse"] | components["schemas"]["UserBarsResponse"] | components["schemas"]["UserCooldownsResponse"] | components["schemas"]["UserNotificationsResponse"] | components["schemas"]["UserPerksResponse"] | components["schemas"]["UserRefillsResponse"] | components["schemas"]["UserTravelResponse"] | components["schemas"]["UserVirusResponse"] | components["schemas"]["AttacksFullResponse"] | components["schemas"]["UserCasinoResponse"] | components["schemas"]["UserNetworthResponse"] | components["schemas"]["UserMoneyResponse"] | components["schemas"]["UserJobPointsResponse"] | components["schemas"]["UserWorkStatsResponse"] | components["schemas"]["UserSkillsResponse"] | components["schemas"]["UserBattleStatsResponse"] | components["schemas"]["UserTradeResponse"] | components["schemas"]["UserTradesResponse"] | components["schemas"]["UserNewEventsResponse"] | components["schemas"]["UserEventsResponse"] | components["schemas"]["UserMessagesResponse"] | components["schemas"]["UserNewMessagesResponse"] | components["schemas"]["UserLookupResponse"] | components["schemas"]["UserInventoryResponse"] | components["schemas"]["TimestampResponse"];
                 };
             };
         };
@@ -11883,7 +12077,7 @@ export interface operations {
     getMyFactionApplications: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11922,7 +12116,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
                 from?: components["parameters"]["ApiFrom"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11961,7 +12155,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
                 from?: components["parameters"]["ApiFrom"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -11990,7 +12184,7 @@ export interface operations {
             query?: {
                 /** @description By default, this selection will return only current faction's member balances, and the option 'all' will return all current members balances + additionally those of ex-members which do have money or points on their balance. */
                 cat?: "all" | "current";
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12017,7 +12211,7 @@ export interface operations {
     getMyFactionBasicInformation: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12044,7 +12238,7 @@ export interface operations {
     getFactionBasicInformation: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12074,7 +12268,7 @@ export interface operations {
     getMyFactionChain: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12101,7 +12295,7 @@ export interface operations {
     getFactionChain: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12138,7 +12332,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
                 from?: components["parameters"]["ApiFrom"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12172,7 +12366,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
                 from?: components["parameters"]["ApiFrom"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12202,7 +12396,7 @@ export interface operations {
     getMyFactionLatestChainReport: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12229,7 +12423,7 @@ export interface operations {
     getChainReport: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12263,7 +12457,7 @@ export interface operations {
                 stat: components["schemas"]["FactionStatEnum"];
                 /** @description By default, this selection will return only current faction's member contributions, and the option 'all' will return all contributors. */
                 cat?: "all" | "current";
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12302,7 +12496,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSortDesc"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12329,7 +12523,7 @@ export interface operations {
     getMyFactionOrganizedCrime: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12359,7 +12553,7 @@ export interface operations {
     getMyFactionHoF: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12386,7 +12580,7 @@ export interface operations {
     getFactionHoF: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12418,7 +12612,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12447,7 +12641,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12488,7 +12682,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description News category type */
                 cat: components["schemas"]["FactionNewsCategory"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12515,7 +12709,7 @@ export interface operations {
     getMyFactionPositions: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12542,7 +12736,7 @@ export interface operations {
     getFactionRackets: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12569,7 +12763,7 @@ export interface operations {
     getRaidReport: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12606,7 +12800,7 @@ export interface operations {
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSortDesc"];
                 limit?: components["parameters"]["ApiLimit100Default20"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12640,7 +12834,7 @@ export interface operations {
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSortDesc"];
                 limit?: components["parameters"]["ApiLimit100Default20"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12678,7 +12872,7 @@ export interface operations {
                 to?: components["parameters"]["ApiTo"];
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSortDesc"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12707,7 +12901,7 @@ export interface operations {
             query?: {
                 offset?: components["parameters"]["ApiOffset"];
                 limit?: components["parameters"]["ApiLimit100Default20"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12737,7 +12931,7 @@ export interface operations {
     getRankedWarReport: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12775,7 +12969,7 @@ export interface operations {
                 offset?: components["parameters"]["ApiOffset"];
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSortDesc"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12816,7 +13010,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12857,7 +13051,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12899,7 +13093,7 @@ export interface operations {
                 filters?: components["parameters"]["ApiFactionSearchFilter"];
                 limit?: components["parameters"]["ApiLimit100Default20"];
                 offset?: components["parameters"]["ApiOffset"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12926,8 +13120,8 @@ export interface operations {
     getFactionsSnapshot: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
-                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Timestamp to get the data in specific point in time */
+                timestamp?: components["parameters"]["ApiTimestampSpecificPointInTime"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
                 /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
@@ -12953,7 +13147,7 @@ export interface operations {
     getMyFactionStats: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -12980,7 +13174,7 @@ export interface operations {
     getMyFactionTerritory: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13007,7 +13201,7 @@ export interface operations {
     getFactionTerritory: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13039,7 +13233,7 @@ export interface operations {
             query?: {
                 offset?: components["parameters"]["ApiOffset"];
                 limit?: components["parameters"]["ApiLimit500Default20"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13073,7 +13267,7 @@ export interface operations {
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSortDesc"];
                 limit?: components["parameters"]["ApiLimit100"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13107,7 +13301,7 @@ export interface operations {
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSortDesc"];
                 limit?: components["parameters"]["ApiLimit100"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13137,7 +13331,7 @@ export interface operations {
     getTerritoryWarReport: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13167,7 +13361,7 @@ export interface operations {
     getMyFactionUpgrades: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13202,7 +13396,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13229,7 +13423,7 @@ export interface operations {
     getMyFactionWars: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13256,7 +13450,7 @@ export interface operations {
     getFactionWars: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13286,7 +13480,7 @@ export interface operations {
     getFactionLookup: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13313,7 +13507,7 @@ export interface operations {
     getFactionTimestamp: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13361,7 +13555,7 @@ export interface operations {
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSort"];
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13388,7 +13582,7 @@ export interface operations {
     getMyCompanyApplications: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13417,7 +13611,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13446,7 +13640,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13487,7 +13681,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description News category type */
                 cat: components["schemas"]["CompanyNewsCategory"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13518,7 +13712,7 @@ export interface operations {
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13550,7 +13744,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13579,7 +13773,7 @@ export interface operations {
             query?: {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13624,7 +13818,7 @@ export interface operations {
                 filters?: components["parameters"]["ApiCompanySearchFilter"];
                 limit?: components["parameters"]["ApiLimit100Default20"];
                 offset?: components["parameters"]["ApiOffset"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13651,8 +13845,8 @@ export interface operations {
     getCompaniesSnapshot: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
-                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Timestamp to get the data in specific point in time */
+                timestamp?: components["parameters"]["ApiTimestampSpecificPointInTime"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
                 /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
@@ -13678,7 +13872,7 @@ export interface operations {
     getMyCompanyStock: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13705,7 +13899,7 @@ export interface operations {
     getCompanyLookup: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13732,7 +13926,7 @@ export interface operations {
     getCompanyTimestamp: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13771,7 +13965,7 @@ export interface operations {
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTags"];
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13798,7 +13992,7 @@ export interface operations {
     getForumCategories: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13834,7 +14028,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13864,7 +14058,7 @@ export interface operations {
     getForumThread: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13901,7 +14095,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13935,7 +14129,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13965,7 +14159,7 @@ export interface operations {
     getForumLookup: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -13992,7 +14186,7 @@ export interface operations {
     getForumTimestamp: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14033,7 +14227,7 @@ export interface operations {
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14062,7 +14256,7 @@ export interface operations {
             query?: {
                 limit?: components["parameters"]["ApiLimit100"];
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14089,7 +14283,7 @@ export interface operations {
     getKeyInfo: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14120,7 +14314,7 @@ export interface operations {
                 selections?: components["schemas"]["KeySelectionName"][];
                 limit?: components["parameters"]["ApiLimit100"];
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14147,7 +14341,7 @@ export interface operations {
     getMarketAuctionHouseListing: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14184,7 +14378,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14221,7 +14415,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14250,7 +14444,7 @@ export interface operations {
             query?: {
                 /** @description Category of specialized bazaars returned */
                 cat?: components["schemas"]["MarketSpecializedBazaarCategoryEnum"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14277,7 +14471,7 @@ export interface operations {
     getMarketBazaarItem: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14311,7 +14505,7 @@ export interface operations {
                 bonus?: components["schemas"]["WeaponBonusEnum"];
                 limit?: components["parameters"]["ApiLimit100Default20"];
                 offset?: components["parameters"]["ApiOffset"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14345,7 +14539,7 @@ export interface operations {
                 limit?: components["parameters"]["ApiLimit100Default20"];
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSort"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14372,6 +14566,33 @@ export interface operations {
             };
         };
     };
+    getMarketPoints: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PointsMarketResponse"];
+                };
+            };
+        };
+    };
     getMarketPropertiesRental: {
         parameters: {
             query?: {
@@ -14379,7 +14600,7 @@ export interface operations {
                 limit?: components["parameters"]["ApiLimit100Default20"];
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSort"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14409,7 +14630,7 @@ export interface operations {
     getMarketLookup: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14436,7 +14657,7 @@ export interface operations {
     getMarketTimestamp: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14477,7 +14698,7 @@ export interface operations {
                 sort?: "DESC" | "ASC";
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
                 limit?: components["parameters"]["ApiLimit100Default20"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14496,7 +14717,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["BazaarResponse"] | components["schemas"]["BazaarResponseSpecialized"] | components["schemas"]["MarketItemMarketResponse"] | components["schemas"]["MarketRentalsResponse"] | components["schemas"]["AuctionHouseResponse"] | components["schemas"]["AuctionHouseListingResponse"] | components["schemas"]["MarketPropertiesResponse"] | components["schemas"]["MarketLookupResponse"] | components["schemas"]["TimestampResponse"];
+                    "application/json": components["schemas"]["BazaarResponse"] | components["schemas"]["BazaarResponseSpecialized"] | components["schemas"]["MarketItemMarketResponse"] | components["schemas"]["MarketRentalsResponse"] | components["schemas"]["AuctionHouseResponse"] | components["schemas"]["AuctionHouseListingResponse"] | components["schemas"]["PointsMarketResponse"] | components["schemas"]["MarketPropertiesResponse"] | components["schemas"]["MarketLookupResponse"] | components["schemas"]["TimestampResponse"];
                 };
             };
         };
@@ -14504,7 +14725,7 @@ export interface operations {
     getRacingCars: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14531,7 +14752,7 @@ export interface operations {
     getRacingCarUpgrades: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14567,7 +14788,7 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Category of races returned */
                 cat?: components["schemas"]["RacingRaceTypeEnum"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14594,7 +14815,7 @@ export interface operations {
     getRacingRaceDetails: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14626,7 +14847,7 @@ export interface operations {
             query: {
                 /** @description Car class */
                 cat: components["schemas"]["RaceClassEnum"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14656,7 +14877,7 @@ export interface operations {
     getRacingTracks: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14683,7 +14904,7 @@ export interface operations {
     getRacingLookup: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14710,7 +14931,7 @@ export interface operations {
     getRacingTimestamp: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14751,7 +14972,7 @@ export interface operations {
                 /** @description Selection category */
                 cat?: components["schemas"]["RacingRaceTypeEnum"] | components["schemas"]["RaceClassEnum"];
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14778,7 +14999,7 @@ export interface operations {
     getProperty: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14808,7 +15029,7 @@ export interface operations {
     getPropertyLookup: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14835,7 +15056,7 @@ export interface operations {
     getPropertyTimestamp: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14866,7 +15087,7 @@ export interface operations {
                 selections?: components["schemas"]["PropertySelectionName"][];
                 /** @description Property id */
                 id: components["schemas"]["PropertyId"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14900,7 +15121,7 @@ export interface operations {
                 sort?: components["parameters"]["ApiSort"];
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
                 striptags?: components["parameters"]["ApiStripTagsTrue"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14929,7 +15150,7 @@ export interface operations {
             query?: {
                 limit?: components["parameters"]["ApiLimit100"];
                 offset?: components["parameters"]["ApiOffset"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14956,7 +15177,7 @@ export interface operations {
     getTornCalendar: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -14983,7 +15204,7 @@ export interface operations {
     getTornCrimes: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15010,7 +15231,7 @@ export interface operations {
     getTornEducation: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15037,7 +15258,7 @@ export interface operations {
     getTornElimination: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15066,7 +15287,7 @@ export interface operations {
             query?: {
                 limit?: components["parameters"]["ApiLimit100"];
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15100,7 +15321,7 @@ export interface operations {
                 offset?: components["parameters"]["ApiOffset"];
                 /** @description Leaderboards category */
                 cat: components["schemas"]["TornFactionHofCategory"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15127,7 +15348,7 @@ export interface operations {
     getTornFactionTree: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15158,7 +15379,7 @@ export interface operations {
                 offset?: components["parameters"]["ApiOffset"];
                 /** @description Sorted by the greatest timestamps */
                 sort?: components["parameters"]["ApiSort"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15185,7 +15406,7 @@ export interface operations {
     getTornHonorsSpecific: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15219,7 +15440,7 @@ export interface operations {
                 offset?: components["parameters"]["ApiOffset"];
                 /** @description Leaderboards category */
                 cat: components["schemas"]["TornHofCategory"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15246,7 +15467,7 @@ export interface operations {
     getTornItemAmmo: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15273,7 +15494,7 @@ export interface operations {
     getTornItemDetails: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15303,7 +15524,7 @@ export interface operations {
     getTornItemMods: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15334,7 +15555,7 @@ export interface operations {
                 cat?: components["schemas"]["TornItemCategory"];
                 /** @description Sort rows from newest to oldest<br>Default ordering is ascending */
                 sort?: components["parameters"]["ApiSortAsc"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15363,7 +15584,7 @@ export interface operations {
             query?: {
                 /** @description Sort rows from newest to oldest<br>Default ordering is ascending */
                 sort?: components["parameters"]["ApiSortAsc"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15393,7 +15614,7 @@ export interface operations {
     getTornLogCategories: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15420,7 +15641,7 @@ export interface operations {
     getTornLogTypes: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15447,7 +15668,7 @@ export interface operations {
     getTornLogTypesSpecific: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15477,7 +15698,7 @@ export interface operations {
     getTornMedals: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15504,7 +15725,7 @@ export interface operations {
     getTornMedalsSpecific: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15534,7 +15755,7 @@ export interface operations {
     getTornMerits: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15561,7 +15782,7 @@ export interface operations {
     getTornMuseum: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15588,7 +15809,7 @@ export interface operations {
     getTornOrganizedCrimes: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15615,7 +15836,7 @@ export interface operations {
     getTornProperties: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15642,7 +15863,7 @@ export interface operations {
     getTornStocks: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15669,7 +15890,7 @@ export interface operations {
     getSpecificTornStock: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15699,7 +15920,7 @@ export interface operations {
     getTornSubcrimes: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15733,7 +15954,7 @@ export interface operations {
                 ids?: components["schemas"]["FactionTerritoryEnum"][];
                 offset?: components["parameters"]["ApiOffset"];
                 limit?: components["parameters"]["ApiLimit250Default20"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15760,7 +15981,7 @@ export interface operations {
     getTornLookup: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15787,7 +16008,7 @@ export interface operations {
     getTornTimestamp: {
         parameters: {
             query?: {
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
@@ -15832,7 +16053,7 @@ export interface operations {
                 /** @description Selection category */
                 cat?: components["schemas"]["TornFactionHofCategory"] | components["schemas"]["TornHofCategory"] | components["schemas"]["TornItemCategory"];
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
-                /** @description Timestamp to bypass cache or get the data in specific point in time */
+                /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];

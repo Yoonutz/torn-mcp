@@ -62,7 +62,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -140,7 +140,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -233,7 +233,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -274,7 +274,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -322,7 +322,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -365,7 +365,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -402,7 +402,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -458,7 +458,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -484,14 +484,14 @@ export const ENDPOINTS = {
       "summary": "Get your casino streak & tokens",
       "description": "Requires limited access key. <br>Only available to yourself.",
       "keyLevel": "limited",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -525,7 +525,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -567,7 +567,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -602,7 +602,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -646,7 +646,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -686,7 +686,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -720,7 +720,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -771,7 +771,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -855,7 +855,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -890,7 +890,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -935,7 +935,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -975,7 +975,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1057,7 +1057,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1109,7 +1109,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1177,7 +1177,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1229,7 +1229,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1282,7 +1282,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1316,7 +1316,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1405,7 +1405,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1445,7 +1445,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1484,7 +1484,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1520,7 +1520,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1566,7 +1566,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1600,7 +1600,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1684,7 +1684,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1763,7 +1763,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1800,7 +1800,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1834,7 +1834,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1902,7 +1902,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1941,7 +1941,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -1976,7 +1976,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2027,7 +2027,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2050,10 +2050,48 @@ export const ENDPOINTS = {
       ],
       "path": "/user/newevents"
     },
+    "networth": {
+      "requiresId": false,
+      "summary": "Get your networth",
+      "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "networth",
+          "type": "object",
+          "fields": [
+            "money",
+            "items",
+            "assets",
+            "points",
+            "total",
+            "timestamp"
+          ]
+        }
+      ],
+      "path": "/user/networth"
+    },
     "newmessages": {
       "requiresId": false,
       "summary": "Get your unseen messages",
-      "description": "Requires limited access key. <br>",
+      "description": "Requires limited access key. <br>This selection is cached for 1 hour.",
       "keyLevel": "limited",
       "stability": "Stable",
       "query": [
@@ -2062,7 +2100,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2101,7 +2139,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2137,7 +2175,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2182,7 +2220,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2213,6 +2251,46 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/user/organizedcrimes"
+    },
+    "perks": {
+      "requiresId": false,
+      "summary": "Get your current perks",
+      "description": "Requires minimal access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "perks",
+          "type": "object",
+          "fields": [
+            "faction",
+            "job",
+            "property",
+            "education",
+            "enhancer",
+            "book",
+            "stock",
+            "merit"
+          ]
+        }
+      ],
+      "path": "/user/perks"
     },
     "personalstats": {
       "requiresId": false,
@@ -2527,7 +2605,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2612,7 +2690,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2648,7 +2726,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2737,7 +2815,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2781,7 +2859,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2815,7 +2893,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2900,7 +2978,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -2992,7 +3070,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3084,7 +3162,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3122,7 +3200,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3148,7 +3226,7 @@ export const ENDPOINTS = {
     "snapshot": {
       "requiresId": false,
       "summary": "Get daily active players snapshot CSV",
-      "description": "Requires public access key.<br>Returns a CSV daily snapshot of active players.<br>This selection is standalone and cannot be used together with other selections.<br>\nCSV columns: id, name, gender, role, signed_up, last_action, level, rank, donator, networth, faction, company, spouse, display_case, bazaar, location, fed, fed_reason",
+      "description": "Requires public access key.<br>Returns a CSV daily snapshot of active players.<br>This selection is standalone and cannot be used together with other selections.<br>\nCSV columns: id, name, gender, signed_up, level, rank, donator, faction, company, job, spouse, display_case, bazaar, fed, fed_reason, time_played, awards",
       "keyLevel": "public",
       "stability": "Unstable",
       "query": [
@@ -3157,7 +3235,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to get the data in specific point in time"
         },
         {
           "name": "comment",
@@ -3181,7 +3259,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3210,7 +3288,7 @@ export const ENDPOINTS = {
       "summary": "Get your trades",
       "description": "Requires limited access key. <br> When requesting 'ongoing' trades (default), limit/offset/sort are not being used.",
       "keyLevel": "limited",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -3259,7 +3337,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3291,14 +3369,14 @@ export const ENDPOINTS = {
       "summary": "Get your detailed trade",
       "description": "Requires limited access key. <br>Only possible to get trades you participated in.",
       "keyLevel": "limited",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3343,7 +3421,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3380,7 +3458,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3415,7 +3493,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3450,7 +3528,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3486,7 +3564,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3516,7 +3594,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3548,7 +3626,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3628,7 +3706,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3721,7 +3799,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3773,7 +3851,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3807,7 +3885,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3860,7 +3938,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3937,7 +4015,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -3980,7 +4058,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4089,7 +4167,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4192,7 +4270,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4236,7 +4314,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4285,7 +4363,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4337,7 +4415,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4450,7 +4528,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4485,7 +4563,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4520,7 +4598,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4558,7 +4636,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4632,7 +4710,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4712,7 +4790,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4756,7 +4834,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4848,7 +4926,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -4940,7 +5018,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5032,7 +5110,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5102,7 +5180,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5146,7 +5224,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to get the data in specific point in time"
         },
         {
           "name": "comment",
@@ -5170,7 +5248,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5204,7 +5282,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5263,7 +5341,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5330,7 +5408,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5375,7 +5453,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5420,7 +5498,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5504,7 +5582,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5543,7 +5621,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5592,7 +5670,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5622,7 +5700,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5647,14 +5725,14 @@ export const ENDPOINTS = {
       "summary": "Get your company's applications",
       "description": "Requires limited access key. <br>",
       "keyLevel": "limited",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5683,7 +5761,7 @@ export const ENDPOINTS = {
       "summary": "Get my company's employees",
       "description": "Requires public access key. <br>When using Limited, Custom or Full access API keys, the response will be:<br>\n * for director: CompanyEmployeeFull\n * for employee: CompanyEmployeeExtended\n * anyone else: CompanyEmployee.",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -5701,7 +5779,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5738,7 +5816,7 @@ export const ENDPOINTS = {
       "summary": "Get your company's news details",
       "description": "Requires minimal access key. <br>",
       "keyLevel": "minimal",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -5801,7 +5879,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5829,7 +5907,7 @@ export const ENDPOINTS = {
       "summary": "Get a list of companies for a specific company type",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "limit",
@@ -5859,7 +5937,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5909,7 +5987,7 @@ export const ENDPOINTS = {
       "summary": "Get my company's profile",
       "description": "Requires public access key. <br>When using Limited, Custom or Full access API keys, the response will be of type CompanyProfileExtended, otherwise it will be CompanyProfile.",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "striptags",
@@ -5927,7 +6005,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -5970,7 +6048,7 @@ export const ENDPOINTS = {
       "summary": "Search companies by name or other criteria",
       "description": "Requires public access key. <br>This selection is standalone and cannot be used together with other selections.",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "name",
@@ -6007,7 +6085,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6043,14 +6121,14 @@ export const ENDPOINTS = {
       "summary": "Get daily companies snapshot CSV",
       "description": "Requires public access key.<br>Returns a CSV daily snapshot of companies.<br>This selection is standalone and cannot be used together with other selections.<br>\nCSV columns: id, name, created_at, days_old, image, type, rating, director_id,\nemployees_hired, employees_capacity, daily_income, daily_customers,\nweekly_income, weekly_customers, applications_allowed",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to get the data in specific point in time"
         },
         {
           "name": "comment",
@@ -6067,14 +6145,14 @@ export const ENDPOINTS = {
       "summary": "Get your company's stock",
       "description": "Requires limited access key. <br>",
       "keyLevel": "limited",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6114,7 +6192,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6144,7 +6222,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6176,7 +6254,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6254,7 +6332,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6305,7 +6383,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6389,7 +6467,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6440,7 +6518,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6470,7 +6548,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6514,7 +6592,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6552,7 +6630,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6589,7 +6667,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6665,7 +6743,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6743,7 +6821,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6874,7 +6952,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6938,7 +7016,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -6972,6 +7050,42 @@ export const ENDPOINTS = {
         "type": "integer",
         "description": "Property type id"
       }
+    },
+    "pointsmarket": {
+      "requiresId": false,
+      "summary": "Get points market listings",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "pointsmarket",
+          "type": "array",
+          "fields": [
+            "id",
+            "quantity",
+            "cost",
+            "total_cost"
+          ]
+        }
+      ],
+      "path": "/market/pointsmarket"
     },
     "rentals": {
       "requiresId": true,
@@ -7008,7 +7122,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7055,7 +7169,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7085,7 +7199,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7117,7 +7231,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7159,7 +7273,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7241,7 +7355,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7283,7 +7397,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7345,7 +7459,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7387,7 +7501,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7422,7 +7536,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7452,7 +7566,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7484,7 +7598,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7514,7 +7628,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7581,7 +7695,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7627,7 +7741,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7677,7 +7791,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7711,7 +7825,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7752,7 +7866,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7787,7 +7901,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7842,7 +7956,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7910,7 +8024,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -7948,7 +8062,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8005,7 +8119,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8086,7 +8200,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8116,7 +8230,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8152,7 +8266,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8197,7 +8311,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8284,7 +8398,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8336,7 +8450,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8370,7 +8484,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8410,7 +8524,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8455,7 +8569,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8483,14 +8597,14 @@ export const ENDPOINTS = {
       "summary": "Get all museum sets",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8525,7 +8639,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8564,7 +8678,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8603,7 +8717,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -8648,7 +8762,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -12816,7 +12930,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -12856,7 +12970,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
@@ -12886,7 +13000,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer|string",
-          "description": "Timestamp to bypass cache or get the data in specific point in time"
+          "description": "Timestamp to bypass cache"
         },
         {
           "name": "comment",
