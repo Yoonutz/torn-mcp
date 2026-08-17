@@ -3,7 +3,7 @@
     "info": {
         "title": "Torn API",
         "description": "\n * The development of Torn's API v2 is still ongoing.\n * If selections remain unaltered, they will default to the API v1 version.\n * Unlike API v1, API v2 accepts both selections and IDs as path and query parameters.\n * If any discrepancies or errors are found, please submit a [bug report](https://www.torn.com/forums.php#/p=forums&f=19&b=0&a=0) on the Torn Forums.\n * In case you're using bots to check for changes on openapi.json file, make sure to specificy a custom user-agent header - CloudFlare sometimes prevents requests from default user-agents.",
-        "version": "6.6.1"
+        "version": "6.9.0"
     },
     "servers": [
         {
@@ -1488,7 +1488,7 @@
                     "User"
                 ],
                 "summary": "Get your icons information",
-                "description": "Requires public access key. <br> When requesting data for yourself with 'Custom', 'Limited' or 'Full' access keys, the response will be of type UserIconPrivate, otherwise UserIconPublic.",
+                "description": "Requires public access key. <br> When requesting data for yourself with 'Limited' or 'Full' access keys, the response will be of type UserIconPrivate, otherwise UserIconPublic.",
                 "operationId": "getMyIcons",
                 "parameters": [
                     {
@@ -1575,7 +1575,7 @@
                     "User"
                 ],
                 "summary": "Get your inventory",
-                "description": "<b>Cached selection (1 hour per category).</b><br><br>Requires limited access key. <br>",
+                "description": "<b>Cached selection (1 hour per category).</b><br><br>Requires minimal access key. <br>",
                 "operationId": "getMyInventory",
                 "parameters": [
                     {
@@ -1600,7 +1600,7 @@
                         "$ref": "#/components/parameters/ApiComment"
                     },
                     {
-                        "$ref": "#/components/parameters/ApiKeyLimited"
+                        "$ref": "#/components/parameters/ApiKeyMinimal"
                     }
                 ],
                 "responses": {
@@ -2014,8 +2014,8 @@
                 "tags": [
                     "User"
                 ],
-                "summary": "Get your achieved medals",
-                "description": "Requires minimal access key. <br>",
+                "summary": "Get all your achieved medals",
+                "description": "Requires public access key. <br>",
                 "operationId": "getMyMedals",
                 "parameters": [
                     {
@@ -2025,7 +2025,55 @@
                         "$ref": "#/components/parameters/ApiComment"
                     },
                     {
-                        "$ref": "#/components/parameters/ApiKeyMinimal"
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserMedalsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Stable"
+            }
+        },
+        "/user/{id}/medals": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get medals achieved by a specific player",
+                "description": "Requires public access key.<br>Returns only highest medal in each category (just like profiles on site).",
+                "operationId": "getUserMedals",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User id or user discord id",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/UserDiscordPathId"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
                     }
                 ],
                 "responses": {
@@ -3279,6 +3327,54 @@
                     }
                 ],
                 "x-stability": "Stable"
+            }
+        },
+        "/user/search": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Search users by name or other criteria",
+                "description": "Requires public access key. <br>This selection is standalone and cannot be used together with other selections.<br>It's always limited to return just 25 records.",
+                "operationId": "getUsersSearch",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiName"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiUserSearchFilter"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiOffset"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSearchResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
             }
         },
         "/user/snapshot": {
@@ -4818,6 +4914,45 @@
                 "x-stability": "Stable"
             }
         },
+        "/faction/dirtybombs": {
+            "get": {
+                "tags": [
+                    "Faction"
+                ],
+                "summary": "Get all dirty bombs",
+                "description": "Requires public access key. <br>",
+                "operationId": "getWarfareDirtyBombs",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FactionWarfareDirtyBombsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Stable"
+            }
+        },
         "/faction/hof": {
             "get": {
                 "tags": [
@@ -6097,13 +6232,229 @@
                 "x-stability": "Stable"
             }
         },
+        "/faction/warfarechains": {
+            "get": {
+                "tags": [
+                    "Faction"
+                ],
+                "summary": "Get all chains",
+                "description": "Requires public access key. <br>By default, active chains are returned.",
+                "operationId": "getWarfareChains",
+                "parameters": [
+                    {
+                        "name": "cat",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "complete"
+                            ]
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiLimit100"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiSort"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiFrom"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTo"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FactionWarfareChainsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Stable"
+            }
+        },
+        "/faction/warfareraids": {
+            "get": {
+                "tags": [
+                    "Faction"
+                ],
+                "summary": "Get all raids",
+                "description": "Requires public access key. <br>",
+                "operationId": "getWarfareRaids",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiLimit100"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiSort"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiFrom"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTo"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FactionWarfareRaidsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Stable"
+            }
+        },
+        "/faction/warfareranked": {
+            "get": {
+                "tags": [
+                    "Faction"
+                ],
+                "summary": "Get all ranked wars",
+                "description": "Requires public access key. <br>",
+                "operationId": "getWarfareRankedWars",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiLimit100"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiSort"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiFrom"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTo"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FactionWarfareRankedResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Stable"
+            }
+        },
+        "/faction/warfareterritory": {
+            "get": {
+                "tags": [
+                    "Faction"
+                ],
+                "summary": "Get all territory wars",
+                "description": "Requires public access key. <br>",
+                "operationId": "getWarfareTerritoryWars",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiLimit100"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiSort"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiFrom"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTo"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FactionWarfareTerritoryWarsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Stable"
+            }
+        },
         "/faction/warfare": {
             "get": {
                 "tags": [
                     "Faction"
                 ],
                 "summary": "Get faction warfare",
-                "description": "Requires public access key. <br>The response depends on the selected category.",
+                "description": "This selection is replaced by other warfare selections and 'faction' -> 'dirtybombs'.<br>This will be removed on 1st January 2027<b></b>.<br>Requires public access key. <br>The response depends on the selected category.",
                 "operationId": "getWarfare",
                 "parameters": [
                     {
@@ -6148,6 +6499,7 @@
                         }
                     }
                 },
+                "deprecated": true,
                 "security": [
                     {
                         "api_key": []
@@ -6584,6 +6936,21 @@
                                             "$ref": "#/components/schemas/FactionLookupResponse"
                                         },
                                         {
+                                            "$ref": "#/components/schemas/FactionWarfareDirtyBombsResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/FactionWarfareChainsResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/FactionWarfareTerritoryWarsResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/FactionWarfareRaidsResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/FactionWarfareRankedResponse"
+                                        },
+                                        {
                                             "$ref": "#/components/schemas/TimestampResponse"
                                         }
                                     ]
@@ -6738,7 +7105,7 @@
                     "Company"
                 ],
                 "summary": "Get your company's news details",
-                "description": "Requires minimal access key. <br>",
+                "description": "Requires limited access key. <br>",
                 "operationId": "getMyCompanyNews",
                 "parameters": [
                     {
@@ -6772,7 +7139,7 @@
                         "$ref": "#/components/parameters/ApiComment"
                     },
                     {
-                        "$ref": "#/components/parameters/ApiKeyMinimal"
+                        "$ref": "#/components/parameters/ApiKeyLimited"
                     }
                 ],
                 "responses": {
@@ -9411,6 +9778,93 @@
                 "x-stability": "Stable"
             }
         },
+        "/torn/companies": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get all companies details",
+                "description": "Requires public access key. <br>",
+                "operationId": "getTornCompanies",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornCompaniesResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
+        "/torn/{typeId}/companies": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get specific company details",
+                "description": "Requires public access key. <br>",
+                "operationId": "getTornCompaniesSpecific",
+                "parameters": [
+                    {
+                        "name": "typeId",
+                        "in": "path",
+                        "description": "Company type id",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/CompanyTypeId"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornCompaniesResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
         "/torn/crimes": {
             "get": {
                 "tags": [
@@ -10435,6 +10889,84 @@
                     }
                 ],
                 "x-stability": "Stable"
+            }
+        },
+        "/torn/searchforcash": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get search for cash crime statuses",
+                "description": "Requires public access key. <br>",
+                "operationId": "getTornSearchForCash",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornSearchForCashResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
+        "/torn/shoplifting": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get shoplifting crime statuses",
+                "description": "Requires public access key. <br>",
+                "operationId": "getTornShoplifting",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornShopliftingResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
             }
         },
         "/torn/stocks": {
@@ -16008,6 +16540,14 @@
                 "type": "integer",
                 "format": "int32"
             },
+            "CompanySpecialId": {
+                "type": "integer",
+                "format": "int32"
+            },
+            "CompanyStockId": {
+                "type": "integer",
+                "format": "int32"
+            },
             "TradeId": {
                 "type": "integer",
                 "format": "int64"
@@ -16084,6 +16624,10 @@
                 "format": "int64"
             },
             "TornCrimeId": {
+                "type": "integer",
+                "format": "int32"
+            },
+            "TornSubCrimeId": {
                 "type": "integer",
                 "format": "int32"
             },
@@ -16260,6 +16804,47 @@
                     }
                 ]
             },
+            "UserSearchParameter": {
+                "oneOf": [
+                    {
+                        "type": "string",
+                        "enum": [
+                            "married",
+                            "notMarried",
+                            "traveling",
+                            "notTraveling",
+                            "inFaction",
+                            "notInFaction",
+                            "inCompany",
+                            "notInCompany",
+                            "inHospital",
+                            "notInHospital",
+                            "inJail",
+                            "notInJail",
+                            "inFederalJail",
+                            "notInFederalJail",
+                            "male",
+                            "female",
+                            "enby",
+                            "lastActionNow",
+                            "lastActionRecent",
+                            "lastActionHourAgo",
+                            "lastActionDayAgo",
+                            "lastActionWeekAgo",
+                            "lastActionMonthAgo",
+                            "lastActionYearAgo"
+                        ]
+                    },
+                    {
+                        "type": "string",
+                        "pattern": "^(level|daysOld|offences):(=|!=|<|<=|>=|>|Equal|NotEqual|Less|LessOrEqual|GreaterOrEqual|Greater):\\d+$"
+                    },
+                    {
+                        "type": "string",
+                        "pattern": "^factions:\\d+(;\\d+)*$"
+                    }
+                ]
+            },
             "Parameters": {
                 "oneOf": [
                     {
@@ -16275,6 +16860,18 @@
                         "type": "string",
                         "pattern": "^(id|respect|members|membersMax):(=|!=|<|<=|>=|>|Equal|NotEqual|Less|LessOrEqual|GreaterOrEqual|Greater):\\d+$"
                     }
+                ]
+            },
+            "TornShopliftingStatusTitleEnum": {
+                "type": "string",
+                "enum": [
+                    "One camera",
+                    "Two cameras",
+                    "Three cameras",
+                    "Four cameras",
+                    "Checkpoint",
+                    "One guard",
+                    "Two guards"
                 ]
             },
             "ReviveSetting": {
@@ -18349,6 +18946,59 @@
                         "$ref": "#/components/schemas/ErrorFileDoesNotExist"
                     }
                 ]
+            },
+            "UserSearch": {
+                "required": [
+                    "id",
+                    "name",
+                    "level",
+                    "online",
+                    "faction_id",
+                    "icons"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/UserId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "level": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "online": {
+                        "$ref": "#/components/schemas/UserLastActionStatusEnum"
+                    },
+                    "faction_id": {
+                        "$ref": "#/components/schemas/FactionId"
+                    },
+                    "icons": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserIconPublic"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "UserSearchResponse": {
+                "required": [
+                    "search",
+                    "_metadata"
+                ],
+                "properties": {
+                    "search": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserSearch"
+                        }
+                    },
+                    "_metadata": {
+                        "$ref": "#/components/schemas/RequestMetadataWithLinksAndTotal"
+                    }
+                },
+                "type": "object"
             },
             "UserPerksResponse": {
                 "required": [
@@ -22006,8 +22656,7 @@
                 ],
                 "properties": {
                     "id": {
-                        "type": "integer",
-                        "format": "int32"
+                        "$ref": "#/components/schemas/TornSubCrimeId"
                     },
                     "total": {
                         "type": "integer",
@@ -29035,6 +29684,7 @@
                             "contributors",
                             "crime",
                             "crimes",
+                            "dirtbombs",
                             "hof",
                             "lookup",
                             "members",
@@ -29056,7 +29706,10 @@
                             "territorywars",
                             "timestamp",
                             "upgrades",
-                            "warfare",
+                            "warfarechains",
+                            "warfareraids",
+                            "warfareranked",
+                            "warfareterritory",
                             "wars",
                             "armor",
                             "boosters",
@@ -29171,6 +29824,92 @@
                     },
                     "_metadata": {
                         "$ref": "#/components/schemas/RequestMetadataWithLinks"
+                    }
+                },
+                "type": "object"
+            },
+            "FactionWarfareRankedResponse": {
+                "required": [
+                    "warfareranked",
+                    "_metadata"
+                ],
+                "properties": {
+                    "warfareranked": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FactionRankedWarDetails"
+                        }
+                    },
+                    "_metadata": {
+                        "$ref": "#/components/schemas/RequestMetadataWithLinks"
+                    }
+                },
+                "type": "object"
+            },
+            "FactionWarfareRaidsResponse": {
+                "required": [
+                    "warfareraids",
+                    "_metadata"
+                ],
+                "properties": {
+                    "warfareraids": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FactionRaidWarfare"
+                        }
+                    },
+                    "_metadata": {
+                        "$ref": "#/components/schemas/RequestMetadataWithLinks"
+                    }
+                },
+                "type": "object"
+            },
+            "FactionWarfareTerritoryWarsResponse": {
+                "required": [
+                    "warfareterritory",
+                    "_metadata"
+                ],
+                "properties": {
+                    "warfareterritory": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FactionTerritoryWarfare"
+                        }
+                    },
+                    "_metadata": {
+                        "$ref": "#/components/schemas/RequestMetadataWithLinks"
+                    }
+                },
+                "type": "object"
+            },
+            "FactionWarfareChainsResponse": {
+                "required": [
+                    "warfarechains",
+                    "_metadata"
+                ],
+                "properties": {
+                    "warfarechains": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FactionChainWarfare"
+                        }
+                    },
+                    "_metadata": {
+                        "$ref": "#/components/schemas/RequestMetadataWithLinks"
+                    }
+                },
+                "type": "object"
+            },
+            "FactionWarfareDirtyBombsResponse": {
+                "required": [
+                    "dirtybombs"
+                ],
+                "properties": {
+                    "dirtybombs": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FactionWarfareDirtyBomb"
+                        }
                     }
                 },
                 "type": "object"
@@ -30046,8 +30785,7 @@
                         "type": "string"
                     },
                     "id": {
-                        "type": "integer",
-                        "format": "int32"
+                        "$ref": "#/components/schemas/CompanyStockId"
                     },
                     "cost": {
                         "type": "integer",
@@ -32443,6 +33181,278 @@
                 },
                 "type": "object"
             },
+            "TornSearchForCash": {
+                "required": [
+                    "id",
+                    "title",
+                    "percentage"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/TornSubCrimeId"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "percentage": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "type": "object"
+            },
+            "TornSearchForCashResponse": {
+                "required": [
+                    "searchforcash"
+                ],
+                "properties": {
+                    "searchforcash": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornSearchForCash"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornShopliftingSecurityStatus": {
+                "required": [
+                    "title",
+                    "disabled"
+                ],
+                "properties": {
+                    "title": {
+                        "$ref": "#/components/schemas/TornShopliftingStatusTitleEnum"
+                    },
+                    "disabled": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "TornShoplifting": {
+                "required": [
+                    "id",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/TornSubCrimeId"
+                    },
+                    "status": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornShopliftingSecurityStatus"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornShopliftingResponse": {
+                "required": [
+                    "shoplifting"
+                ],
+                "properties": {
+                    "shoplifting": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornShoplifting"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornCompaniesResponse": {
+                "required": [
+                    "companies"
+                ],
+                "properties": {
+                    "companies": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornCompany"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornCompany": {
+                "required": [
+                    "id",
+                    "name",
+                    "cost",
+                    "employees",
+                    "positions",
+                    "specials",
+                    "stock"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/CompanyTypeId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "cost": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "employees": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "positions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornCompanyPosition"
+                        }
+                    },
+                    "specials": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornCompanySpecial"
+                        }
+                    },
+                    "stock": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornCompanyStock"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornCompanyPosition": {
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "ability",
+                    "working_stats"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/CompanyPositionId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "ability": {
+                        "type": "string"
+                    },
+                    "working_stats": {
+                        "required": [
+                            "required",
+                            "daily_gains"
+                        ],
+                        "properties": {
+                            "required": {
+                                "required": [
+                                    "intelligence",
+                                    "manual_labor",
+                                    "endurance"
+                                ],
+                                "properties": {
+                                    "intelligence": {
+                                        "type": "integer",
+                                        "format": "int32"
+                                    },
+                                    "manual_labor": {
+                                        "type": "integer",
+                                        "format": "int32"
+                                    },
+                                    "endurance": {
+                                        "type": "integer",
+                                        "format": "int32"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "daily_gains": {
+                                "required": [
+                                    "intelligence",
+                                    "manual_labor",
+                                    "endurance"
+                                ],
+                                "properties": {
+                                    "intelligence": {
+                                        "type": "integer",
+                                        "format": "int32"
+                                    },
+                                    "manual_labor": {
+                                        "type": "integer",
+                                        "format": "int32"
+                                    },
+                                    "endurance": {
+                                        "type": "integer",
+                                        "format": "int32"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "TornCompanySpecial": {
+                "required": [
+                    "id",
+                    "name",
+                    "effect",
+                    "cost",
+                    "rating"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/CompanySpecialId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "effect": {
+                        "type": "string"
+                    },
+                    "cost": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "type": "object"
+            },
+            "TornCompanyStock": {
+                "required": [
+                    "id",
+                    "name",
+                    "cost",
+                    "rrp"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/CompanyStockId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "cost": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "rrp": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "type": "object"
+            },
             "TornStock": {
                 "required": [
                     "id",
@@ -33554,8 +34564,7 @@
                 ],
                 "properties": {
                     "id": {
-                        "type": "integer",
-                        "format": "int32"
+                        "$ref": "#/components/schemas/TornSubCrimeId"
                     },
                     "name": {
                         "type": "string"
@@ -34752,7 +35761,7 @@
             "TornSelectionName": {
                 "oneOf": [
                     {
-                        "description": "The following selections will fallback to API v1 and may change at any time: 'bank','cards','cityshops','companies','competition','gyms','itemdetails','itemstats','organisedcrimes','pawnshop','pokertables','rockpaperscissors','searchforcash','shoplifting','stats'.\n *   The following selections are not available in API v2: 'dirtybombs','raidreport','raids', 'chainreport', 'rackets', 'rankedwarreport', 'rankedwars', 'territorynames', 'territorywarreport', 'territorywars'.",
+                        "description": "The following selections will fallback to API v1 and may change at any time: 'bank','cards','cityshops','companies','competition','gyms','itemdetails','itemstats','organisedcrimes','pawnshop','pokertables','rockpaperscissors','stats'.\n *   The following selections are not available in API v2: 'dirtybombs','raidreport','raids', 'chainreport', 'rackets', 'rankedwarreport', 'rankedwars', 'territorynames', 'territorywarreport', 'territorywars'.",
                         "type": "string",
                         "enum": [
                             "attacklog",
@@ -34777,6 +35786,8 @@
                             "museum",
                             "organizedcrimes",
                             "properties",
+                            "searchforcash",
+                            "shoplifting",
                             "stocks",
                             "subcrimes",
                             "territory",
@@ -34793,8 +35804,6 @@
                             "pawnshop",
                             "pokertables",
                             "rockpaperscissors",
-                            "searchforcash",
-                            "shoplifting",
                             "stats"
                         ]
                     },
@@ -34822,7 +35831,7 @@
             "ApiCompanySearchFilter": {
                 "name": "filters",
                 "in": "query",
-                "description": "A filtering query parameter allowing a comma-separated list of filters. <br>\n *  Each filter can be one of the following:\n *  Fixed options: `recruiting`, `notRecruiting`\n *  Dynamic options: `fieldName`+`condition`+`number`. Each dynamic filter is made out of 3 parts separated by colon `:`:\n *  * `fieldName` is one of: `id`, `type`, `daysOld`, `rating`, `dailyIncome`, `weeklyIncome`, `dailyCustomers`, `weeklyCustomers`\n *  * `condition` is one of: `=`, `!=`, `<`, `<=`, `>=`, `>`, `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`\n *  * `number`: any integer value\n *  Examples: `filters=recruiting`, `filters=weeklyIncome:>=:20000,id:<:1000,notRecruiting`, `filters=type:Equal:10,rating:=:10,dailyIncome:<=:6666666`",
+                "description": "A filtering query parameter allowing a comma-separated list of filters. <br>\n *  Each filter can be one of the following:\n *  Fixed options: `recruiting`, `notRecruiting`\n *  Dynamic options: `fieldName`+`condition`+`number`. Each dynamic filter is made out of 3 parts separated by colon `:`:\n *  * `fieldName` is one of: `id`, `type`, `daysOld`, `rating`, `dailyIncome`, `weeklyIncome`, `dailyCustomers`, `weeklyCustomers`\n *  * `condition` is one of: `=`, `!=`, `<`, `<=`, `>=`, `>`, `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`\n *  * `number`: any integer value\n *  Examples:\n * `filters=recruiting`,\n * `filters=weeklyIncome:>=:20000,id:<:1000,notRecruiting`,\n * `filters=type:Equal:10,rating:=:10,dailyIncome:<=:6666666`",
                 "required": false,
                 "style": "form",
                 "explode": false,
@@ -34841,6 +35850,59 @@
                             {
                                 "type": "string",
                                 "pattern": "^(id|type|daysOld|rating|dailyIncome|weeklyIncome|dailyCustomers|weeklyCustomers):(=|!=|<|<=|>=|>|Equal|NotEqual|Less|LessOrEqual|GreaterOrEqual|Greater):\\d+$"
+                            }
+                        ]
+                    }
+                }
+            },
+            "ApiUserSearchFilter": {
+                "name": "filters",
+                "in": "query",
+                "description": "A filtering query parameter allowing a comma-separated list of filters. <br>\n *  Filters in this selection reflect on-site filters, and they can be:\n *  One of: `married`, `notMarried`, `traveling`, `notTraveling`, `inFaction`, `notInFaction`, `inCompany`, `notInCompany`, `inHospital`, `notInHospital`, `inJail`, `notInJail`, `inFederalJail`, `notInFederalJail`\n *  Additionally, one of last action: `lastActionNow`, `lastActionRecent`, `lastActionHourAgo`, `lastActionDayAgo`, `lastActionWeekAgo`, `lastActionMonthAgo`, `lastActionYearAgo`\n *  Additionally, one of gender: `male`, `female`, `enby`\n *  Any dynamic option: `fieldName`+`condition`+`number`. Each dynamic filter is made out of 3 parts separated by colon `:`:\n *  * `fieldName` is one of: `level`, `daysOld`, `offences`\n *  * `condition` is one of: `=`, `!=`, `<`, `<=`, `>=`, `>`, `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`\n *  * `number`: any integer value\n *  Additionally, a dynamic list of faction ids (negates `inFaction` and `notInFaction` filters): `factions`+`:`+`list of ids separated by semicolon ;`\n *  Examples:\n * `filters=married`,\n * `filters=daysOld:>=:5000,offences:>:100000,notInFaction`,\n * `filters=factions:1;2;3`,\n * `filters=level:=:100,lastActionYearAgo,male,inFaction,offences:>=:1000,offences:<=:1000000,daysOld:>:500,daysOld:<:7000`",
+                "required": false,
+                "style": "form",
+                "explode": false,
+                "schema": {
+                    "type": "array",
+                    "items": {
+                        "schema": "UserSearchParameter",
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "enum": [
+                                    "married",
+                                    "notMarried",
+                                    "traveling",
+                                    "notTraveling",
+                                    "inFaction",
+                                    "notInFaction",
+                                    "inCompany",
+                                    "notInCompany",
+                                    "inHospital",
+                                    "notInHospital",
+                                    "inJail",
+                                    "notInJail",
+                                    "inFederalJail",
+                                    "notInFederalJail",
+                                    "male",
+                                    "female",
+                                    "enby",
+                                    "lastActionNow",
+                                    "lastActionRecent",
+                                    "lastActionHourAgo",
+                                    "lastActionDayAgo",
+                                    "lastActionWeekAgo",
+                                    "lastActionMonthAgo",
+                                    "lastActionYearAgo"
+                                ]
+                            },
+                            {
+                                "type": "string",
+                                "pattern": "^(level|daysOld|offences):(=|!=|<|<=|>=|>|Equal|NotEqual|Less|LessOrEqual|GreaterOrEqual|Greater):\\d+$"
+                            },
+                            {
+                                "type": "string",
+                                "pattern": "^factions:\\d+(;\\d+)*$"
                             }
                         ]
                     }
@@ -34961,7 +36023,7 @@
             "ApiFactionSearchFilter": {
                 "name": "filters",
                 "in": "query",
-                "description": "A filtering query parameter allowing a comma-separated list of filters. <br>\n * Each filter can be one of the following:\n * Fixed options: `destroyed`, `notDestroyed`, `recruiting`, `notRecruiting`\n * Dynamic options: `fieldName`+`condition`+`number`. Each dynamic filter is made out of 3 parts separated by colon `:`:\n * * `fieldName` is one of: `id`, `respect`, `members`, `membersMax`\n * * `condition` is one of: `=`, `!=`, `<`, `<=`, `>=`, `>`, `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`\n * * `number`: any integer value\n * Examples: `filters=destroyed`, `filters=notDestroyed,recruiting`, `filters=respect:>=:20000,id:<:100,notRecruiting`",
+                "description": "A filtering query parameter allowing a comma-separated list of filters. <br>\n * Each filter can be one of the following:\n * Fixed options: `destroyed`, `notDestroyed`, `recruiting`, `notRecruiting`\n * Dynamic options: `fieldName`+`condition`+`number`. Each dynamic filter is made out of 3 parts separated by colon `:`:\n * * `fieldName` is one of: `id`, `respect`, `members`, `membersMax`\n * * `condition` is one of: `=`, `!=`, `<`, `<=`, `>=`, `>`, `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`\n * * `number`: any integer value\n * Examples:\n * `filters=destroyed`,\n * `filters=notDestroyed,recruiting`,\n * `filters=respect:>=:20000,id:<:100,notRecruiting`",
                 "required": false,
                 "style": "form",
                 "explode": false,
@@ -34999,7 +36061,7 @@
             "ApiName": {
                 "name": "name",
                 "in": "query",
-                "description": "Name  to search for.",
+                "description": "Name to search for.",
                 "required": false,
                 "schema": {
                     "type": "string"

@@ -1,5 +1,26 @@
 # Torn OpenAPI change log
 
+## 2026-08-17 — OpenAPI 6.9.0
+
+**OpenAPI version:** 6.6.1 → 6.9.0
+**Endpoints:** 166 → 175 catalog (from 211 → 222 raw operations) — +9 −0 ~1, 165 unchanged
+
+| Category | Endpoints | + Added | − Removed | ~ Changed |
+|----------|-----------|---------|-----------|-----------|
+| user | 68 | +1 | 0 | 1 |
+| faction | 40 | +5 | 0 | 0 |
+| torn | 30 | +3 | 0 | 0 |
+| company | 10 | 0 | 0 | 0 |
+| market | 9 | 0 | 0 | 0 |
+| racing | 8 | 0 | 0 | 0 |
+| forum | 6 | 0 | 0 | 0 |
+| key | 2 | 0 | 0 | 0 |
+| property | 2 | 0 | 0 | 0 |
+| **Total** | **175** | **+9** | **0** | **1** |
+
+**Added:** faction/dirtybombs, faction/warfarechains, faction/warfareraids, faction/warfareranked, faction/warfareterritory, torn/companies, torn/searchforcash, torn/shoplifting, user/search
+**Changed (params/enums):** user/medals
+
 ## 2026-08-10 — OpenAPI 6.6.1
 
 **OpenAPI version:** 6.3.1 → 6.6.1

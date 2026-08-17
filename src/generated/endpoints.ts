@@ -1307,7 +1307,7 @@ export const ENDPOINTS = {
     "icons": {
       "requiresId": false,
       "summary": "Get your icons information",
-      "description": "Requires public access key. <br> When requesting data for yourself with 'Custom', 'Limited' or 'Full' access keys, the response will be of type UserIconPrivate, otherwise UserIconPublic.",
+      "description": "Requires public access key. <br> When requesting data for yourself with 'Limited' or 'Full' access keys, the response will be of type UserIconPrivate, otherwise UserIconPublic.",
       "keyLevel": "public",
       "stability": "Stable",
       "query": [
@@ -1350,8 +1350,8 @@ export const ENDPOINTS = {
     "inventory": {
       "requiresId": false,
       "summary": "Get your inventory",
-      "description": "<b>Cached selection (1 hour per category).</b><br><br>Requires limited access key. <br>",
-      "keyLevel": "limited",
+      "description": "<b>Cached selection (1 hour per category).</b><br><br>Requires minimal access key. <br>",
+      "keyLevel": "minimal",
       "stability": "Stable",
       "query": [
         {
@@ -1790,9 +1790,9 @@ export const ENDPOINTS = {
     },
     "medals": {
       "requiresId": false,
-      "summary": "Get your achieved medals",
-      "description": "Requires minimal access key. <br>",
-      "keyLevel": "minimal",
+      "summary": "Get all your achieved medals",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
       "stability": "Stable",
       "query": [
         {
@@ -1820,7 +1820,13 @@ export const ENDPOINTS = {
           ]
         }
       ],
-      "path": "/user/medals"
+      "path": "/user/medals",
+      "idPath": "/user/{id}/medals",
+      "idParam": {
+        "name": "id",
+        "type": "integer|string",
+        "description": "User id or user discord id"
+      }
     },
     "merits": {
       "requiresId": false,
@@ -3223,6 +3229,90 @@ export const ENDPOINTS = {
       ],
       "path": "/user/skills"
     },
+    "search": {
+      "requiresId": false,
+      "summary": "Search users by name or other criteria",
+      "description": "Requires public access key. <br>This selection is standalone and cannot be used together with other selections.<br>It's always limited to return just 25 records.",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "name",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Name to search for."
+        },
+        {
+          "name": "filters",
+          "in": "query",
+          "required": false,
+          "type": "array<enum|string>",
+          "description": "A filtering query parameter allowing a comma-separated list of filters. <br>\n *  Filters in this selection reflect on-site filters, and they can be:\n *  One of: `married`, `notMarried`, `traveling`, `notTraveling`, `inFaction`, `notInFaction`, `inCompany`, `notInCompany`, `inHospital`, `notInHospital`, `inJail`, `notInJail`, `inFederalJail`, `notInFederalJail`\n *  Additionally, one of last action: `lastActionNow`, `lastActionRecent`, `lastActionHourAgo`, `lastActionDayAgo`, `lastActionWeekAgo`, `lastActionMonthAgo`, `lastActionYearAgo`\n *  Additionally, one of gender: `male`, `female`, `enby`\n *  Any dynamic option: `fieldName`+`condition`+`number`. Each dynamic filter is made out of 3 parts separated by colon `:`:\n *  * `fieldName` is one of: `level`, `daysOld`, `offences`\n *  * `condition` is one of: `=`, `!=`, `<`, `<=`, `>=`, `>`, `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`\n *  * `number`: any integer value\n *  Additionally, a dynamic list of faction ids (negates `inFaction` and `notInFaction` filters): `factions`+`:`+`list of ids separated by semicolon ;`\n *  Examples:\n * `filters=married`,\n * `filters=daysOld:>=:5000,offences:>:100000,notInFaction`,\n * `filters=factions:1;2;3`,\n * `filters=level:=:100,lastActionYearAgo,male,inFaction,offences:>=:1000,offences:<=:1000000,daysOld:>:500,daysOld:<:7000`",
+          "enum": [
+            "married",
+            "notMarried",
+            "traveling",
+            "notTraveling",
+            "inFaction",
+            "notInFaction",
+            "inCompany",
+            "notInCompany",
+            "inHospital",
+            "notInHospital",
+            "inJail",
+            "notInJail",
+            "inFederalJail",
+            "notInFederalJail",
+            "male",
+            "female",
+            "enby",
+            "lastActionNow",
+            "lastActionRecent",
+            "lastActionHourAgo",
+            "lastActionDayAgo",
+            "lastActionWeekAgo",
+            "lastActionMonthAgo",
+            "lastActionYearAgo"
+          ]
+        },
+        {
+          "name": "offset",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "search",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "level",
+            "online",
+            "faction_id",
+            "icons"
+          ]
+        }
+      ],
+      "path": "/user/search"
+    },
     "snapshot": {
       "requiresId": false,
       "summary": "Get daily active players snapshot CSV",
@@ -4351,6 +4441,43 @@ export const ENDPOINTS = {
         "description": "Crime id"
       }
     },
+    "dirtybombs": {
+      "requiresId": false,
+      "summary": "Get all dirty bombs",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "dirtybombs",
+          "type": "array",
+          "fields": [
+            "id",
+            "planted_at",
+            "detonated_at",
+            "faction",
+            "user"
+          ]
+        }
+      ],
+      "path": "/faction/dirtybombs"
+    },
     "hof": {
       "requiresId": false,
       "summary": "Get your faction's hall of fame rankings.",
@@ -5148,14 +5275,14 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "string",
-          "description": "Name  to search for."
+          "description": "Name to search for."
         },
         {
           "name": "filters",
           "in": "query",
           "required": false,
           "type": "array<enum|string>",
-          "description": "A filtering query parameter allowing a comma-separated list of filters. <br>\n * Each filter can be one of the following:\n * Fixed options: `destroyed`, `notDestroyed`, `recruiting`, `notRecruiting`\n * Dynamic options: `fieldName`+`condition`+`number`. Each dynamic filter is made out of 3 parts separated by colon `:`:\n * * `fieldName` is one of: `id`, `respect`, `members`, `membersMax`\n * * `condition` is one of: `=`, `!=`, `<`, `<=`, `>=`, `>`, `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`\n * * `number`: any integer value\n * Examples: `filters=destroyed`, `filters=notDestroyed,recruiting`, `filters=respect:>=:20000,id:<:100,notRecruiting`",
+          "description": "A filtering query parameter allowing a comma-separated list of filters. <br>\n * Each filter can be one of the following:\n * Fixed options: `destroyed`, `notDestroyed`, `recruiting`, `notRecruiting`\n * Dynamic options: `fieldName`+`condition`+`number`. Each dynamic filter is made out of 3 parts separated by colon `:`:\n * * `fieldName` is one of: `id`, `respect`, `members`, `membersMax`\n * * `condition` is one of: `=`, `!=`, `<`, `<=`, `>=`, `>`, `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`\n * * `number`: any integer value\n * Examples:\n * `filters=destroyed`,\n * `filters=notDestroyed,recruiting`,\n * `filters=respect:>=:20000,id:<:100,notRecruiting`",
           "enum": [
             "destroyed",
             "notDestroyed",
@@ -5525,10 +5652,297 @@ export const ENDPOINTS = {
       ],
       "path": "/faction/upgrades"
     },
+    "warfarechains": {
+      "requiresId": false,
+      "summary": "Get all chains",
+      "description": "Requires public access key. <br>By default, active chains are returned.",
+      "keyLevel": "public",
+      "stability": "Stable",
+      "query": [
+        {
+          "name": "cat",
+          "in": "query",
+          "required": true,
+          "type": "enum",
+          "enum": [
+            "active",
+            "complete"
+          ]
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "description": "Sorted by the greatest timestamps",
+          "enum": [
+            "DESC",
+            "ASC"
+          ]
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "type": "integer",
+          "description": "Timestamp that sets the lower limit for the data returned. Data returned will be after this time"
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "type": "integer",
+          "description": "Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time"
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "warfarechains",
+          "type": "array",
+          "fields": [
+            "id",
+            "chain",
+            "respect",
+            "start",
+            "end",
+            "faction"
+          ]
+        }
+      ],
+      "path": "/faction/warfarechains"
+    },
+    "warfareraids": {
+      "requiresId": false,
+      "summary": "Get all raids",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
+      "query": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "description": "Sorted by the greatest timestamps",
+          "enum": [
+            "DESC",
+            "ASC"
+          ]
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "type": "integer",
+          "description": "Timestamp that sets the lower limit for the data returned. Data returned will be after this time"
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "type": "integer",
+          "description": "Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time"
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "warfareraids",
+          "type": "array",
+          "fields": [
+            "id",
+            "start",
+            "end",
+            "aggressor",
+            "defender"
+          ]
+        }
+      ],
+      "path": "/faction/warfareraids"
+    },
+    "warfareranked": {
+      "requiresId": false,
+      "summary": "Get all ranked wars",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
+      "query": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "description": "Sorted by the greatest timestamps",
+          "enum": [
+            "DESC",
+            "ASC"
+          ]
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "type": "integer",
+          "description": "Timestamp that sets the lower limit for the data returned. Data returned will be after this time"
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "type": "integer",
+          "description": "Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time"
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "warfareranked",
+          "type": "array",
+          "fields": [
+            "id",
+            "start",
+            "end",
+            "target",
+            "winner",
+            "factions"
+          ]
+        }
+      ],
+      "path": "/faction/warfareranked"
+    },
+    "warfareterritory": {
+      "requiresId": false,
+      "summary": "Get all territory wars",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
+      "query": [
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "description": "Sorted by the greatest timestamps",
+          "enum": [
+            "DESC",
+            "ASC"
+          ]
+        },
+        {
+          "name": "from",
+          "in": "query",
+          "required": false,
+          "type": "integer",
+          "description": "Timestamp that sets the lower limit for the data returned. Data returned will be after this time"
+        },
+        {
+          "name": "to",
+          "in": "query",
+          "required": false,
+          "type": "integer",
+          "description": "Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time"
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "warfareterritory",
+          "type": "array",
+          "fields": [
+            "id",
+            "territory",
+            "start",
+            "end",
+            "target",
+            "aggressor",
+            "defender",
+            "result"
+          ]
+        }
+      ],
+      "path": "/faction/warfareterritory"
+    },
     "warfare": {
       "requiresId": false,
       "summary": "Get faction warfare",
-      "description": "Requires public access key. <br>The response depends on the selected category.",
+      "description": "This selection is replaced by other warfare selections and 'faction' -> 'dirtybombs'.<br>This will be removed on 1st January 2027<b></b>.<br>Requires public access key. <br>The response depends on the selected category.",
       "keyLevel": "public",
       "stability": "Stable",
       "query": [
@@ -5814,8 +6228,8 @@ export const ENDPOINTS = {
     "news": {
       "requiresId": false,
       "summary": "Get your company's news details",
-      "description": "Requires minimal access key. <br>",
-      "keyLevel": "minimal",
+      "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
       "stability": "Stable",
       "query": [
         {
@@ -6055,14 +6469,14 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "string",
-          "description": "Name  to search for."
+          "description": "Name to search for."
         },
         {
           "name": "filters",
           "in": "query",
           "required": false,
           "type": "array<enum|string>",
-          "description": "A filtering query parameter allowing a comma-separated list of filters. <br>\n *  Each filter can be one of the following:\n *  Fixed options: `recruiting`, `notRecruiting`\n *  Dynamic options: `fieldName`+`condition`+`number`. Each dynamic filter is made out of 3 parts separated by colon `:`:\n *  * `fieldName` is one of: `id`, `type`, `daysOld`, `rating`, `dailyIncome`, `weeklyIncome`, `dailyCustomers`, `weeklyCustomers`\n *  * `condition` is one of: `=`, `!=`, `<`, `<=`, `>=`, `>`, `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`\n *  * `number`: any integer value\n *  Examples: `filters=recruiting`, `filters=weeklyIncome:>=:20000,id:<:1000,notRecruiting`, `filters=type:Equal:10,rating:=:10,dailyIncome:<=:6666666`",
+          "description": "A filtering query parameter allowing a comma-separated list of filters. <br>\n *  Each filter can be one of the following:\n *  Fixed options: `recruiting`, `notRecruiting`\n *  Dynamic options: `fieldName`+`condition`+`number`. Each dynamic filter is made out of 3 parts separated by colon `:`:\n *  * `fieldName` is one of: `id`, `type`, `daysOld`, `rating`, `dailyIncome`, `weeklyIncome`, `dailyCustomers`, `weeklyCustomers`\n *  * `condition` is one of: `=`, `!=`, `<`, `<=`, `>=`, `>`, `Equal`, `NotEqual`, `Less`, `LessOrEqual`, `GreaterOrEqual`, `Greater`\n *  * `number`: any integer value\n *  Examples:\n * `filters=recruiting`,\n * `filters=weeklyIncome:>=:20000,id:<:1000,notRecruiting`,\n * `filters=type:Equal:10,rating:=:10,dailyIncome:<=:6666666`",
           "enum": [
             "recruiting",
             "notRecruiting"
@@ -7813,6 +8227,51 @@ export const ENDPOINTS = {
       ],
       "path": "/torn/calendar"
     },
+    "companies": {
+      "requiresId": false,
+      "summary": "Get all companies details",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "companies",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "cost",
+            "employees",
+            "positions",
+            "specials",
+            "stock"
+          ]
+        }
+      ],
+      "path": "/torn/companies",
+      "idPath": "/torn/{typeId}/companies",
+      "idParam": {
+        "name": "typeId",
+        "type": "integer",
+        "description": "Company type id"
+      }
+    },
     "crimes": {
       "requiresId": false,
       "summary": "Get crimes information",
@@ -8704,6 +9163,75 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/torn/properties"
+    },
+    "searchforcash": {
+      "requiresId": false,
+      "summary": "Get search for cash crime statuses",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "searchforcash",
+          "type": "array",
+          "fields": [
+            "id",
+            "title",
+            "percentage"
+          ]
+        }
+      ],
+      "path": "/torn/searchforcash"
+    },
+    "shoplifting": {
+      "requiresId": false,
+      "summary": "Get shoplifting crime statuses",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "shoplifting",
+          "type": "array",
+          "fields": [
+            "id",
+            "status"
+          ]
+        }
+      ],
+      "path": "/torn/shoplifting"
     },
     "stocks": {
       "requiresId": false,
