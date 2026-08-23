@@ -38,6 +38,7 @@ export function createConformanceThrottle({
   async function run(doRequest) {
     await gate();
     let out = await doRequest();
+    const firstMs = typeof out?.ms === "number" ? out.ms : null;
     requestsInBatch += 1;
 
     if (out?.json?.error?.code === 5) {
@@ -46,8 +47,13 @@ export function createConformanceThrottle({
       requestsInBatch = 0;
       lastCallAt = 0;
       await gate();
-      out = await doRequest();
+      const retryOut = await doRequest();
       requestsInBatch += 1;
+      if (firstMs != null && typeof retryOut?.ms === "number") {
+        out = { ...retryOut, ms: firstMs + pauseMs + retryOut.ms };
+      } else {
+        out = retryOut;
+      }
     }
 
     return out;
