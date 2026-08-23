@@ -604,6 +604,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/user/gym": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get your currently active gym
+         * @description Requires minimal access key. <br>
+         */
+        get: operations["getMyGym"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/user/hof": {
         parameters: {
             query?: never;
@@ -1959,6 +1979,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/faction/crimeexp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get your faction members crime experience
+         * @description Requires minimal access key. <br>Members are ordered descending, from highest crime experience to lowest.
+         */
+        get: operations["getMyFactionCrimeExp"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/faction/crimes": {
         parameters: {
             query?: never;
@@ -2055,6 +2095,26 @@ export interface paths {
          * @description Requires public access key. <br>
          */
         get: operations["getFactionHoF"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/faction/inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get your faction's inventory items.
+         * @description <b>Cached selection (1 hour, all items cached at once).</b><br><br>Requires limited access key. <br>
+         */
+        get: operations["getMyFactionInventory"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3745,6 +3805,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/torn/bank": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current bank rates
+         * @description Requires public access key. <br>
+         */
+        get: operations["getTornBank"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/torn/bounties": {
         parameters: {
             query?: never;
@@ -3777,6 +3857,66 @@ export interface paths {
          * @description Requires public access key. <br> Get the details about competitions & events in the running year.
          */
         get: operations["getTornCalendar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/torn/cards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get casino playing cards
+         * @description Requires public access key. <br>
+         */
+        get: operations["getTornCards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/torn/cityshops": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get city shops stock information
+         * @description Requires public access key. <br>
+         */
+        get: operations["getTornCityShops"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/torn/{shopId}/cityshops": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get stock information for a specific shop
+         * @description Requires public access key. <br>
+         */
+        get: operations["getTornCityShopSpecific"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3945,6 +4085,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/torn/gyms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all gyms
+         * @description Requires public access key. <br>
+         */
+        get: operations["getTornGyms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/torn/honors": {
         parameters: {
             query?: never;
@@ -4025,7 +4185,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/torn/{id}/itemdetails": {
+    "/torn/{ids}/itemdetails": {
         parameters: {
             query?: never;
             header?: never;
@@ -4033,7 +4193,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get information about a specific item
+         * Get details for specific item(s)
          * @description Requires public key.
          */
         get: operations["getTornItemDetails"];
@@ -4057,6 +4217,26 @@ export interface paths {
          * @description Requires public key.
          */
         get: operations["getTornItemMods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/torn/{ids}/itemstats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get specific item(s) stats
+         * @description Requires public key.<br>
+         */
+        get: operations["getTornItemStats"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4265,6 +4445,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/torn/pokertables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get active poker tables
+         * @description Requires public access key. <br>
+         */
+        get: operations["getTornPokerTables"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/torn/properties": {
         parameters: {
             query?: never;
@@ -4277,6 +4477,26 @@ export interface paths {
          * @description Requires public access key. <br>
          */
         get: operations["getTornProperties"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/torn/rockpaperscissors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get rock paper scissors competition stats
+         * @description Requires public key.
+         */
+        get: operations["getTornRps"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4317,6 +4537,26 @@ export interface paths {
          * @description Requires public access key. <br>
          */
         get: operations["getTornShoplifting"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/torn/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get daily city stats
+         * @description Requires public key.
+         */
+        get: operations["getTornCityStats"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4472,6 +4712,10 @@ export interface components {
         /** @enum {string} */
         RaceClassEnum: "A" | "B" | "C" | "D" | "E";
         /** @enum {string} */
+        TornItemStatTitleEnum: "Damage" | "Rounds fired" | "Hits" | "Misses" | "Damage taken" | "Reloads" | "Highest damage" | "Hits received" | "Most damage taken" | "Damage mitigated" | "Most damage mitigated" | "Finishing hits" | "Critical hits" | "First owner" | "First faction owner" | "Time created" | "Respect earned";
+        /** @enum {string} */
+        FactionArmoryCategoryEnum: "weapons" | "armor" | "temporary" | "medical" | "consumables" | "drugs" | "boosters" | "utilities" | "loot";
+        /** @enum {string} */
         MissionDifficultyEnum: "Very easy" | "Easy" | "Medium" | "Hard" | "Very hard" | "Expert";
         /** @enum {string} */
         MissionStatusEnum: "Accepted" | "Available" | "Failed" | "Completed";
@@ -4512,7 +4756,7 @@ export interface components {
         /** @enum {string} */
         FactionTerritoryEnum: "AAB" | "AAC" | "AAD" | "AAE" | "AAF" | "AAG" | "ABA" | "ABB" | "ABC" | "ABD" | "ABE" | "ABF" | "ACA" | "ACB" | "ACC" | "ACD" | "ACE" | "ACF" | "ACG" | "ADA" | "ADB" | "ADC" | "ADD" | "ADE" | "ADF" | "ADG" | "AEA" | "AEB" | "AEC" | "AED" | "AEE" | "AEF" | "AFA" | "AFB" | "AFC" | "AFD" | "AFE" | "AFF" | "AFG" | "AGA" | "AGB" | "AGC" | "AGD" | "AGE" | "AGF" | "AGG" | "AHA" | "AHB" | "AHC" | "AHD" | "AHE" | "AHF" | "AIA" | "AIB" | "AIC" | "AID" | "AIE" | "AIF" | "AJA" | "AJB" | "AJC" | "AJD" | "AJE" | "AJF" | "AKA" | "AKB" | "AKC" | "AKD" | "AKE" | "AKF" | "ALA" | "ALB" | "ALC" | "ALD" | "ALE" | "ALF" | "AMA" | "AMB" | "AMC" | "AMD" | "AME" | "AMF" | "ANB" | "ANC" | "AND" | "ANE" | "ANF" | "ANG" | "AOB" | "AOC" | "AOD" | "AOE" | "AOF" | "AOG" | "APB" | "APC" | "APD" | "APE" | "APF" | "APG" | "AQB" | "AQC" | "AQD" | "AQE" | "AQF" | "AQG" | "ARB" | "ARC" | "ARD" | "ARE" | "ARF" | "ASB" | "ASC" | "ASD" | "ASE" | "ASF" | "ASG" | "ATB" | "ATC" | "ATD" | "ATE" | "ATF" | "ATG" | "AUB" | "AUC" | "AUD" | "AUE" | "AUF" | "AUG" | "AVB" | "AVC" | "AVD" | "AVE" | "AVF" | "AVG" | "AWB" | "AWC" | "AWD" | "AWE" | "AWF" | "AWG" | "AXB" | "AXC" | "AXD" | "AXE" | "AXF" | "AXG" | "AYB" | "AYC" | "AYD" | "AYE" | "AYF" | "AYG" | "AZB" | "AZC" | "AZD" | "AZE" | "AZF" | "AZG" | "BAA" | "BAB" | "BAC" | "BAD" | "BAE" | "BAF" | "BAG" | "BBA" | "BBB" | "BBC" | "BBD" | "BBE" | "BBF" | "BBG" | "BCA" | "BCB" | "BCC" | "BCD" | "BCE" | "BCF" | "BCG" | "BDA" | "BDB" | "BDC" | "BDD" | "BDE" | "BDF" | "BDG" | "BEA" | "BEB" | "BEC" | "BED" | "BEE" | "BEF" | "BFA" | "BFB" | "BFC" | "BFD" | "BFE" | "BFF" | "BFG" | "BGA" | "BGB" | "BGC" | "BGD" | "BGE" | "BGF" | "BGG" | "BHA" | "BHB" | "BHC" | "BHD" | "BHE" | "BHF" | "BIA" | "BIB" | "BIC" | "BID" | "BIE" | "BIF" | "BJA" | "BJB" | "BJC" | "BJD" | "BJE" | "BJF" | "BKA" | "BKB" | "BKC" | "BKD" | "BKE" | "BKF" | "BLA" | "BLB" | "BLC" | "BLD" | "BLE" | "BLF" | "BMA" | "BMB" | "BMC" | "BMD" | "BME" | "BMF" | "BNB" | "BNC" | "BND" | "BNE" | "BNF" | "BNG" | "BOB" | "BOC" | "BOD" | "BOE" | "BOF" | "BPB" | "BPC" | "BPD" | "BPE" | "BPF" | "BPG" | "BQB" | "BQC" | "BQD" | "BQF" | "BQG" | "BRB" | "BRC" | "BRD" | "BRE" | "BRF" | "BRG" | "BSB" | "BSC" | "BSD" | "BSE" | "BSF" | "BTB" | "BTC" | "BTD" | "BTE" | "BTF" | "BTG" | "BUB" | "BUC" | "BUD" | "BUE" | "BUF" | "BUG" | "BVB" | "BVC" | "BVD" | "BVE" | "BVF" | "BVG" | "BWB" | "BWC" | "BWD" | "BWE" | "BWF" | "BWG" | "BXB" | "BXC" | "BXD" | "BXE" | "BXF" | "BXG" | "BYB" | "BYC" | "BYD" | "BYE" | "BYF" | "BYG" | "BZB" | "BZC" | "BZD" | "BZE" | "BZF" | "BZG" | "CAA" | "CAB" | "CAC" | "CAD" | "CAE" | "CAF" | "CAG" | "CBA" | "CBB" | "CBC" | "CBD" | "CBE" | "CBF" | "CBG" | "CCA" | "CCB" | "CCC" | "CCD" | "CCE" | "CCF" | "CCG" | "CDA" | "CDB" | "CDC" | "CDD" | "CDE" | "CDF" | "CDG" | "CEA" | "CEB" | "CEC" | "CED" | "CEE" | "CEF" | "CFA" | "CFB" | "CFC" | "CFD" | "CFE" | "CFG" | "CGA" | "CGB" | "CGC" | "CGD" | "CGE" | "CGF" | "CGG" | "CHA" | "CHB" | "CHC" | "CHD" | "CHE" | "CHF" | "CIA" | "CIB" | "CIC" | "CID" | "CIE" | "CIF" | "CJA" | "CJB" | "CJC" | "CJD" | "CJE" | "CJF" | "CKA" | "CKB" | "CKC" | "CKD" | "CKE" | "CKF" | "CLA" | "CLB" | "CLC" | "CLD" | "CLE" | "CLF" | "CMA" | "CMB" | "CMC" | "CMD" | "CME" | "CMF" | "CNB" | "CNC" | "CND" | "CNE" | "CNF" | "CNG" | "COB" | "COC" | "COD" | "COE" | "COF" | "COG" | "CPB" | "CPC" | "CPD" | "CPE" | "CPF" | "CPG" | "CQB" | "CQC" | "CQD" | "CQF" | "CQG" | "CRB" | "CRC" | "CRD" | "CRE" | "CRF" | "CRG" | "CSB" | "CSC" | "CSD" | "CSE" | "CSF" | "CSG" | "CTB" | "CTC" | "CTD" | "CTE" | "CTF" | "CTG" | "CUB" | "CUC" | "CUD" | "CUE" | "CUF" | "CUG" | "CVB" | "CVC" | "CVD" | "CVE" | "CVF" | "CVG" | "CWB" | "CWC" | "CWD" | "CWE" | "CWF" | "CWG" | "CXB" | "CXC" | "CXD" | "CXE" | "CXF" | "CXG" | "CYB" | "CYC" | "CYD" | "CYE" | "CYF" | "CZB" | "CZC" | "CZD" | "CZE" | "CZF" | "CZG" | "DAA" | "DAB" | "DAC" | "DAD" | "DAE" | "DAF" | "DAG" | "DBA" | "DBB" | "DBC" | "DBD" | "DBE" | "DBF" | "DBG" | "DCA" | "DCB" | "DCC" | "DCD" | "DCE" | "DCF" | "DCG" | "DDA" | "DDB" | "DDC" | "DDD" | "DDE" | "DDF" | "DDG" | "DEA" | "DEB" | "DEC" | "DED" | "DEE" | "DEF" | "DFA" | "DFB" | "DFC" | "DFD" | "DFE" | "DFF" | "DFG" | "DGA" | "DGB" | "DGC" | "DGD" | "DGE" | "DGF" | "DGG" | "DHA" | "DHB" | "DHC" | "DHD" | "DHE" | "DHF" | "DIA" | "DIB" | "DIC" | "DID" | "DIE" | "DIF" | "DJA" | "DJB" | "DJC" | "DJD" | "DJE" | "DKA" | "DKB" | "DKC" | "DKD" | "DKE" | "DKF" | "DLA" | "DLB" | "DLC" | "DLD" | "DLE" | "DLF" | "DMA" | "DMB" | "DMC" | "DMD" | "DME" | "DMF" | "DNB" | "DNC" | "DND" | "DNE" | "DNF" | "DNG" | "DOB" | "DOC" | "DOD" | "DOE" | "DOF" | "DOG" | "DPB" | "DPC" | "DPD" | "DPE" | "DPF" | "DPG" | "DQB" | "DQC" | "DQD" | "DQF" | "DQG" | "DRB" | "DRC" | "DRD" | "DRE" | "DRF" | "DRG" | "DSB" | "DSC" | "DSD" | "DSE" | "DSF" | "DSG" | "DTB" | "DTC" | "DTD" | "DTE" | "DTF" | "DTG" | "DUB" | "DUC" | "DUD" | "DUE" | "DUF" | "DUG" | "DVB" | "DVC" | "DVD" | "DVE" | "DVF" | "DVG" | "DWB" | "DWC" | "DWD" | "DWE" | "DWF" | "DWG" | "DXB" | "DXC" | "DXD" | "DXE" | "DXF" | "DXG" | "DYB" | "DYC" | "DYD" | "DYE" | "DYF" | "DYG" | "DZB" | "DZC" | "DZD" | "DZE" | "DZF" | "DZG" | "EAA" | "EAB" | "EAC" | "EAD" | "EAE" | "EAF" | "EAG" | "EBA" | "EBB" | "EBC" | "EBD" | "EBE" | "EBF" | "EBG" | "ECA" | "ECB" | "ECC" | "ECD" | "ECE" | "ECF" | "ECG" | "EDA" | "EDB" | "EDC" | "EDD" | "EDE" | "EDF" | "EDG" | "EEA" | "EEB" | "EEC" | "EED" | "EEE" | "EEF" | "EFA" | "EFB" | "EFC" | "EFD" | "EFE" | "EFF" | "EFG" | "EGA" | "EGB" | "EGC" | "EGD" | "EGE" | "EGF" | "EHA" | "EHB" | "EHC" | "EHD" | "EHE" | "EHF" | "EIA" | "EIB" | "EIC" | "EID" | "EIE" | "EIF" | "EJA" | "EJB" | "EJC" | "EJD" | "EJE" | "EKA" | "EKB" | "EKC" | "EKD" | "EKE" | "EKF" | "ELA" | "ELB" | "ELC" | "ELD" | "ELE" | "ELF" | "EMA" | "EMB" | "EMC" | "EMD" | "EME" | "EMF" | "ENB" | "ENC" | "END" | "ENE" | "ENF" | "ENG" | "EOB" | "EOC" | "EOD" | "EOE" | "EOF" | "EPB" | "EPC" | "EPD" | "EPE" | "EPF" | "EPG" | "EQB" | "EQC" | "EQD" | "EQF" | "EQG" | "ERB" | "ERC" | "ERD" | "ERE" | "ERF" | "ERG" | "ESB" | "ESC" | "ESD" | "ESE" | "ESF" | "ESG" | "ETB" | "ETC" | "ETD" | "ETE" | "ETF" | "ETG" | "EUB" | "EUC" | "EUD" | "EUE" | "EUF" | "EUG" | "EVB" | "EVC" | "EVD" | "EVE" | "EVF" | "EVG" | "EWB" | "EWC" | "EWD" | "EWE" | "EWF" | "EWG" | "EXB" | "EXC" | "EXD" | "EXE" | "EXF" | "EXG" | "EYB" | "EYC" | "EYD" | "EYE" | "EYF" | "EYG" | "EZB" | "EZC" | "EZD" | "EZE" | "EZF" | "EZG" | "FAA" | "FAB" | "FAC" | "FAD" | "FAE" | "FAF" | "XAG" | "FBA" | "FBB" | "FBC" | "FBD" | "FBF" | "FBG" | "FCA" | "FCB" | "FCC" | "FCD" | "FCE" | "FCF" | "FCG" | "FDA" | "FDB" | "FDC" | "FDD" | "FDE" | "FDF" | "FDG" | "FEA" | "FEB" | "FEC" | "FED" | "FEE" | "FEF" | "FFA" | "FFB" | "FFC" | "FFD" | "FFE" | "FFF" | "FFG" | "FGA" | "FGB" | "FGC" | "FGD" | "FGE" | "FGF" | "FGG" | "FHA" | "FHB" | "FHC" | "FHD" | "FHE" | "FHF" | "FIA" | "FIB" | "FIC" | "FID" | "FIE" | "FIF" | "FJA" | "FJB" | "FJC" | "FJD" | "FJE" | "FJF" | "FKA" | "FKB" | "FKC" | "FKD" | "FKE" | "FKF" | "FLA" | "FLB" | "FLC" | "FLD" | "FLE" | "FLF" | "FMA" | "FMC" | "FMD" | "FME" | "FMF" | "FNB" | "FNC" | "FND" | "FNE" | "FNF" | "FNG" | "FOB" | "FOC" | "FOD" | "FOE" | "FOF" | "FPB" | "FPC" | "FPD" | "FPE" | "FPF" | "FPG" | "FQB" | "FQC" | "FQD" | "FQF" | "FQG" | "FRB" | "FRC" | "FRD" | "FRE" | "FRF" | "FRG" | "FSB" | "FSC" | "FSD" | "FSE" | "FSF" | "FSG" | "FTB" | "FTC" | "FTD" | "FTE" | "FTF" | "FTG" | "FUB" | "FUC" | "FUD" | "FUE" | "FUF" | "FUG" | "FVB" | "FVC" | "FVD" | "FVE" | "FVF" | "FVG" | "FWB" | "FWC" | "FWD" | "FWE" | "FWF" | "FWG" | "FXB" | "FXC" | "FXD" | "FXE" | "FXF" | "FXG" | "FYB" | "FYC" | "FYD" | "FYE" | "FYF" | "FYG" | "FZB" | "FZC" | "FZD" | "FZE" | "FZF" | "FZG" | "GAA" | "GAB" | "GAC" | "GAD" | "GAE" | "GAF" | "GAG" | "GBA" | "GBB" | "GBC" | "GBD" | "GBE" | "GBF" | "GCA" | "GCB" | "GCC" | "GCD" | "GCE" | "GCF" | "GCG" | "GDA" | "GDB" | "GDC" | "GDD" | "GDE" | "GDF" | "GDG" | "GEA" | "GEB" | "GEC" | "GED" | "GEE" | "GEF" | "GFA" | "GFB" | "GFC" | "GFD" | "GFE" | "GFF" | "GFG" | "GGA" | "GGB" | "GGC" | "GGD" | "GGE" | "GGF" | "GHA" | "GHB" | "GHC" | "GHD" | "GHE" | "GHF" | "GIA" | "GIB" | "GIC" | "GID" | "GIE" | "GJA" | "GJB" | "GJC" | "GJD" | "GJE" | "GJF" | "GKA" | "GKB" | "GKC" | "GKD" | "GKE" | "GKF" | "GLA" | "GLB" | "GLC" | "GLD" | "GLE" | "GLF" | "GMA" | "GMC" | "GMD" | "GME" | "GMF" | "GNB" | "GNC" | "GND" | "GNE" | "GNF" | "GNG" | "GOB" | "GOC" | "GOD" | "GOE" | "GOF" | "GPB" | "GPC" | "GPD" | "GPE" | "GPF" | "GPG" | "GQC" | "GQD" | "GQF" | "GQG" | "GRB" | "GRC" | "GRD" | "GRE" | "GRF" | "GRG" | "GSB" | "GSC" | "GSD" | "GSE" | "GSF" | "GSG" | "GTB" | "GTC" | "GTD" | "GTE" | "GTF" | "GTG" | "GUB" | "GUC" | "GUD" | "GUF" | "GUG" | "GVB" | "GVC" | "GVD" | "GVE" | "GVF" | "GVG" | "GWB" | "GWC" | "GWD" | "GWE" | "GWF" | "GWG" | "GXB" | "GXC" | "GXD" | "GXE" | "GXF" | "GXG" | "GYB" | "GYC" | "GYD" | "GYE" | "GYF" | "GYG" | "GZB" | "GZC" | "GZD" | "GZE" | "GZF" | "GZG" | "HAA" | "HAB" | "HAC" | "HAD" | "HAE" | "HAF" | "HAG" | "HBA" | "HBB" | "HBC" | "HBD" | "HBE" | "HBF" | "HCA" | "HCB" | "HCC" | "HCD" | "HCE" | "HCF" | "HCG" | "HDA" | "HDB" | "HDC" | "HDD" | "HDE" | "HDF" | "HDG" | "HEA" | "HEB" | "HEC" | "HED" | "HEE" | "HEF" | "HFA" | "HFB" | "HFC" | "HFD" | "HFE" | "HFF" | "HGA" | "HGB" | "HGC" | "HGD" | "HGE" | "HGF" | "HHA" | "HHB" | "HHC" | "HHD" | "HHE" | "HHF" | "HIA" | "HIB" | "HIC" | "HID" | "HIE" | "HJA" | "HJB" | "HJC" | "HJD" | "HJE" | "HJF" | "HKA" | "HKB" | "HKC" | "HKD" | "HKE" | "HKF" | "HLA" | "HLB" | "HLC" | "HLD" | "HLE" | "HLF" | "HMA" | "HMC" | "HMD" | "HME" | "HMF" | "HNB" | "HNC" | "HND" | "HNE" | "HNF" | "HNG" | "HOB" | "HOC" | "HOD" | "HOE" | "HOF" | "HPB" | "HPC" | "HPD" | "HPE" | "HPF" | "HPG" | "HQB" | "HQC" | "HQD" | "HQF" | "HQG" | "HRB" | "HRC" | "HRD" | "HRE" | "HRF" | "HRG" | "HSB" | "HSC" | "HSD" | "HSE" | "HSF" | "HSG" | "HTB" | "HTC" | "HTD" | "HTE" | "HTF" | "HTG" | "HUB" | "HUC" | "HUD" | "HUE" | "HUF" | "HUG" | "HVB" | "HVC" | "HVD" | "HVE" | "HVF" | "HVG" | "HWB" | "HWC" | "HWD" | "HWE" | "HWF" | "HWG" | "HXB" | "HXC" | "HXD" | "HXE" | "HXF" | "HXG" | "HYB" | "HYC" | "HYD" | "HYE" | "HYF" | "HYG" | "HZB" | "HZC" | "HZD" | "HZE" | "HZF" | "HZG" | "IAA" | "IAB" | "IAC" | "IAD" | "IAE" | "IAF" | "IAG" | "IBA" | "IBB" | "IBC" | "IBD" | "IBE" | "IBF" | "ICA" | "ICB" | "ICC" | "ICD" | "ICE" | "ICF" | "ICG" | "IDA" | "IDB" | "IDC" | "IDD" | "IDE" | "IDF" | "IDG" | "IEA" | "IEB" | "IEC" | "IED" | "IEE" | "IEF" | "IFA" | "IFB" | "IFC" | "IFD" | "IFE" | "IFF" | "IFG" | "IGA" | "IGB" | "IGC" | "IGD" | "IGE" | "IGF" | "IGG" | "IHA" | "IHB" | "IHC" | "IHD" | "IHE" | "IHF" | "IIA" | "IIB" | "IIC" | "IID" | "IIE" | "IJA" | "IJB" | "IJC" | "IJD" | "IJE" | "IJF" | "IKA" | "IKB" | "IKC" | "IKD" | "IKE" | "IKF" | "ILA" | "ILB" | "ILC" | "ILD" | "ILE" | "ILF" | "IMA" | "IMB" | "IMC" | "IMD" | "IME" | "IMF" | "INB" | "INC" | "IND" | "INE" | "INF" | "ING" | "IOB" | "IOC" | "IOD" | "IOE" | "IOF" | "IPB" | "IPC" | "IPD" | "IPE" | "IPF" | "IPG" | "IQB" | "IQC" | "IQD" | "IQF" | "IQG" | "IRB" | "IRC" | "IRD" | "IRE" | "IRF" | "IRG" | "ISB" | "ISC" | "ISD" | "ISE" | "ISF" | "ISG" | "ITB" | "ITC" | "ITD" | "ITE" | "ITF" | "ITG" | "IUB" | "IUC" | "IUD" | "IUE" | "IUF" | "IUG" | "IVB" | "IVC" | "IVD" | "IVE" | "IVF" | "IVG" | "IWB" | "IWC" | "IWD" | "IWE" | "IWF" | "IWG" | "IXB" | "IXC" | "IXD" | "IXE" | "IXF" | "IXG" | "IYB" | "IYC" | "IYD" | "IYE" | "IYF" | "IYG" | "IZB" | "IZC" | "IZD" | "IZE" | "IZF" | "IZG" | "JAA" | "JAB" | "JAC" | "JAD" | "JAE" | "JAF" | "JAG" | "JBA" | "JBB" | "JBC" | "JBD" | "JBE" | "JBF" | "JCA" | "JCB" | "JCC" | "JCD" | "JCE" | "JCF" | "JCG" | "JDA" | "JDB" | "JDC" | "JDD" | "JDE" | "JDF" | "JDG" | "JEA" | "JEB" | "JEC" | "JED" | "JEE" | "JEF" | "JFA" | "JFB" | "JFC" | "JFD" | "JFE" | "JFF" | "JFG" | "JGA" | "JGB" | "JGC" | "JGD" | "JGE" | "JGF" | "JHA" | "JHB" | "JHC" | "JHD" | "JHE" | "JHF" | "JIA" | "JIB" | "JIC" | "JID" | "JIE" | "JIF" | "JJA" | "JJB" | "JJC" | "JJD" | "JJE" | "JJF" | "JKA" | "JKB" | "JKC" | "JKD" | "JKE" | "JKF" | "JLA" | "JLB" | "JLC" | "JLD" | "JLE" | "JLF" | "JMA" | "JMC" | "JMD" | "JME" | "JMF" | "JNB" | "JNC" | "JND" | "JNE" | "JNF" | "JNG" | "JOB" | "JOC" | "JOD" | "JOE" | "JOF" | "JPB" | "JPC" | "JPD" | "JPE" | "JPF" | "JPG" | "JQB" | "JQC" | "JQD" | "JQF" | "JQG" | "JRB" | "JRC" | "JRD" | "JRE" | "JRF" | "JRG" | "JSB" | "JSC" | "JSD" | "JSE" | "JSF" | "JSG" | "JTB" | "JTC" | "JTD" | "JTE" | "JTF" | "JTG" | "JUB" | "JUC" | "JUD" | "JUE" | "JUF" | "JUG" | "JVB" | "JVC" | "JVD" | "JVE" | "JVF" | "JVG" | "JWB" | "JWC" | "JWD" | "JWE" | "JWF" | "JWG" | "JXB" | "JXC" | "JXD" | "JXE" | "JXF" | "JXG" | "JYB" | "JYC" | "JYD" | "JYE" | "JYF" | "JYG" | "JZB" | "JZC" | "JZD" | "JZE" | "JZF" | "JZG" | "KAA" | "KAB" | "KAC" | "KAD" | "KAE" | "KAF" | "KAG" | "KBA" | "KBB" | "KBC" | "KBD" | "KBE" | "KBF" | "KBG" | "KCA" | "KCB" | "KCC" | "KCD" | "KCE" | "KCF" | "KCG" | "KDA" | "KDB" | "KDC" | "KDD" | "KDE" | "KEA" | "KEB" | "KEC" | "KED" | "KEE" | "KEF" | "KFA" | "KFB" | "KFC" | "KFD" | "KFE" | "KFF" | "KFG" | "KGA" | "KGB" | "KGC" | "KGD" | "KGE" | "KGF" | "KGG" | "KHA" | "KHB" | "KHC" | "KHD" | "KHE" | "KHF" | "KIA" | "KIB" | "KIC" | "KID" | "KIE" | "KIF" | "KJA" | "KJB" | "KJC" | "KJD" | "KJE" | "KJF" | "KKA" | "KKB" | "KKC" | "KKD" | "KKE" | "KKF" | "KLA" | "KLB" | "KLC" | "KLD" | "KLE" | "KLF" | "KMA" | "KMC" | "KMD" | "KME" | "KMF" | "KNB" | "KNC" | "KND" | "KNE" | "KNF" | "KNG" | "KOB" | "KOC" | "KOD" | "KOE" | "KOF" | "KPB" | "KPC" | "KPD" | "KPE" | "KPF" | "KPG" | "KQB" | "KQC" | "KQD" | "KQE" | "KQF" | "KQG" | "KRB" | "KRC" | "KRD" | "KRE" | "KRF" | "KRG" | "KSB" | "KSC" | "KSD" | "KSE" | "KSF" | "KSG" | "KTB" | "KTC" | "KTD" | "KTE" | "KTF" | "KTG" | "KUB" | "KUC" | "KUD" | "KUE" | "KUF" | "KUG" | "KVB" | "KVC" | "KVD" | "KVE" | "KVF" | "KVG" | "KWB" | "KWC" | "KWD" | "KWE" | "KWF" | "KWG" | "KXB" | "KXC" | "KXD" | "KXE" | "KXF" | "KXG" | "KYB" | "KYC" | "KYD" | "KYE" | "KYF" | "KYG" | "KZB" | "KZC" | "KZD" | "KZE" | "KZF" | "KZG" | "LAA" | "LAB" | "LAC" | "LAD" | "LAE" | "LAF" | "LAG" | "LBA" | "LBB" | "LBC" | "LBD" | "LBE" | "LBF" | "LBG" | "LCA" | "LCB" | "LCC" | "LCD" | "LCE" | "LCF" | "LCG" | "LDA" | "LDB" | "LDC" | "LDD" | "LDE" | "LDF" | "LEA" | "LEB" | "LEC" | "LED" | "LEE" | "LEF" | "LFA" | "LFB" | "LFC" | "LFD" | "LFE" | "LFF" | "LFG" | "LGA" | "LGB" | "LGC" | "LGD" | "LGE" | "LGF" | "LGG" | "LHA" | "LHB" | "LHC" | "LHD" | "LHE" | "LHF" | "LIA" | "LIB" | "LIC" | "LID" | "LIE" | "LIF" | "LJA" | "LJB" | "LJC" | "LJD" | "LJE" | "LJF" | "LKA" | "LKB" | "LKC" | "LKD" | "LKE" | "LKF" | "LLA" | "LLB" | "LLC" | "LLD" | "LLE" | "LLF" | "LMA" | "LMC" | "LMD" | "LME" | "LMF" | "LNB" | "LNC" | "LND" | "LNE" | "LNF" | "LNG" | "LOB" | "LOC" | "LOD" | "LOE" | "LOF" | "LPB" | "LPC" | "LPD" | "LPE" | "LPF" | "LPG" | "LQB" | "LQC" | "LQD" | "LQE" | "LQF" | "LQG" | "LRB" | "LRC" | "LRD" | "LRE" | "LRF" | "LRG" | "LSB" | "LSC" | "LSD" | "LSE" | "LSF" | "LSG" | "LTB" | "LTC" | "LTD" | "LTE" | "LTF" | "LTG" | "LUB" | "LUC" | "LUD" | "LUE" | "LUF" | "LUG" | "LVB" | "LVC" | "LVD" | "LVE" | "LVF" | "LVG" | "LWB" | "LWC" | "LWD" | "LWE" | "LWF" | "LWG" | "LXB" | "LXC" | "LXD" | "LXE" | "LXF" | "LXG" | "LYB" | "LYC" | "LYD" | "LYE" | "LYF" | "LYG" | "LZB" | "LZC" | "LZD" | "LZE" | "LZF" | "LZG" | "MAA" | "MAB" | "MAC" | "MAD" | "MAE" | "MAF" | "MAG" | "MBA" | "MBB" | "MBC" | "MBD" | "MBE" | "MBF" | "MBG" | "MCA" | "MCB" | "MCC" | "MCD" | "MCE" | "MCF" | "MCG" | "MDA" | "MDB" | "MDC" | "MDD" | "MDE" | "MDF" | "MDG" | "MEA" | "MEB" | "MEC" | "MED" | "MEE" | "MEF" | "MEG" | "MFA" | "MFB" | "MFC" | "MFD" | "MFE" | "MFF" | "MFG" | "MGA" | "MGB" | "MGC" | "MGD" | "MGE" | "MGF" | "MGG" | "MHA" | "MHB" | "MHC" | "MHD" | "MHE" | "MHF" | "MIA" | "MIB" | "MIC" | "MID" | "MIE" | "MIF" | "MJA" | "MJB" | "MJC" | "MJD" | "MJE" | "MKA" | "MKB" | "MKC" | "MKD" | "MKE" | "MKF" | "MLA" | "MLB" | "MLC" | "MLD" | "MLE" | "MLF" | "MMA" | "MMC" | "MMD" | "MME" | "MMF" | "MNB" | "MNC" | "MND" | "MNE" | "MNF" | "MNG" | "MOB" | "MOC" | "MOD" | "MOE" | "MOF" | "MPB" | "MPC" | "MPD" | "MPE" | "MPF" | "MPG" | "MQB" | "MQC" | "MQD" | "MQE" | "MQF" | "MQG" | "MRB" | "MRC" | "MRD" | "MRE" | "MRF" | "MRG" | "MSB" | "MSC" | "MSD" | "MSE" | "MSF" | "MSG" | "MTB" | "MTC" | "MTD" | "MTE" | "MTF" | "MTG" | "MUB" | "MUC" | "MUD" | "MUE" | "MUF" | "MUG" | "MVB" | "MVC" | "MVD" | "MVE" | "MVF" | "MVG" | "MWB" | "MWC" | "MWD" | "MWE" | "MWF" | "MWG" | "MXB" | "MXC" | "MXD" | "MXE" | "MXF" | "MXG" | "MYB" | "MYC" | "MYD" | "MYE" | "MYF" | "MYG" | "MZB" | "MZC" | "MZD" | "MZE" | "MZF" | "MZG" | "NAB" | "NAC" | "NAD" | "NAE" | "NAF" | "NAG" | "NBA" | "NBB" | "NBC" | "NBD" | "NBE" | "NBF" | "NBG" | "NCA" | "NCB" | "NCC" | "NCD" | "NCE" | "NCF" | "NCG" | "NDA" | "NDB" | "NDC" | "NDD" | "NDE" | "NDF" | "NDG" | "NEA" | "NEB" | "NEC" | "NED" | "NEE" | "NEF" | "NEG" | "NFA" | "NFB" | "NFC" | "NFD" | "NFE" | "NFF" | "NFG" | "NGA" | "NGB" | "NGC" | "NGD" | "NGE" | "NGF" | "NGG" | "NHA" | "NHB" | "NHC" | "NHD" | "NHE" | "NHF" | "NIA" | "NIB" | "NIC" | "NID" | "NIE" | "NIF" | "NJA" | "NJB" | "NJC" | "NJD" | "NJE" | "NJF" | "NKA" | "NKB" | "NKC" | "NKD" | "NKE" | "NKF" | "NLA" | "NLB" | "NLC" | "NLD" | "NLE" | "NLF" | "NMA" | "NMB" | "NMC" | "NMD" | "NME" | "NMF" | "NNB" | "NND" | "NNE" | "NNF" | "NNG" | "NOB" | "NOC" | "NOD" | "NOE" | "NOF" | "NOG" | "NPB" | "NPC" | "NPD" | "NPE" | "NPF" | "NQB" | "NQC" | "NQD" | "NQE" | "NQF" | "NQG" | "NRB" | "NRC" | "NRD" | "NRE" | "NRF" | "NRG" | "NSB" | "NSC" | "NSD" | "NSE" | "NSF" | "NSG" | "NTB" | "NTC" | "NTD" | "NTE" | "NTF" | "NTG" | "NUB" | "NUC" | "NUD" | "NUE" | "NUF" | "NUG" | "NVB" | "NVC" | "NVD" | "NVE" | "NVF" | "NVG" | "NWB" | "NWC" | "NWD" | "NWE" | "NWF" | "NWG" | "NXB" | "NXC" | "NXD" | "NXE" | "NXF" | "NXG" | "NYB" | "NYC" | "NYD" | "NYE" | "NYF" | "NYG" | "NZB" | "NZC" | "NZD" | "NZE" | "NZF" | "NZG" | "OAB" | "OAC" | "OAD" | "OAE" | "OAF" | "OAG" | "OBA" | "OBB" | "OBC" | "OBD" | "OBE" | "OBF" | "OCA" | "OCB" | "OCC" | "OCD" | "OCE" | "OCF" | "OCG" | "ODA" | "ODB" | "ODC" | "ODD" | "ODE" | "ODF" | "ODG" | "OEA" | "OEB" | "OEC" | "OED" | "OEE" | "OEF" | "OFA" | "OFB" | "OFC" | "OFD" | "OFE" | "OFF" | "OFG" | "OGA" | "OGB" | "OGC" | "OGD" | "OGE" | "OGF" | "OGG" | "OHA" | "OHB" | "OHC" | "OHD" | "OHE" | "OHF" | "OIA" | "OIB" | "OIC" | "OID" | "OIE" | "OIF" | "OJA" | "OJB" | "OJC" | "OJD" | "OJE" | "OJF" | "OKA" | "OKB" | "OKC" | "OKD" | "OKE" | "OKF" | "OLA" | "OLB" | "OLC" | "OLD" | "OLE" | "OLF" | "OMA" | "OMB" | "OMC" | "OMD" | "OME" | "OMF" | "ONB" | "OND" | "ONE" | "ONF" | "ONG" | "OOB" | "OOC" | "OOD" | "OOE" | "OOF" | "OOG" | "OPB" | "OPC" | "OPD" | "OPE" | "OPF" | "OQB" | "OQC" | "OQD" | "OQE" | "OQF" | "OQG" | "ORB" | "ORC" | "ORD" | "ORE" | "ORF" | "ORG" | "OSB" | "OSC" | "OSD" | "OSE" | "OSF" | "OTB" | "OTC" | "OTD" | "OTE" | "OTG" | "OUB" | "OUC" | "OUD" | "OUE" | "OUF" | "OUG" | "OVB" | "OVC" | "OVD" | "OVE" | "OVF" | "OVG" | "OWB" | "OWC" | "OWD" | "OWE" | "OWF" | "OWG" | "OXB" | "OXC" | "OXD" | "OXE" | "OXF" | "OXG" | "OYB" | "OYC" | "OYD" | "OYE" | "OYF" | "OYG" | "OZB" | "OZC" | "OZD" | "OZE" | "OZF" | "OZG" | "PAB" | "PAC" | "PAD" | "PAE" | "PAF" | "PAG" | "PBA" | "PBB" | "PBC" | "PBD" | "PBE" | "PBF" | "PCA" | "PCB" | "PCC" | "PCD" | "PCE" | "PCF" | "PCG" | "PDA" | "PDB" | "PDC" | "PDD" | "PDE" | "PDF" | "PDG" | "PEA" | "PEB" | "PEC" | "PED" | "PEE" | "PEF" | "PFA" | "PFB" | "PFC" | "PFD" | "PFE" | "PFF" | "PFG" | "PGA" | "PGB" | "PGC" | "PGD" | "PGE" | "PGF" | "PGG" | "PHA" | "PHB" | "PHC" | "PHD" | "PHE" | "PHF" | "PIA" | "PIB" | "PIC" | "PID" | "PIE" | "PIF" | "PJA" | "PJB" | "PJC" | "PJD" | "PJE" | "PJF" | "PKA" | "PKB" | "PKC" | "PKD" | "PKE" | "PKF" | "PLA" | "PLB" | "PLC" | "PLD" | "PLE" | "PLF" | "PMA" | "PMB" | "PMC" | "PMD" | "PME" | "PMF" | "PNB" | "PND" | "PNE" | "PNF" | "PNG" | "POB" | "POC" | "POD" | "POE" | "POF" | "POG" | "PPB" | "PPC" | "PPD" | "PPE" | "PPF" | "PQB" | "PQC" | "PQD" | "PQE" | "PQF" | "PQG" | "PRB" | "PRC" | "PRD" | "PRE" | "PRF" | "PRG" | "PSB" | "PSC" | "PSD" | "PSE" | "PSF" | "PTB" | "PTC" | "PTD" | "PTE" | "PTF" | "PTG" | "PUB" | "PUC" | "PUD" | "PUE" | "PUF" | "PUG" | "PVB" | "PVC" | "PVD" | "PVE" | "PVF" | "PVG" | "PWB" | "PWC" | "PWD" | "PWE" | "PWF" | "PWG" | "PXB" | "PXC" | "PXD" | "PXE" | "PXF" | "PXG" | "PYB" | "PYC" | "PYD" | "PYE" | "PYF" | "PYG" | "PZB" | "PZC" | "PZD" | "PZE" | "PZF" | "PZG" | "QAB" | "QAC" | "QAD" | "QAE" | "QAF" | "QAG" | "QBA" | "QBB" | "QBC" | "QBD" | "QBE" | "QBF" | "QCA" | "QCB" | "QCC" | "QCD" | "QCE" | "QCF" | "QCG" | "QDA" | "QDB" | "QDC" | "QDD" | "QDE" | "QDG" | "QEA" | "QEB" | "QEC" | "QED" | "QEE" | "QEF" | "QFA" | "QFB" | "QFC" | "QFD" | "QFE" | "QFF" | "QFG" | "QGA" | "QGB" | "QGC" | "QGD" | "QGE" | "QGF" | "QGG" | "QHA" | "QHB" | "QHC" | "QHD" | "QHE" | "QHF" | "QIA" | "QIB" | "QIC" | "QID" | "QIE" | "QIF" | "QJA" | "QJB" | "QJC" | "QJD" | "QJE" | "QJF" | "QKA" | "QKB" | "QKC" | "QKD" | "QKE" | "QKF" | "QLA" | "QLB" | "QLC" | "QLD" | "QLE" | "QLF" | "QMA" | "QMB" | "QMC" | "QMD" | "QME" | "QMF" | "QNB" | "QND" | "QNE" | "QNF" | "QNG" | "QOB" | "QOC" | "QOD" | "QOE" | "QOF" | "QOG" | "QPB" | "QPC" | "QPD" | "QPE" | "QPF" | "QQB" | "QQC" | "QQD" | "QQE" | "QQF" | "QQG" | "QRB" | "QRC" | "QRD" | "QRE" | "QRF" | "QRG" | "QSB" | "QSC" | "QSD" | "QSE" | "QSF" | "QSG" | "QTB" | "QTC" | "QTD" | "QTE" | "QTF" | "QTG" | "QUB" | "QUC" | "QUD" | "QUE" | "QUF" | "QUG" | "QVB" | "QVC" | "QVD" | "QVE" | "QVF" | "QWB" | "QWC" | "QWD" | "QWE" | "QWF" | "QWG" | "QXB" | "QXC" | "QXD" | "QXE" | "QXF" | "QXG" | "QYB" | "QYC" | "QYD" | "QYE" | "QYF" | "QYG" | "QZB" | "QZC" | "QZD" | "QZE" | "QZF" | "QZG" | "RAB" | "RAC" | "RAD" | "RAE" | "RAF" | "RAG" | "RBA" | "RBB" | "RBC" | "RBD" | "RBE" | "RBF" | "RCA" | "RCB" | "RCC" | "RCD" | "RCE" | "RCF" | "RCG" | "RDA" | "RDB" | "RDC" | "RDD" | "RDE" | "RDF" | "RDG" | "REA" | "REB" | "REC" | "RED" | "REE" | "REF" | "RFA" | "RFB" | "RFC" | "RFD" | "RFE" | "RFF" | "RFG" | "RGA" | "RGB" | "RGC" | "RGD" | "RGE" | "RGF" | "RGG" | "RHA" | "RHB" | "RHC" | "RHD" | "RHE" | "RHF" | "RIA" | "RIB" | "RIC" | "RID" | "RIE" | "RIF" | "RJA" | "RJB" | "RJC" | "RJD" | "RJE" | "RJF" | "RKA" | "RKB" | "RKC" | "RKD" | "RKE" | "RKF" | "RLA" | "RLB" | "RLC" | "RLD" | "RLE" | "RLF" | "RMA" | "RMB" | "RMC" | "RMD" | "RME" | "RMF" | "RNB" | "RND" | "RNE" | "RNF" | "RNG" | "ROB" | "ROC" | "ROD" | "ROE" | "ROF" | "ROG" | "RPB" | "RPC" | "RPD" | "RPE" | "RPF" | "RQB" | "RQC" | "RQD" | "RQE" | "RQF" | "RQG" | "RRC" | "RRD" | "RRE" | "RRF" | "RRG" | "RSB" | "RSC" | "RSD" | "RSE" | "RSF" | "RTB" | "RTC" | "RTD" | "RTE" | "RTF" | "RTG" | "RUB" | "RUC" | "RUD" | "RUE" | "RUF" | "RUG" | "RVB" | "RVC" | "RVD" | "RVE" | "RVF" | "RVG" | "RWB" | "RWC" | "RWD" | "RWE" | "RWF" | "RWG" | "RXB" | "RXC" | "RXD" | "RXE" | "RXF" | "RXG" | "RYB" | "RYC" | "RYD" | "RYE" | "RYF" | "RYG" | "RZB" | "RZC" | "RZD" | "RZE" | "RZF" | "RZG" | "SAB" | "SAC" | "SAD" | "SAE" | "SAF" | "SAG" | "SBA" | "SBB" | "SBC" | "SBD" | "SBE" | "SBF" | "SCA" | "SCB" | "SCC" | "SCD" | "SCE" | "SCF" | "SCG" | "SDA" | "SDB" | "SDC" | "SDD" | "SDE" | "SDF" | "SDG" | "SEA" | "SEB" | "SEC" | "SED" | "SEE" | "SEF" | "SFA" | "SFB" | "SFC" | "SFD" | "SFE" | "SFF" | "SFG" | "SGA" | "SGB" | "SGC" | "SGD" | "SGE" | "SGF" | "SGG" | "SHA" | "SHB" | "SHC" | "SHD" | "SHE" | "SHF" | "SIA" | "SIB" | "SIC" | "SID" | "SIE" | "SIF" | "SJA" | "SJB" | "SJC" | "SJD" | "SJE" | "SJF" | "SKA" | "SKB" | "SKC" | "SKD" | "SKE" | "SKF" | "SLA" | "SLB" | "SLC" | "SLD" | "SLE" | "SLF" | "SMA" | "SMB" | "SMC" | "SMD" | "SME" | "SMF" | "SNB" | "SND" | "SNE" | "SNF" | "SNG" | "SOB" | "SOC" | "SOD" | "SOE" | "SOF" | "SOG" | "SPB" | "SPC" | "SPD" | "SPE" | "SPF" | "SPG" | "SQB" | "SQC" | "SQD" | "SQE" | "SQF" | "SQG" | "SRB" | "SRC" | "SRD" | "SRE" | "SRF" | "SRG" | "SSB" | "SSC" | "SSD" | "SSE" | "SSF" | "SSG" | "STB" | "STC" | "STD" | "STE" | "STF" | "STG" | "SUB" | "SUC" | "SUD" | "SUE" | "SUF" | "SUG" | "SVB" | "SVC" | "SVD" | "SVE" | "SVF" | "SVG" | "SWB" | "SWC" | "SWD" | "SWE" | "SWF" | "SWG" | "SXB" | "SXC" | "SXD" | "SXE" | "SXF" | "SXG" | "SYB" | "SYC" | "SYD" | "SYE" | "SYF" | "SYG" | "SZB" | "SZC" | "SZD" | "SZE" | "SZF" | "SZG" | "TAB" | "TAC" | "TAD" | "TAE" | "TAF" | "TAG" | "TBA" | "TBB" | "TBC" | "TBD" | "TBE" | "TBF" | "TCA" | "TCB" | "TCC" | "TCD" | "TCE" | "TCF" | "TCG" | "TDA" | "TDB" | "TDC" | "TDD" | "TDE" | "TDF" | "TDG" | "TEA" | "TEB" | "TEC" | "TED" | "TEE" | "TEF" | "TFA" | "TFB" | "TFC" | "TFD" | "TFE" | "TFF" | "TFG" | "TGA" | "TGB" | "TGC" | "TGD" | "TGE" | "TGF" | "TGG" | "THA" | "THB" | "THC" | "THD" | "THE" | "THF" | "TIA" | "TIB" | "TIC" | "TID" | "TIE" | "TIF" | "TJA" | "TJB" | "TJC" | "TJD" | "TJE" | "TJF" | "TKA" | "TKB" | "TKC" | "TKD" | "TKE" | "TKF" | "TLA" | "TLB" | "TLC" | "TLD" | "TLE" | "TLF" | "TMA" | "TMB" | "TMC" | "TMD" | "TME" | "TMF" | "TNB" | "TNC" | "TND" | "TNE" | "TNF" | "TNG" | "TOB" | "TOC" | "TOD" | "TOE" | "TOF" | "TOG" | "TPB" | "TPC" | "TPD" | "TPE" | "TPF" | "TPG" | "TQB" | "TQC" | "TQD" | "TQE" | "TQF" | "TQG" | "TRB" | "TRC" | "TRD" | "TRE" | "TRF" | "TRG" | "TSB" | "TSC" | "TSD" | "TSE" | "TSF" | "TSG" | "TTB" | "TTC" | "TTD" | "TTE" | "TTF" | "TTG" | "TUB" | "TUD" | "TUE" | "TUF" | "TUG" | "TVB" | "TVC" | "TVD" | "TVE" | "TVF" | "TVG" | "TWB" | "TWC" | "TWD" | "TWE" | "TWF" | "TWG" | "TXB" | "TXC" | "TXD" | "TXE" | "TXF" | "TXG" | "TYB" | "TYC" | "TYD" | "TYE" | "TYF" | "TYG" | "TZB" | "TZC" | "TZD" | "TZE" | "TZF" | "TZG" | "UAB" | "UAC" | "UAD" | "UAE" | "UAF" | "UAG" | "UBA" | "UBB" | "UBC" | "UBD" | "UBE" | "UBF" | "UCA" | "UCB" | "UCC" | "UCD" | "UCE" | "UCF" | "UCG" | "UDA" | "UDB" | "UDC" | "UDD" | "UDE" | "UDF" | "UDG" | "UEA" | "UEB" | "UEC" | "UED" | "UEE" | "UEF" | "UFA" | "UFB" | "UFC" | "UFD" | "UFF" | "UFG" | "UGA" | "UGB" | "UGC" | "UGD" | "UGE" | "UGF" | "UGG" | "UHA" | "UHB" | "UHC" | "UHD" | "UHE" | "UHF" | "UIA" | "UIB" | "UIC" | "UID" | "UIE" | "UIF" | "UJA" | "UJB" | "UJC" | "UJD" | "UJE" | "UJF" | "UKA" | "UKB" | "UKC" | "UKD" | "UKE" | "UKF" | "ULA" | "ULB" | "ULC" | "ULD" | "ULE" | "ULF" | "UMA" | "UMB" | "UMC" | "UMD" | "UME" | "UMF" | "UNB" | "UNC" | "UND" | "UNE" | "UNF" | "UNG" | "UOB" | "UOC" | "UOD" | "UOE" | "UOF" | "UOG" | "UPB" | "UPC" | "UPD" | "UPE" | "UPF" | "UPG" | "UQB" | "UQC" | "UQD" | "UQE" | "UQF" | "UQG" | "URB" | "URC" | "URD" | "URE" | "URF" | "URG" | "USB" | "USC" | "USD" | "USE" | "USF" | "USG" | "UTB" | "UTC" | "UTD" | "UTE" | "UTF" | "UTG" | "UUB" | "UUC" | "UUD" | "UUE" | "UUF" | "UUG" | "UVB" | "UVC" | "UVD" | "UVE" | "UVF" | "UVG" | "UWB" | "UWC" | "UWD" | "UWE" | "UWF" | "UWG" | "UXB" | "UXC" | "UXD" | "UXE" | "UXF" | "UXG" | "UYB" | "UYC" | "UYD" | "UYE" | "UYF" | "UYG" | "UZB" | "UZC" | "UZD" | "UZE" | "UZF" | "UZG" | "VAB" | "VAC" | "VAD" | "VAE" | "VAF" | "VAG" | "VBA" | "VBB" | "VBC" | "VBD" | "VBE" | "VBF" | "VBG" | "VCA" | "VCB" | "VCC" | "VCD" | "VCE" | "VCF" | "VCG" | "VDA" | "VDB" | "VDC" | "VDD" | "VDE" | "VDF" | "VDG" | "VEA" | "VEB" | "VEC" | "VED" | "VEE" | "VEF" | "VFA" | "VFB" | "VFC" | "VFD" | "VFE" | "VFF" | "VFG" | "VGA" | "VGB" | "VGC" | "VGD" | "VGE" | "VGF" | "VGG" | "VHA" | "VHB" | "VHC" | "VHD" | "VHE" | "VHF" | "VIA" | "VIB" | "VIC" | "VID" | "VIE" | "VIF" | "VJA" | "VJB" | "VJC" | "VJD" | "VJE" | "VKA" | "VKB" | "VKC" | "VKD" | "VKE" | "VKF" | "VLA" | "VLB" | "VLC" | "VLD" | "VLE" | "VLF" | "VMA" | "VMB" | "VMC" | "VMD" | "VME" | "VMF" | "VNB" | "VNC" | "VND" | "VNE" | "VNF" | "VNG" | "VOB" | "VOC" | "VOD" | "VOE" | "VOF" | "VOG" | "VPB" | "VPC" | "VPD" | "VPE" | "VPF" | "VPG" | "VQB" | "VQC" | "VQD" | "VQE" | "VQF" | "VQG" | "VRB" | "VRC" | "VRD" | "VRE" | "VRF" | "VRG" | "VSB" | "VSC" | "VSD" | "VSE" | "VSF" | "VSG" | "VTB" | "VTC" | "VTD" | "VTE" | "VTF" | "VTG" | "VUB" | "VUC" | "VUD" | "VUE" | "VUF" | "VUG" | "VVB" | "VVC" | "VVD" | "VVE" | "VVF" | "VVG" | "VWB" | "VWC" | "VWD" | "VWE" | "VWF" | "VWG" | "VXC" | "VXD" | "VXE" | "VXF" | "VXG" | "VYB" | "VYC" | "VYD" | "VYE" | "VYF" | "VYG" | "VZB" | "VZC" | "VZD" | "VZE" | "VZF" | "VZG" | "WAB" | "WAC" | "WAD" | "WAE" | "WAF" | "WAG" | "WBA" | "WBB" | "WBC" | "WBD" | "WBE" | "WBF" | "WBG" | "WCA" | "WCB" | "WCC" | "WCD" | "WCE" | "WCF" | "WCG" | "WDA" | "WDC" | "WDD" | "WDE" | "WDF" | "WDG" | "WEA" | "WEB" | "WEC" | "WED" | "WEE" | "WEF" | "WFA" | "WFB" | "WFC" | "WFD" | "WFE" | "WFF" | "WFG" | "WGA" | "WGB" | "WGC" | "WGD" | "WGE" | "WGF" | "WGG" | "WHA" | "WHB" | "WHC" | "WHD" | "WHE" | "WHF" | "WIA" | "WIB" | "WIC" | "WID" | "WIE" | "WIF" | "WJA" | "WJB" | "WJC" | "WJD" | "WJE" | "WJF" | "WKA" | "WKB" | "WKC" | "WKD" | "WKE" | "WKF" | "WLA" | "WLB" | "WLC" | "WLD" | "WLE" | "WLF" | "WMA" | "WMB" | "WMC" | "WMD" | "WME" | "WMF" | "WNB" | "WNC" | "WND" | "WNE" | "WNF" | "WNG" | "WOB" | "WOC" | "WOD" | "WOE" | "WOF" | "WOG" | "WPB" | "WPC" | "WPD" | "WPE" | "WPF" | "WPG" | "WQB" | "WQC" | "WQD" | "WQE" | "WQF" | "WQG" | "WRB" | "WRC" | "WRD" | "WRE" | "WRF" | "WRG" | "WSB" | "WSC" | "WSD" | "WSE" | "WSF" | "WSG" | "WTB" | "WTC" | "WTD" | "WTE" | "WTF" | "WTG" | "WUB" | "WUC" | "WUD" | "WUE" | "WUF" | "WUG" | "WVB" | "WVC" | "WVD" | "WVE" | "WVF" | "WVG" | "WWB" | "WWC" | "WWD" | "WWE" | "WWF" | "WWG" | "WXB" | "WXC" | "WXD" | "WXE" | "WXF" | "WXG" | "WYB" | "WYC" | "WYD" | "WYE" | "WYF" | "WYG" | "WZB" | "WZC" | "WZD" | "WZE" | "WZF" | "WZG" | "XAC" | "XAD" | "XAE" | "XAF" | "XBA" | "XBB" | "XBC" | "XBD" | "XBE" | "XBF" | "XBG" | "XCA" | "XCB" | "XCC" | "XCD" | "XCE" | "XCF" | "XCG" | "XDA" | "XDB" | "XDC" | "XDD" | "XDE" | "XDF" | "XDG" | "XEA" | "XEB" | "XEC" | "XED" | "XEE" | "XEF" | "XFA" | "XFB" | "XFC" | "XFD" | "XFE" | "XFF" | "XFG" | "XGA" | "XGB" | "XGC" | "XGD" | "XGE" | "XGF" | "XGG" | "XHA" | "XHB" | "XHC" | "XHD" | "XHE" | "XHF" | "XIA" | "XIB" | "XIC" | "XID" | "XIE" | "XIF" | "XJA" | "XJB" | "XJC" | "XJD" | "XJE" | "XJF" | "XKA" | "XKB" | "XKC" | "XKD" | "XKE" | "XKF" | "XLA" | "XLB" | "XLC" | "XLD" | "XLE" | "XLF" | "XMA" | "XMB" | "XMC" | "XMD" | "XME" | "XMF" | "XNB" | "XNC" | "XND" | "XNE" | "XNF" | "XNG" | "XOB" | "XOC" | "XOD" | "XOE" | "XOF" | "XOG" | "XPB" | "XPC" | "XPD" | "XPE" | "XPF" | "XPG" | "XQB" | "XQC" | "XQD" | "XQF" | "XQG" | "XRB" | "XRC" | "XRD" | "XRE" | "XRF" | "XRG" | "XSB" | "XSC" | "XSD" | "XSE" | "XSF" | "XSG" | "XTB" | "XTC" | "XTD" | "XTE" | "XTF" | "XTG" | "XUB" | "XUC" | "XUD" | "XUE" | "XUF" | "XUG" | "XVB" | "XVC" | "XVD" | "XVE" | "XVF" | "XVG" | "XWB" | "XWC" | "XWD" | "XWE" | "XWF" | "XWG" | "XXB" | "XXC" | "XXD" | "XXE" | "XXF" | "XXG" | "XYB" | "XYC" | "XYD" | "XYE" | "XYF" | "XYG" | "XZB" | "XZC" | "XZD" | "XZE" | "XZF" | "XZG" | "YAB" | "YAC" | "YAD" | "YAE" | "YAF" | "YAG" | "YBA" | "YBB" | "YBC" | "YBD" | "YBE" | "YBF" | "YCA" | "YCB" | "YCD" | "YCE" | "YCF" | "YCG" | "YDA" | "YDB" | "YDC" | "YDD" | "YDE" | "YDF" | "YDG" | "YEA" | "YEB" | "YEC" | "YED" | "YEE" | "YEF" | "YFA" | "YFB" | "YFC" | "YFD" | "YFE" | "YFG" | "YGA" | "YGB" | "YGC" | "YGD" | "YGE" | "YGF" | "YGG" | "YHA" | "YHB" | "YHC" | "YHD" | "YHE" | "YHF" | "YIA" | "YIB" | "YIC" | "YID" | "YIE" | "YIF" | "YJA" | "YJB" | "YJC" | "YJD" | "YJE" | "YJF" | "YKA" | "YKB" | "YKC" | "YKD" | "YKE" | "YKF" | "YLA" | "YLB" | "YLC" | "YLD" | "YLE" | "YLF" | "YMA" | "YMB" | "YMC" | "YMD" | "YME" | "YMF" | "YNB" | "YNC" | "YND" | "YNE" | "YNF" | "YNG" | "YOB" | "YOC" | "YOD" | "YOE" | "YOF" | "YOG" | "YPB" | "YPC" | "YPD" | "YPE" | "YPF" | "YPG" | "YQB" | "YQC" | "YQD" | "YQF" | "YQG" | "YRB" | "YRC" | "YRD" | "YRE" | "YRF" | "YRG" | "YSB" | "YSC" | "YSD" | "YSE" | "YSF" | "YSG" | "YTB" | "YTC" | "YTD" | "YTE" | "YTF" | "YTG" | "YUB" | "YUC" | "YUD" | "YUE" | "YUF" | "YUG" | "YVB" | "YVC" | "YVD" | "YVE" | "YVF" | "YVG" | "YWB" | "YWC" | "YWD" | "YWE" | "YWF" | "YWG" | "YXB" | "YXC" | "YXD" | "YXE" | "YXF" | "YXG" | "YYB" | "YYC" | "YYD" | "YYE" | "YYF" | "YYG" | "YZB" | "YZC" | "YZD" | "YZE" | "YZF" | "YZG" | "ZAB" | "ZAD" | "ZAE" | "ZAF" | "ZAG" | "ZBA" | "ZBB" | "ZBC" | "ZBD" | "ZBE" | "ZBF" | "ZCA" | "ZCB" | "ZCC" | "ZCD" | "ZCE" | "ZCF" | "ZCG" | "ZDA" | "ZDB" | "ZDC" | "ZDD" | "ZDE" | "ZDF" | "ZDG" | "ZEA" | "ZEB" | "ZEC" | "ZED" | "ZEE" | "ZEF" | "ZFA" | "ZFB" | "ZFC" | "ZFD" | "ZFE" | "ZFF" | "ZFG" | "ZGA" | "ZGB" | "ZGC" | "ZGD" | "ZGE" | "ZGF" | "ZGG" | "ZHA" | "ZHB" | "ZHC" | "ZHD" | "ZHE" | "ZHF" | "ZIA" | "ZIB" | "ZIC" | "ZID" | "ZIE" | "ZIF" | "ZJA" | "ZJB" | "ZJC" | "ZJD" | "ZJE" | "ZJF" | "ZKA" | "ZKB" | "ZKC" | "ZKD" | "ZKE" | "ZKF" | "ZLA" | "ZLB" | "ZLC" | "ZLD" | "ZLE" | "ZLF" | "ZMA" | "ZMB" | "ZMC" | "ZMD" | "ZME" | "ZMF" | "ZNB" | "ZNC" | "ZND" | "ZNE" | "ZNF" | "ZNG" | "ZOB" | "ZOC" | "ZOD" | "ZOE" | "ZOF" | "ZPB" | "ZPC" | "ZPD" | "ZPE" | "ZPF" | "ZPG" | "ZQB" | "ZQC" | "ZQD" | "ZQF" | "ZQG" | "ZRB" | "ZRC" | "ZRD" | "ZRE" | "ZRF" | "ZRG" | "ZSB" | "ZSC" | "ZSD" | "ZSE" | "ZSF" | "ZSG" | "ZTB" | "ZTC" | "ZTD" | "ZTE" | "ZTF" | "ZTG" | "ZUB" | "ZUC" | "ZUD" | "ZUE" | "ZUF" | "ZUG" | "ZVB" | "ZVC" | "ZVD" | "ZVE" | "ZVF" | "ZVG" | "ZWB" | "ZWC" | "ZWD" | "ZWE" | "ZWF" | "ZWG" | "ZXB" | "ZXC" | "ZXD" | "ZXE" | "ZXF" | "ZXG" | "ZYB" | "ZYC" | "ZYD" | "ZYE" | "ZYF" | "ZYG" | "ZZB" | "ZZC" | "ZZD" | "ZZE" | "ZZF" | "ZZG";
         /** @enum {string} */
-        FactionStatEnum: "medicalitemsused" | "criminaloffences" | "organisedcrimerespect" | "organisedcrimemoney" | "organisedcrimesuccess" | "organisedcrimefail" | "attackswon" | "attackslost" | "attackschain" | "attacksleave" | "attacksmug" | "attackshosp" | "bestchain" | "busts" | "revives" | "jails" | "hosps" | "medicalitemrecovery" | "medicalcooldownused" | "gymtrains" | "gymstrength" | "gymspeed" | "gymenergy" | "gymdefense" | "gymdexterity" | "candyused" | "alcoholused" | "energydrinkused" | "drugsused" | "drugoverdoses" | "rehabs" | "caymaninterest" | "traveltimes" | "traveltime" | "hunting" | "attacksdamagehits" | "attacksdamage" | "hosptimegiven" | "hosptimereceived" | "attacksdamaging" | "attacksrunaway" | "highestterritories" | "territoryrespect";
+        FactionStatEnum: "medicalitemsused" | "criminaloffences" | "organisedcrimerespect" | "organisedcrimemoney" | "organisedcrimesuccess" | "organisedcrimefail" | "attackswon" | "attackslost" | "attackschain" | "attacksleave" | "attacksmug" | "attackshosp" | "bestchain" | "busts" | "revives" | "jails" | "hosps" | "medicalitemrecovery" | "medicalcooldownused" | "gymtrains" | "gymstrength" | "gymspeed" | "gymenergy" | "gymdefense" | "gymdexterity" | "candyused" | "alcoholused" | "energydrinkused" | "drugsused" | "drugoverdoses" | "rehabs" | "caymaninterest" | "traveltimes" | "traveltime" | "hunting" | "attacksdamagehits" | "attacksdamage" | "hosptimegiven" | "hosptimereceived" | "attacksdamaging" | "attacksrunaway" | "highestterritories" | "territoryrespect" | "membersamount";
         /** @enum {string} */
         FactionBranchStateEnum: "war" | "peace";
         /** @enum {string} */
@@ -4615,10 +4859,14 @@ export interface components {
         RaceCarUpgradeId: number;
         /** Format: int64 */
         ItemId: number;
+        /** Format: int34 */
+        ItemStatId: number;
         /** Format: int32 */
         AuctionListingId: number;
         /** Format: int32 */
         ItemModId: number;
+        /** Format: int32 */
+        CityShopId: number;
         /** Format: int32 */
         AmmoId: number;
         /** Format: int32 */
@@ -4639,6 +4887,8 @@ export interface components {
         CompanyStockId: number;
         /** Format: int64 */
         TradeId: number;
+        /** Format: int32 */
+        PokerTableId: number;
         /** Format: int32 */
         StockId: number;
         DiscordId: string;
@@ -4683,6 +4933,8 @@ export interface components {
         /** Format: int32 */
         ForumThreadId: number;
         /** Format: int32 */
+        GymId: number;
+        /** Format: int32 */
         ForumPostId: number;
         RequestLinks: {
             /** @description Auto-generated link to get the next set of records. */
@@ -4701,6 +4953,11 @@ export interface components {
             /** Format: int64 */
             total?: number;
         };
+        RequestMetadataWithLinksAndNanostamp: {
+            links: components["schemas"]["RequestLinks"];
+            /** @description Use to bypass system limitation when 100 or more logs were inserted within the same second. */
+            nanostamp?: string;
+        };
         /**
          * Format: int32
          * @description This represents the type of the activity. Values range from 1 to 8 where:
@@ -4714,6 +4971,10 @@ export interface components {
          * @enum {integer}
          */
         ForumFeedTypeEnum: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+        /** @enum {string} */
+        GymClassEnum: "Basic" | "Lightweight" | "Middleweight" | "Heavyweight" | "Specialist";
+        /** @enum {string} */
+        ShopNameEnum: "Arms Dealer" | "General Store" | "Black Market" | "Big Al's Gun Shop" | "Sally's Sweet Shop" | "TC Clothing" | "Bits 'n' Bobs" | "Jewelry Store" | "Super Store" | "Docks" | "Post Office" | "Pharmacy" | "Nikeh Sports" | "Print Shop" | "Recycling Center" | "Cyber Force" | "Pawn Shop";
         /** @enum {string} */
         UserGenderEnum: "Male" | "Female" | "Enby";
         /** @enum {string} */
@@ -4802,8 +5063,8 @@ export interface components {
             respect_gain: number;
             /** Format: float */
             respect_loss: number;
-            /** Format: int32 */
-            chain: number;
+            /** @description Important! Starting January 1st, 2027, the value '0' will be replaced with 'null'. */
+            chain: number | null;
             /** @description This is an experimental flag which should help determine 'assist' attacks which have not contributed to the chain. For example, attacks such as where the opponent lost to someoene else before the attacker could finish the attack. This flag might not work entirely correctly, so use with caution. */
             is_interrupted: boolean;
             is_stealthed: boolean;
@@ -5281,7 +5542,21 @@ export interface components {
             code: 30;
             error: string;
         };
-        ApiError: components["schemas"]["ErrorUnknown"] | components["schemas"]["ErrorKeyEmpty"] | components["schemas"]["ErrorIncorrectKey"] | components["schemas"]["ErrorWrongType"] | components["schemas"]["ErrorWrongFields"] | components["schemas"]["ErrorTooManyRequests"] | components["schemas"]["ErrorIncorrectId"] | components["schemas"]["ErrorIncorrectIdEntityRelation"] | components["schemas"]["ErrorIpBlocked"] | components["schemas"]["ErrorApiDisabled"] | components["schemas"]["ErrorKeyOwnerInFederalJail"] | components["schemas"]["ErrorKeyChangeCooldown"] | components["schemas"]["ErrorKeyReadError"] | components["schemas"]["ErrorKeyTemporaryDisabled"] | components["schemas"]["ErrorDailyReadLimitReached"] | components["schemas"]["ErrorLogUnavailable"] | components["schemas"]["ErrorAccessLevelTooLow"] | components["schemas"]["ErrorBackendError"] | components["schemas"]["ErrorApiKeyPaused"] | components["schemas"]["ErrorMustMigrateToCrimesV2"] | components["schemas"]["ErrorRaceNotFinished"] | components["schemas"]["ErrorIncorrectCategory"] | components["schemas"]["ErrorOnlyAvailableInApiV1"] | components["schemas"]["ErrorOnlyAvailableInApiV2"] | components["schemas"]["ErrorClosedTemporarily"] | components["schemas"]["ErrorInvalidStatRequested"] | components["schemas"]["ErrorOnlyCategoryOrStatsAllowed"] | components["schemas"]["ErrorMustMigrateToOrganizedCrimesV2"] | components["schemas"]["ErrorIncorrectLogId"] | components["schemas"]["ErrorCategorySelectionUnavailableForInteractionLogs"] | components["schemas"]["ErrorFileDoesNotExist"];
+        ErrorCityStatsCronFailed: {
+            /**
+             * Format: int32
+             * @enum {integer}
+             */
+            code: 31;
+            error: string;
+        };
+        ApiError: components["schemas"]["ErrorUnknown"] | components["schemas"]["ErrorKeyEmpty"] | components["schemas"]["ErrorIncorrectKey"] | components["schemas"]["ErrorWrongType"] | components["schemas"]["ErrorWrongFields"] | components["schemas"]["ErrorTooManyRequests"] | components["schemas"]["ErrorIncorrectId"] | components["schemas"]["ErrorIncorrectIdEntityRelation"] | components["schemas"]["ErrorIpBlocked"] | components["schemas"]["ErrorApiDisabled"] | components["schemas"]["ErrorKeyOwnerInFederalJail"] | components["schemas"]["ErrorKeyChangeCooldown"] | components["schemas"]["ErrorKeyReadError"] | components["schemas"]["ErrorKeyTemporaryDisabled"] | components["schemas"]["ErrorDailyReadLimitReached"] | components["schemas"]["ErrorLogUnavailable"] | components["schemas"]["ErrorAccessLevelTooLow"] | components["schemas"]["ErrorBackendError"] | components["schemas"]["ErrorApiKeyPaused"] | components["schemas"]["ErrorMustMigrateToCrimesV2"] | components["schemas"]["ErrorRaceNotFinished"] | components["schemas"]["ErrorIncorrectCategory"] | components["schemas"]["ErrorOnlyAvailableInApiV1"] | components["schemas"]["ErrorOnlyAvailableInApiV2"] | components["schemas"]["ErrorClosedTemporarily"] | components["schemas"]["ErrorInvalidStatRequested"] | components["schemas"]["ErrorOnlyCategoryOrStatsAllowed"] | components["schemas"]["ErrorMustMigrateToOrganizedCrimesV2"] | components["schemas"]["ErrorIncorrectLogId"] | components["schemas"]["ErrorCategorySelectionUnavailableForInteractionLogs"] | components["schemas"]["ErrorFileDoesNotExist"] | components["schemas"]["ErrorCityStatsCronFailed"];
+        UserGymResponse: {
+            gym: {
+                id: components["schemas"]["GymId"];
+                name: string;
+            };
+        };
         UserSearch: {
             id: components["schemas"]["UserId"];
             name: string;
@@ -5521,17 +5796,18 @@ export interface components {
         UserOrganizedCrimesResponse: {
             organizedcrimes: components["schemas"]["FactionCrime"][];
         };
+        UserEquipmentAmmo: {
+            id: components["schemas"]["AmmoId"];
+            name: string;
+            /** Format: int32 */
+            quantity: number;
+            type: components["schemas"]["TornItemAmmoTypeEnum"];
+        };
         UserEquipment: components["schemas"]["TornItemDetails"] & {
             /** Format: int32 */
             slot: number;
             mods: components["schemas"]["UserEquipmentItemMod"][];
-            ammo: {
-                id: components["schemas"]["AmmoId"];
-                name: string;
-                /** Format: int32 */
-                quantity: number;
-                type: components["schemas"]["TornItemAmmoTypeEnum"];
-            };
+            ammo: components["schemas"]["UserEquipmentAmmo"] | null;
         };
         UserEquipmentItemMod: {
             id: components["schemas"]["ItemModId"];
@@ -5843,6 +6119,8 @@ export interface components {
                 signed_up: number;
                 faction_id: components["schemas"]["FactionId"] | null;
                 honor_id: components["schemas"]["HonorId"];
+                /** @description This field is shown only for 'Limited' or 'Full' access keys and only for the key owner, otherwise, the status is 'Unknown'. */
+                revive_setting: components["schemas"]["ReviveSetting"];
                 property: {
                     id: components["schemas"]["PropertyId"];
                     name: string;
@@ -6023,7 +6301,7 @@ export interface components {
         };
         UserLogsResponse: {
             log: components["schemas"]["UserLog"][];
-            _metadata: components["schemas"]["RequestMetadataWithLinks"];
+            _metadata: components["schemas"]["RequestMetadataWithLinksAndNanostamp"];
         };
         BasicUser: {
             id: components["schemas"]["UserId"];
@@ -6410,7 +6688,8 @@ export interface components {
         };
         UserRaceCarDetails: components["schemas"]["RaceCar"] & {
             id: components["schemas"]["RaceCarId"];
-            name?: string | null;
+            /** @description Car nickanme. */
+            car_name: string | null;
             /** Format: int64 */
             worth: number;
             /** Format: int32 */
@@ -6570,7 +6849,7 @@ export interface components {
             list: components["schemas"]["UserList"][];
             _metadata: components["schemas"]["RequestMetadataWithLinks"];
         };
-        UserSelectionName: ("ammo" | "attacks" | "attacksfull" | "bars" | "basic" | "battlestats" | "bounties" | "calendar" | "casino" | "competition" | "cooldowns" | "crimes" | "discord" | "enlistedcars" | "equipment" | "events" | "faction" | "factionbalance" | "forumfeed" | "forumfriends" | "forumposts" | "forumsubscribedthreads" | "forumthreads" | "hof" | "honors" | "icons" | "inventory" | "itemmarket" | "itemmod" | "job" | "jobpoints" | "jobranks" | "list" | "log" | "lookup" | "medals" | "merits" | "messages" | "missions" | "money" | "networth" | "newevents" | "newmessages" | "notifications" | "organizedcrime" | "personalstats" | "profile" | "properties" | "property" | "races" | "racingrecords" | "refills" | "reports" | "revives" | "revivesfull" | "skills" | "snapshot" | "stocks" | "trades" | "trade" | "travel" | "timestamp" | "weaponexp" | "workstats" | "bazaar" | "criminalrecord" | "display" | "education" | "gym" | "perks") | string;
+        UserSelectionName: ("ammo" | "attacks" | "attacksfull" | "bars" | "basic" | "battlestats" | "bounties" | "calendar" | "casino" | "competition" | "cooldowns" | "crimes" | "discord" | "enlistedcars" | "equipment" | "events" | "faction" | "factionbalance" | "forumfeed" | "forumfriends" | "forumposts" | "forumsubscribedthreads" | "forumthreads" | "gym" | "hof" | "honors" | "icons" | "inventory" | "itemmarket" | "itemmod" | "job" | "jobpoints" | "jobranks" | "list" | "log" | "lookup" | "medals" | "merits" | "messages" | "missions" | "money" | "networth" | "newevents" | "newmessages" | "notifications" | "organizedcrime" | "personalstats" | "profile" | "properties" | "property" | "races" | "racingrecords" | "refills" | "reports" | "revives" | "revivesfull" | "skills" | "snapshot" | "stocks" | "trades" | "trade" | "travel" | "timestamp" | "weaponexp" | "workstats" | "bazaar" | "criminalrecord" | "display" | "education" | "perks") | string;
         UserLookupResponse: {
             selections: components["schemas"]["UserSelectionName"][];
         };
@@ -7518,6 +7797,28 @@ export interface components {
         PersonalStatsCategoryEnum: "all" | "popular" | "attacking" | "battle_stats" | "jobs" | "trading" | "jail" | "hospital" | "finishing_hits" | "communication" | "crimes" | "bounties" | "investments" | "items" | "travel" | "drugs" | "missions" | "racing" | "networth" | "other" | "itemmarketcustomers" | "itemmarketsales" | "itemmarketrevenue" | "itemmarketfees";
         /** @enum {string} */
         PersonalStatsStatName: "attackswon" | "attackslost" | "attacksdraw" | "attacksassisted" | "defendswon" | "defendslost" | "defendsstalemated" | "elo" | "yourunaway" | "theyrunaway" | "unarmoredwon" | "bestkillstreak" | "attackhits" | "attackmisses" | "attackdamage" | "bestdamage" | "onehitkills" | "attackcriticalhits" | "roundsfired" | "specialammoused" | "hollowammoused" | "tracerammoused" | "piercingammoused" | "incendiaryammoused" | "attacksstealthed" | "retals" | "moneymugged" | "largestmug" | "itemslooted" | "highestbeaten" | "respectforfaction" | "rankedwarhits" | "raidhits" | "territoryjoins" | "territoryclears" | "territorytime" | "jobpointsused" | "trainsreceived" | "marketitemsbought" | "auctionswon" | "auctionsells" | "itemssent" | "trades" | "cityitemsbought" | "pointsbought" | "pointssold" | "bazaarcustomers" | "bazaarsales" | "bazaarprofit" | "jailed" | "peoplebusted" | "failedbusts" | "peoplebought" | "peopleboughtspent" | "hospital" | "medicalitemsused" | "bloodwithdrawn" | "reviveskill" | "revives" | "revivesreceived" | "heavyhits" | "machinehits" | "riflehits" | "smghits" | "shotgunhits" | "pistolhits" | "temphits" | "piercinghits" | "slashinghits" | "clubbinghits" | "mechanicalhits" | "h2hhits" | "mailssent" | "friendmailssent" | "factionmailssent" | "companymailssent" | "spousemailssent" | "classifiedadsplaced" | "personalsplaced" | "criminaloffensesold" | "sellillegalgoods" | "theftold" | "autotheftcrime" | "drugdealscrime" | "computercrime" | "fraudold" | "murdercrime" | "othercrime" | "organizedcrimes" | "bountiesplaced" | "totalbountyspent" | "bountiescollected" | "totalbountyreward" | "bountiesreceived" | "receivedbountyvalue" | "cityfinds" | "dumpfinds" | "itemsdumped" | "booksread" | "boostersused" | "consumablesused" | "candyused" | "alcoholused" | "energydrinkused" | "statenhancersused" | "eastereggsfound" | "eastereggsused" | "virusescoded" | "traveltimes" | "timespenttraveling" | "itemsboughtabroad" | "attackswonabroad" | "defendslostabroad" | "argtravel" | "mextravel" | "uaetravel" | "hawtravel" | "japtravel" | "uktravel" | "satravel" | "switravel" | "chitravel" | "cantravel" | "caytravel" | "drugsused" | "overdosed" | "rehabs" | "rehabcost" | "cantaken" | "exttaken" | "kettaken" | "lsdtaken" | "opitaken" | "pcptaken" | "shrtaken" | "spetaken" | "victaken" | "xantaken" | "missionscompleted" | "contractscompleted" | "dukecontractscompleted" | "missioncreditsearned" | "racingskill" | "racingpointsearned" | "racesentered" | "raceswon" | "networth" | "timeplayed" | "activestreak" | "bestactivestreak" | "awards" | "refills" | "nerverefills" | "tokenrefills" | "meritsbought" | "daysbeendonator" | "criminaloffenses" | "vandalism" | "theft" | "counterfeiting" | "fraud" | "illicitservices" | "cybercrime" | "extortion" | "illegalproduction" | "currentkillstreak" | "strength" | "defense" | "speed" | "dexterity" | "totalstats" | "manuallabor" | "intelligence" | "endurance" | "totalworkingstats" | "moneyinvested" | "investedprofit" | "investamount" | "banktimeleft" | "stockprofits" | "stocklosses" | "stockfees" | "stocknetprofits" | "stockpayouts" | "networthwallet" | "networthvault" | "networthbank" | "networthcayman" | "networthpoints" | "networthitems" | "networthdisplaycase" | "networthbazaar" | "networthitemmarket" | "networthproperties" | "networthstockmarket" | "networthauctionhouse" | "networthbookie" | "networthcompany" | "networthenlistedcars" | "networthpiggybank" | "networthpending" | "networthloan" | "networthunpaidfees" | "huntingskill" | "searchforcashskill" | "bootleggingskill" | "graffitiskill" | "shopliftingskill" | "pickpocketingskill" | "cardskimmingskill" | "burglaryskill" | "hustlingskill" | "disposalskill" | "crackingskill" | "forgeryskill" | "scammingskill" | "arsonskill";
+        FactionCrimeExpResponse: {
+            crimeexp: components["schemas"]["UserId"][];
+        };
+        FactionInventoryItem: {
+            id: components["schemas"]["ItemId"];
+            name: string;
+            type: components["schemas"]["MarketSpecializedBazaarCategoryEnum"];
+            /** Format: int32 */
+            amount: number;
+            /** @description Returns up to 250 uids. */
+            uids: components["schemas"]["ItemUid"][];
+            loaned: {
+                id: components["schemas"]["UserId"];
+                name: string;
+            } | null;
+        };
+        FactionInventoryResponse: {
+            /** Format: int64 */
+            inventory_timestamp: number;
+            inventory: components["schemas"]["FactionInventoryItem"][];
+            _metadata: components["schemas"]["RequestMetadataWithLinksAndTotal"];
+        };
         FactionRaidReport: {
             id: components["schemas"]["RaidWarId"];
             /** Format: int32 */
@@ -8338,7 +8639,7 @@ export interface components {
         FactionBalanceResponse: {
             balance: components["schemas"]["FactionBalance"];
         };
-        FactionSelectionName: ("applications" | "attacks" | "attacksfull" | "balance" | "basic" | "chain" | "chainreport" | "chains" | "contributors" | "crime" | "crimes" | "dirtbombs" | "hof" | "lookup" | "members" | "news" | "positions" | "rackets" | "raidreport" | "raids" | "rankedwars" | "rankedwarreport" | "reports" | "revives" | "revivesfull" | "search" | "stats" | "territory" | "territoryownership" | "territorywarreport" | "territorywars" | "timestamp" | "upgrades" | "warfarechains" | "warfareraids" | "warfareranked" | "warfareterritory" | "wars" | "armor" | "boosters" | "caches" | "cesium" | "crimeexp" | "drugs" | "medical" | "utilities" | "temporary" | "weapons") | string;
+        FactionSelectionName: ("applications" | "attacks" | "attacksfull" | "balance" | "basic" | "chain" | "chainreport" | "chains" | "contributors" | "crime" | "crimes" | "crimeexp" | "dirtbombs" | "hof" | "lookup" | "members" | "news" | "positions" | "rackets" | "raidreport" | "raids" | "rankedwars" | "rankedwarreport" | "reports" | "revives" | "revivesfull" | "search" | "stats" | "territory" | "territoryownership" | "territorywarreport" | "territorywars" | "timestamp" | "upgrades" | "warfarechains" | "warfareraids" | "warfareranked" | "warfareterritory" | "wars") | string;
         FactionLookupResponse: {
             selections: components["schemas"]["FactionSelectionName"][];
         };
@@ -9210,6 +9511,327 @@ export interface components {
         PropertyLookupResponse: {
             selections: components["schemas"]["PropertySelectionName"][];
         };
+        TornItemStat: {
+            id: components["schemas"]["ItemStatId"];
+            title: string;
+            /** Format: int64 */
+            value: number;
+        };
+        TornItemStats: {
+            id: components["schemas"]["ItemId"];
+            uid: components["schemas"]["ItemUid"];
+            name: components["schemas"]["TornItemStatTitleEnum"];
+            type: components["schemas"]["TornItemTypeEnum"];
+            sub_type: components["schemas"]["TornItemWeaponTypeEnum"] | null;
+            stats: components["schemas"]["TornItemStat"][];
+        };
+        TornItemStatsResponse: {
+            itemdetails: components["schemas"]["TornItemStats"][];
+        };
+        TornRockPaperScissorsResponse: {
+            rockpaperscissors: {
+                /** @enum {string} */
+                type: "rock" | "paper" | "scissors";
+                /** Format: int64 */
+                count: number;
+            }[];
+        };
+        TornCityStatsResponse: {
+            stats: {
+                users: {
+                    /** Format: int64 */
+                    total: number;
+                    /** Format: int64 */
+                    male: number;
+                    /** Format: int64 */
+                    female: number;
+                    /** Format: int64 */
+                    enby: number;
+                    /** Format: int64 */
+                    married: number;
+                };
+                items: {
+                    /** Format: int64 */
+                    found_in_city: number;
+                    /** Format: int64 */
+                    found_in_dump: number;
+                    /** Format: int64 */
+                    trashed: number;
+                    /** Format: int64 */
+                    total: number;
+                };
+                trading: {
+                    /** Format: int64 */
+                    sold_on_market: number;
+                    /** Format: int64 */
+                    sold_in_bazaar: number;
+                    /** Format: int64 */
+                    sold_points: number;
+                    /** Format: int64 */
+                    bazaar_profit: number;
+                    /** Format: int64 */
+                    auctions: number;
+                    /** Format: int64 */
+                    trades: number;
+                    /** Format: int64 */
+                    items_sent: number;
+                };
+                currency: {
+                    /** Format: int64 */
+                    money_on_hand: number;
+                    /** Format: int64 */
+                    money_on_hand_average: number;
+                    /** Format: int64 */
+                    money_in_bank: number;
+                    /** Format: int64 */
+                    points_total: number;
+                    /** Format: int64 */
+                    points_players: number;
+                    /** Format: int64 */
+                    points_factions: number;
+                    /** Format: int64 */
+                    points_market: number;
+                    /** Format: int64 */
+                    points_used: number;
+                };
+                attacking: {
+                    /** Format: int64 */
+                    attacks_won: number;
+                    /** Format: int64 */
+                    attacks_lost: number;
+                    /** Format: int64 */
+                    attacks_stalemated: number;
+                    /** Format: int64 */
+                    attacks_stealthed: number;
+                    /** Format: int64 */
+                    escapes: number;
+                    /** Format: int64 */
+                    hits: number;
+                    /** Format: int64 */
+                    misses: number;
+                    /** Format: int64 */
+                    critical_hits: number;
+                    /** Format: int64 */
+                    rounds_fired: number;
+                    /** Format: int64 */
+                    money_mugged: number;
+                    /** Format: int64 */
+                    respect_gained: number;
+                };
+                jobs: {
+                    /** Format: int64 */
+                    army: number;
+                    /** Format: int64 */
+                    grocer: number;
+                    /** Format: int64 */
+                    casino: number;
+                    /** Format: int64 */
+                    education: number;
+                    /** Format: int64 */
+                    medical: number;
+                    /** Format: int64 */
+                    law: number;
+                    /** Format: int64 */
+                    company: number;
+                    /** Format: int64 */
+                    unemployed: number;
+                };
+                jail: {
+                    /** Format: int64 */
+                    jailings: number;
+                    /** Format: int64 */
+                    busts: number;
+                    /** Format: int64 */
+                    busts_failed: number;
+                    /** Format: int64 */
+                    bails: number;
+                    /** Format: int64 */
+                    bails_spent: number;
+                };
+                hospital: {
+                    /** Format: int64 */
+                    trips: number;
+                    /** Format: int64 */
+                    medical_items_used: number;
+                    /** Format: int64 */
+                    revives: number;
+                };
+                drugs: {
+                    /** Format: int64 */
+                    total_used: number;
+                    /** Format: int64 */
+                    overdoses: number;
+                    /** Format: int64 */
+                    cannabis: number;
+                    /** Format: int64 */
+                    ecstasy: number;
+                    /** Format: int64 */
+                    ketamine: number;
+                    /** Format: int64 */
+                    lsd: number;
+                    /** Format: int64 */
+                    opium: number;
+                    /** Format: int64 */
+                    shrooms: number;
+                    /** Format: int64 */
+                    speed: number;
+                    /** Format: int64 */
+                    pcp: number;
+                    /** Format: int64 */
+                    xanax: number;
+                    /** Format: int64 */
+                    vicodin: number;
+                };
+                traveling: {
+                    /** Format: int64 */
+                    items_bought_abroad: number;
+                    /** Format: int64 */
+                    total_trips: number;
+                    /** Format: int64 */
+                    argentina: number;
+                    /** Format: int64 */
+                    mexico: number;
+                    /** Format: int64 */
+                    united_arab_emirates: number;
+                    /** Format: int64 */
+                    hawaii: number;
+                    /** Format: int64 */
+                    japan: number;
+                    /** Format: int64 */
+                    united_kingdom: number;
+                    /** Format: int64 */
+                    south_africa: number;
+                    /** Format: int64 */
+                    switzerland: number;
+                    /** Format: int64 */
+                    china: number;
+                    /** Format: int64 */
+                    cayman_islands: number;
+                };
+                bounties: {
+                    /** Format: int64 */
+                    placed: number;
+                    /** Format: int64 */
+                    money_spent: number;
+                };
+                crimes: {
+                    /** Format: int64 */
+                    total: number;
+                    /** Format: int64 */
+                    jail_sentences: number;
+                };
+                communication: {
+                    /** Format: int64 */
+                    total_messages: number;
+                    /** Format: int64 */
+                    friends: number;
+                    /** Format: int64 */
+                    coworkers: number;
+                    /** Format: int64 */
+                    spouses: number;
+                    /** Format: int64 */
+                    classified_ads_placed: number;
+                    /** Format: int64 */
+                    personals_placed: number;
+                };
+                other: {
+                    /** Format: int64 */
+                    logins: number;
+                    /** Format: int64 */
+                    years_played: number;
+                    /** Format: int64 */
+                    merits_bought: number;
+                    /** Format: int64 */
+                    energy_refills: number;
+                    /** Format: int64 */
+                    company_trains: number;
+                    /** Format: int64 */
+                    stat_enhancers_used: number;
+                };
+            };
+        };
+        TornPokerTable: {
+            id: components["schemas"]["PokerTableId"];
+            name: string;
+            blinds: {
+                /** Format: int64 */
+                big: number;
+                /** Format: int64 */
+                small: number;
+            };
+            players: {
+                /** Format: int32 */
+                current: number;
+                /** Format: int32 */
+                maximum: number;
+            };
+            /** Format: int32 */
+            speed: number;
+        };
+        TornPokerTablesResponse: {
+            pokertables: components["schemas"]["TornPokerTable"][];
+        };
+        TornCard: {
+            name: string;
+            short_name: string;
+            class: string;
+        };
+        TornCardsResponse: {
+            cards: components["schemas"]["TornCard"][];
+        };
+        TornBank: {
+            /** Format: int32 */
+            days: number;
+            /** Format: float */
+            rate: number;
+        };
+        TornBankResponse: {
+            bank: components["schemas"]["TornBank"][];
+        };
+        TornCityShopItem: {
+            id: components["schemas"]["ItemId"];
+            name: string;
+            /** Format: int64 */
+            price: number;
+            stock: {
+                /** Format: int32 */
+                current: number;
+                /** Format: int32 */
+                default: number;
+            };
+        };
+        TornCityShop: {
+            id: components["schemas"]["CityShopId"];
+            name: string;
+            items: components["schemas"]["TornCityShopItem"][];
+        };
+        TornCityShopsResponse: {
+            cityshops: components["schemas"]["TornCityShop"][];
+        };
+        TornGymModifiers: {
+            /** Format: float */
+            strength: number;
+            /** Format: float */
+            speed: number;
+            /** Format: float */
+            defense: number;
+            /** Format: float */
+            dexterity: number;
+        };
+        TornGym: {
+            id: components["schemas"]["GymId"];
+            name: string;
+            class: components["schemas"]["GymClassEnum"];
+            /** Format: int32 */
+            energy_cost: number;
+            /** Format: int64 */
+            cost: number;
+            modifiers: components["schemas"]["TornGymModifiers"];
+            note: string | null;
+        };
+        TornGymsResponse: {
+            gyms: components["schemas"]["TornGym"][];
+        };
         TornSearchForCash: {
             id: components["schemas"]["TornSubCrimeId"];
             title: string;
@@ -9409,8 +10031,19 @@ export interface components {
             type: components["schemas"]["TornItemTypeEnum"];
             sub_type: components["schemas"]["TornItemWeaponTypeEnum"] | null;
         };
+        /**
+         * @deprecated
+         * @description This object is deprecated, and starting on 1st January 2027 it will be replaced with an array of TornItemDetails.
+         */
+        TornItemDetailsDeprecated: components["schemas"]["ItemMarketListingItemDetails"] & {
+            id: components["schemas"]["ItemId"];
+            name: string;
+            type: components["schemas"]["TornItemTypeEnum"];
+            sub_type: components["schemas"]["TornItemWeaponTypeEnum"] | null;
+        };
         TornItemDetailsResponse: {
-            itemdetails: components["schemas"]["TornItemDetails"];
+            /** @description Starting 1st January 2027, this response will return only an array of TornItemDetails. */
+            itemdetails: components["schemas"]["TornItemDetails"][] | components["schemas"]["TornItemDetailsDeprecated"];
         };
         TornMerit: {
             id: components["schemas"]["MeritId"];
@@ -9805,6 +10438,12 @@ export interface components {
             coverage: components["schemas"]["TornItemArmorCoverage"][];
             base_stats: components["schemas"]["TornItemBaseStats"];
         };
+        TornItemShop: {
+            country: components["schemas"]["CountryEnum"];
+            shop: components["schemas"]["ShopNameEnum"];
+            buy_price: number | null;
+            sell_price: number | null;
+        };
         TornItem: {
             id: components["schemas"]["ItemId"];
             name: string;
@@ -9818,12 +10457,25 @@ export interface components {
             is_tradable: boolean;
             is_found_in_city: boolean;
             value: {
-                vendor: {
+                /**
+                 * @deprecated
+                 * @description This field is replaced with shops array and will be removed on 1st of January 2027.
+                 */
+                vendor?: {
                     country: string;
                     name: string;
                 } | null;
-                buy_price: number | null;
-                sell_price: number | null;
+                shops: components["schemas"]["TornItemShop"][];
+                /**
+                 * @deprecated
+                 * @description This field is replaced with shops array and will be removed on 1st of January 2027.
+                 */
+                buy_price?: number | null;
+                /**
+                 * @deprecated
+                 * @description This field is replaced with shops array and will be removed on 1st of January 2027.
+                 */
+                sell_price?: number | null;
                 /** Format: int64 */
                 market_price: number;
             };
@@ -9860,7 +10512,7 @@ export interface components {
         TornFactionTreeResponse: {
             factionTree: components["schemas"]["TornFactionTree"][];
         };
-        TornSelectionName: ("attacklog" | "bounties" | "calendar" | "crimes" | "education" | "elimination" | "eliminationteam" | "factionhof" | "factiontree" | "hof" | "honors" | "itemammo" | "itemmods" | "items" | "logcategories" | "logtypes" | "lookup" | "medals" | "merits" | "museum" | "organizedcrimes" | "properties" | "searchforcash" | "shoplifting" | "stocks" | "subcrimes" | "territory" | "timestamp" | "bank" | "cards" | "cityshops" | "companies" | "competition" | "gyms" | "itemdetails" | "itemstats" | "organisedcrimes" | "pawnshop" | "pokertables" | "rockpaperscissors" | "stats") | string;
+        TornSelectionName: ("attacklog" | "bank" | "bounties" | "calendar" | "cards" | "cityshops" | "companies" | "crimes" | "education" | "elimination" | "eliminationteam" | "factionhof" | "factiontree" | "gyms" | "hof" | "honors" | "itemammo" | "itemdetails" | "itemmods" | "itemstats" | "items" | "logcategories" | "logtypes" | "lookup" | "medals" | "merits" | "museum" | "organizedcrimes" | "pokertables" | "properties" | "rockpaperscissors" | "searchforcash" | "shoplifting" | "stats" | "stocks" | "subcrimes" | "territory" | "timestamp" | "competition" | "organisedcrimes") | string;
         TornLookupResponse: {
             selections: components["schemas"]["TornSelectionName"][];
         };
@@ -9911,6 +10563,8 @@ export interface components {
         ApiTimestamp: number | string;
         /** @description Timestamp to get the data in specific point in time */
         ApiTimestampSpecificPointInTime: number | string;
+        /** @description Timestamp in nanoseconds to bypass system limitation when more than 100 logs were returned in the same second. */
+        ApiNanostamp: string;
         /**
          * @description It's possible to use this query parameter to only get incoming or outgoing attacks / revives. If not specified, this selection will return both incoming and outgoing attacks / revives.
          *     It's also possible to combine this with 'idFilter'. This filter allows using from/to to filter by ids instead of timestamps.
@@ -10876,6 +11530,33 @@ export interface operations {
             };
         };
     };
+    getMyGym: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserGymResponse"];
+                };
+            };
+        };
+    };
     getMyHoF: {
         parameters: {
             query?: {
@@ -11265,6 +11946,8 @@ export interface operations {
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Timestamp in nanoseconds to bypass system limitation when more than 100 logs were returned in the same second. */
+                nanostamp?: components["parameters"]["ApiNanostamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];
                 /** @description API key (Full).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
@@ -12505,7 +13188,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserCrimesResponse"] | components["schemas"]["UserWeaponExpResponse"] | components["schemas"]["UserAmmoResponse"] | components["schemas"]["UserDiscordResponse"] | components["schemas"]["UserRacesResponse"] | components["schemas"]["UserEnlistedCarsResponse"] | components["schemas"]["UserForumPostsResponse"] | components["schemas"]["UserForumThreadsResponse"] | components["schemas"]["UserForumSubscribedThreadsResponse"] | components["schemas"]["UserForumFeedResponse"] | components["schemas"]["UserForumFriendsResponse"] | components["schemas"]["UserPropertyResponse"] | components["schemas"]["ReportsResponse"] | components["schemas"]["UserHofResponse"] | components["schemas"]["UserCalendarResponse"] | components["schemas"]["UserRacingRecordsResponse"] | components["schemas"]["UserEducationResponse"] | components["schemas"]["UserStocksResponse"] | components["schemas"]["UserBountiesResponse"] | components["schemas"]["UserJobRanksResponse"] | components["schemas"]["UserPropertiesResponse"] | components["schemas"]["UserFactionBalanceResponse"] | components["schemas"]["UserBasicResponse"] | components["schemas"]["RevivesResponse"] | components["schemas"]["UserHonorsResponse"] | components["schemas"]["UserMedalsResponse"] | components["schemas"]["UserMeritsResponse"] | components["schemas"]["RevivesFullResponse"] | components["schemas"]["UserProfileResponse"] | components["schemas"]["UserJobResponse"] | components["schemas"]["UserFactionResponse"] | components["schemas"]["UserCompetitionResponse"] | components["schemas"]["UserIconsResponse"] | components["schemas"]["UserItemMarketResponse"] | components["schemas"]["UserListResponse"] | components["schemas"]["UserEquipmentResponse"] | components["schemas"]["UserMissionsResponse"] | components["schemas"]["UserPersonalStatsResponse"] | components["schemas"]["UserOrganizedCrimeResponse"] | components["schemas"]["UserItemModsResponse"] | components["schemas"]["AttacksResponse"] | components["schemas"]["UserBarsResponse"] | components["schemas"]["UserCooldownsResponse"] | components["schemas"]["UserNotificationsResponse"] | components["schemas"]["UserPerksResponse"] | components["schemas"]["UserRefillsResponse"] | components["schemas"]["UserTravelResponse"] | components["schemas"]["UserVirusResponse"] | components["schemas"]["AttacksFullResponse"] | components["schemas"]["UserCasinoResponse"] | components["schemas"]["UserNetworthResponse"] | components["schemas"]["UserMoneyResponse"] | components["schemas"]["UserJobPointsResponse"] | components["schemas"]["UserWorkStatsResponse"] | components["schemas"]["UserSkillsResponse"] | components["schemas"]["UserBattleStatsResponse"] | components["schemas"]["UserTradeResponse"] | components["schemas"]["UserTradesResponse"] | components["schemas"]["UserNewEventsResponse"] | components["schemas"]["UserEventsResponse"] | components["schemas"]["UserMessagesResponse"] | components["schemas"]["UserNewMessagesResponse"] | components["schemas"]["UserLookupResponse"] | components["schemas"]["UserInventoryResponse"] | components["schemas"]["TimestampResponse"];
+                    "application/json": components["schemas"]["UserCrimesResponse"] | components["schemas"]["UserWeaponExpResponse"] | components["schemas"]["UserAmmoResponse"] | components["schemas"]["UserDiscordResponse"] | components["schemas"]["UserRacesResponse"] | components["schemas"]["UserEnlistedCarsResponse"] | components["schemas"]["UserForumPostsResponse"] | components["schemas"]["UserForumThreadsResponse"] | components["schemas"]["UserForumSubscribedThreadsResponse"] | components["schemas"]["UserForumFeedResponse"] | components["schemas"]["UserForumFriendsResponse"] | components["schemas"]["UserPropertyResponse"] | components["schemas"]["ReportsResponse"] | components["schemas"]["UserHofResponse"] | components["schemas"]["UserCalendarResponse"] | components["schemas"]["UserRacingRecordsResponse"] | components["schemas"]["UserEducationResponse"] | components["schemas"]["UserStocksResponse"] | components["schemas"]["UserBountiesResponse"] | components["schemas"]["UserJobRanksResponse"] | components["schemas"]["UserPropertiesResponse"] | components["schemas"]["UserFactionBalanceResponse"] | components["schemas"]["UserBasicResponse"] | components["schemas"]["RevivesResponse"] | components["schemas"]["UserHonorsResponse"] | components["schemas"]["UserMedalsResponse"] | components["schemas"]["UserMeritsResponse"] | components["schemas"]["RevivesFullResponse"] | components["schemas"]["UserProfileResponse"] | components["schemas"]["UserJobResponse"] | components["schemas"]["UserFactionResponse"] | components["schemas"]["UserCompetitionResponse"] | components["schemas"]["UserIconsResponse"] | components["schemas"]["UserItemMarketResponse"] | components["schemas"]["UserListResponse"] | components["schemas"]["UserEquipmentResponse"] | components["schemas"]["UserMissionsResponse"] | components["schemas"]["UserPersonalStatsResponse"] | components["schemas"]["UserOrganizedCrimeResponse"] | components["schemas"]["UserItemModsResponse"] | components["schemas"]["AttacksResponse"] | components["schemas"]["UserBarsResponse"] | components["schemas"]["UserCooldownsResponse"] | components["schemas"]["UserNotificationsResponse"] | components["schemas"]["UserPerksResponse"] | components["schemas"]["UserRefillsResponse"] | components["schemas"]["UserTravelResponse"] | components["schemas"]["UserVirusResponse"] | components["schemas"]["AttacksFullResponse"] | components["schemas"]["UserCasinoResponse"] | components["schemas"]["UserNetworthResponse"] | components["schemas"]["UserMoneyResponse"] | components["schemas"]["UserJobPointsResponse"] | components["schemas"]["UserWorkStatsResponse"] | components["schemas"]["UserSkillsResponse"] | components["schemas"]["UserBattleStatsResponse"] | components["schemas"]["UserGymResponse"] | components["schemas"]["UserTradeResponse"] | components["schemas"]["UserTradesResponse"] | components["schemas"]["UserNewEventsResponse"] | components["schemas"]["UserEventsResponse"] | components["schemas"]["UserMessagesResponse"] | components["schemas"]["UserNewMessagesResponse"] | components["schemas"]["UserLookupResponse"] | components["schemas"]["UserInventoryResponse"] | components["schemas"]["TimestampResponse"];
                 };
             };
         };
@@ -12917,6 +13600,33 @@ export interface operations {
             };
         };
     };
+    getMyFactionCrimeExp: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Minimal).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyMinimal"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FactionCrimeExpResponse"];
+                };
+            };
+        };
+    };
     getMyFactionOrganizedCrimes: {
         parameters: {
             query?: {
@@ -13066,6 +13776,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FactionHofResponse"];
+                };
+            };
+        };
+    };
+    getMyFactionInventory: {
+        parameters: {
+            query: {
+                /** @description Armory category */
+                cat: components["schemas"]["FactionArmoryCategoryEnum"];
+                limit?: components["parameters"]["ApiLimit100Default20"];
+                offset?: components["parameters"]["ApiOffset"];
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Limited).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyLimited"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FactionInventoryResponse"];
                 };
             };
         };
@@ -14149,7 +14890,7 @@ export interface operations {
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
                 to?: components["parameters"]["ApiTo"];
                 /** @description Selection category */
-                cat?: ("all" | "current") | ("all" | "recruiting" | "planning" | "failure" | "successful" | "expired" | "available" | "completed") | components["schemas"]["FactionNewsCategory"] | components["schemas"]["FactionRankedWarsCategoryEnum"] | components["schemas"]["ReportTypeEnum"] | components["schemas"]["FactionWarfareTypeEnum"] | components["schemas"]["FactionTerritoryWarsCategoryEnum"];
+                cat?: ("all" | "current") | ("all" | "recruiting" | "planning" | "failure" | "successful" | "expired" | "available" | "completed") | components["schemas"]["FactionNewsCategory"] | components["schemas"]["FactionRankedWarsCategoryEnum"] | components["schemas"]["FactionArmoryCategoryEnum"] | components["schemas"]["ReportTypeEnum"] | components["schemas"]["FactionWarfareTypeEnum"] | components["schemas"]["FactionTerritoryWarsCategoryEnum"];
                 /** @description Stat category */
                 stat?: components["schemas"]["FactionStatEnum"];
                 filters?: "created_at" | "executed_at" | "ready_at" | "expired_at" | "incoming" | "outgoing";
@@ -14177,7 +14918,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FactionHofResponse"] | components["schemas"]["FactionMembersResponse"] | components["schemas"]["FactionBasicResponse"] | components["schemas"]["FactionWarsResponse"] | components["schemas"]["NewsResponse"] | components["schemas"]["RevivesResponse"] | components["schemas"]["FactionTerritoryWarsHistoryResponse"] | components["schemas"]["AttacksResponse"] | components["schemas"]["FactionBalanceResponse"] | components["schemas"]["FactionRaidWarReportResponse"] | components["schemas"]["FactionTerritoriesOwnershipResponse"] | components["schemas"]["FactionPositionsResponse"] | components["schemas"]["RevivesFullResponse"] | components["schemas"]["AttacksFullResponse"] | components["schemas"]["FactionApplicationsResponse"] | components["schemas"]["FactionOngoingChainResponse"] | components["schemas"]["FactionChainsResponse"] | components["schemas"]["FactionChainReportResponse"] | components["schemas"]["FactionCrimesResponse"] | components["schemas"]["FactionCrimeResponse"] | components["schemas"]["FactionRaidsResponse"] | components["schemas"]["FactionWarfareResponse"] | components["schemas"]["FactionRankedWarReportResponse"] | components["schemas"]["FactionTerritoryWarReportResponse"] | components["schemas"]["FactionTerritoriesResponse"] | components["schemas"]["FactionUpgradesResponse"] | components["schemas"]["FactionStatsResponse"] | components["schemas"]["FactionContributorsResponse"] | components["schemas"]["FactionRacketsResponse"] | components["schemas"]["FactionRankedWarResponse"] | components["schemas"]["FactionLookupResponse"] | components["schemas"]["FactionWarfareDirtyBombsResponse"] | components["schemas"]["FactionWarfareChainsResponse"] | components["schemas"]["FactionWarfareTerritoryWarsResponse"] | components["schemas"]["FactionWarfareRaidsResponse"] | components["schemas"]["FactionWarfareRankedResponse"] | components["schemas"]["TimestampResponse"];
+                    "application/json": components["schemas"]["FactionHofResponse"] | components["schemas"]["FactionMembersResponse"] | components["schemas"]["FactionBasicResponse"] | components["schemas"]["FactionWarsResponse"] | components["schemas"]["NewsResponse"] | components["schemas"]["RevivesResponse"] | components["schemas"]["FactionTerritoryWarsHistoryResponse"] | components["schemas"]["AttacksResponse"] | components["schemas"]["FactionBalanceResponse"] | components["schemas"]["FactionRaidWarReportResponse"] | components["schemas"]["FactionTerritoriesOwnershipResponse"] | components["schemas"]["FactionPositionsResponse"] | components["schemas"]["RevivesFullResponse"] | components["schemas"]["AttacksFullResponse"] | components["schemas"]["FactionApplicationsResponse"] | components["schemas"]["FactionOngoingChainResponse"] | components["schemas"]["FactionChainsResponse"] | components["schemas"]["FactionChainReportResponse"] | components["schemas"]["FactionCrimesResponse"] | components["schemas"]["FactionCrimeResponse"] | components["schemas"]["FactionRaidsResponse"] | components["schemas"]["FactionWarfareResponse"] | components["schemas"]["FactionRankedWarReportResponse"] | components["schemas"]["FactionTerritoryWarReportResponse"] | components["schemas"]["FactionTerritoriesResponse"] | components["schemas"]["FactionUpgradesResponse"] | components["schemas"]["FactionStatsResponse"] | components["schemas"]["FactionContributorsResponse"] | components["schemas"]["FactionInventoryResponse"] | components["schemas"]["FactionCrimeExpResponse"] | components["schemas"]["FactionRacketsResponse"] | components["schemas"]["FactionRankedWarResponse"] | components["schemas"]["FactionLookupResponse"] | components["schemas"]["FactionWarfareDirtyBombsResponse"] | components["schemas"]["FactionWarfareChainsResponse"] | components["schemas"]["FactionWarfareTerritoryWarsResponse"] | components["schemas"]["FactionWarfareRaidsResponse"] | components["schemas"]["FactionWarfareRankedResponse"] | components["schemas"]["TimestampResponse"];
                 };
             };
         };
@@ -15751,6 +16492,33 @@ export interface operations {
             };
         };
     };
+    getTornBank: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornBankResponse"];
+                };
+            };
+        };
+    };
     getTornBounties: {
         parameters: {
             query?: {
@@ -15803,6 +16571,90 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TornCalendarResponse"];
+                };
+            };
+        };
+    };
+    getTornCards: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornCardsResponse"];
+                };
+            };
+        };
+    };
+    getTornCityShops: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornCityShopsResponse"];
+                };
+            };
+        };
+    };
+    getTornCityShopSpecific: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path: {
+                /** @description Shop id */
+                shopId: components["schemas"]["CityShopId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornCityShopsResponse"];
                 };
             };
         };
@@ -16035,6 +16887,33 @@ export interface operations {
             };
         };
     };
+    getTornGyms: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornGymsResponse"];
+                };
+            };
+        };
+    };
     getTornHonors: {
         parameters: {
             query?: {
@@ -16166,8 +17045,8 @@ export interface operations {
             };
             header?: never;
             path: {
-                /** @description Item uid */
-                id: components["schemas"]["ItemUid"];
+                /** @description Item uid or a list of item uids (comma separated), 25 uids maximum */
+                ids: components["schemas"]["ItemUid"][];
             };
             cookie?: never;
         };
@@ -16207,6 +17086,36 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TornItemModsResponse"];
+                };
+            };
+        };
+    };
+    getTornItemStats: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path: {
+                /** @description Item uid or a list of item uids (comma separated), 25 uids maximum */
+                ids: components["schemas"]["ItemUid"][];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornItemStatsResponse"];
                 };
             };
         };
@@ -16496,6 +17405,33 @@ export interface operations {
             };
         };
     };
+    getTornPokerTables: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornPokerTablesResponse"];
+                };
+            };
+        };
+    };
     getTornProperties: {
         parameters: {
             query?: {
@@ -16519,6 +17455,33 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TornProperties"];
+                };
+            };
+        };
+    };
+    getTornRps: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornRockPaperScissorsResponse"];
                 };
             };
         };
@@ -16573,6 +17536,33 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TornShopliftingResponse"];
+                };
+            };
+        };
+    };
+    getTornCityStats: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornCityStatsResponse"];
                 };
             };
         };
@@ -16755,7 +17745,7 @@ export interface operations {
                 /** @description Selection names */
                 selections?: components["schemas"]["TornSelectionName"][];
                 /** @description selection id */
-                id?: components["schemas"]["LogCategoryId"] | components["schemas"]["TornCrimeId"] | components["schemas"]["StockId"] | components["schemas"]["EliminationTeamId"] | components["schemas"]["ItemUid"] | components["schemas"]["ItemId"][] | components["schemas"]["MedalId"][] | components["schemas"]["HonorId"][] | components["schemas"]["FactionTerritoryEnum"][];
+                id?: components["schemas"]["LogCategoryId"] | components["schemas"]["TornCrimeId"] | components["schemas"]["StockId"] | components["schemas"]["EliminationTeamId"] | components["schemas"]["CityShopId"] | components["schemas"]["ItemUid"] | components["schemas"]["ItemId"][] | components["schemas"]["MedalId"][] | components["schemas"]["HonorId"][] | components["schemas"]["FactionTerritoryEnum"][];
                 /** @description Legacy selection names for which you want or expect API v1 response */
                 legacy?: components["schemas"]["TornSelectionName"][];
                 /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
@@ -16789,7 +17779,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TornSubcrimesResponse"] | components["schemas"]["TornCrimesResponse"] | components["schemas"]["TornCalendarResponse"] | components["schemas"]["TornHofResponse"] | components["schemas"]["TornFactionHofResponse"] | components["schemas"]["TornLogTypesResponse"] | components["schemas"]["TornItemsResponse"] | components["schemas"]["TornLogCategoriesResponse"] | components["schemas"]["TornEducationResponse"] | components["schemas"]["TornMeritsResponse"] | components["schemas"]["TornOrganizedCrimeResponse"] | components["schemas"]["TornHonorsResponse"] | components["schemas"]["TornItemDetailsResponse"] | components["schemas"]["TornEliminationTeamsResponse"] | components["schemas"]["TornEliminationTeamPlayersResponse"] | components["schemas"]["TornMedalsResponse"] | components["schemas"]["TornBountiesResponse"] | components["schemas"]["TornItemAmmoResponse"] | components["schemas"]["TornProperties"] | components["schemas"]["TornFactionTreeResponse"] | components["schemas"]["AttackLogResponse"] | components["schemas"]["TornMuseumResponse"] | components["schemas"]["TornStockDetailedResponse"] | components["schemas"]["TornStocksResponse"] | components["schemas"]["TornTerritoriesResponse"] | components["schemas"]["TornTerritoriesNoLinksResponse"] | components["schemas"]["TornItemModsResponse"] | components["schemas"]["TornLookupResponse"] | components["schemas"]["TimestampResponse"];
+                    "application/json": components["schemas"]["TornSubcrimesResponse"] | components["schemas"]["TornCrimesResponse"] | components["schemas"]["TornCalendarResponse"] | components["schemas"]["TornHofResponse"] | components["schemas"]["TornFactionHofResponse"] | components["schemas"]["TornLogTypesResponse"] | components["schemas"]["TornCardsResponse"] | components["schemas"]["TornItemsResponse"] | components["schemas"]["TornRockPaperScissorsResponse"] | components["schemas"]["TornCityStatsResponse"] | components["schemas"]["TornLogCategoriesResponse"] | components["schemas"]["TornEducationResponse"] | components["schemas"]["TornMeritsResponse"] | components["schemas"]["TornOrganizedCrimeResponse"] | components["schemas"]["TornItemStatsResponse"] | components["schemas"]["TornHonorsResponse"] | components["schemas"]["TornItemDetailsResponse"] | components["schemas"]["TornEliminationTeamsResponse"] | components["schemas"]["TornCityShopsResponse"] | components["schemas"]["TornEliminationTeamPlayersResponse"] | components["schemas"]["TornMedalsResponse"] | components["schemas"]["TornBankResponse"] | components["schemas"]["TornBountiesResponse"] | components["schemas"]["TornGymsResponse"] | components["schemas"]["TornPokerTablesResponse"] | components["schemas"]["TornItemAmmoResponse"] | components["schemas"]["TornProperties"] | components["schemas"]["TornFactionTreeResponse"] | components["schemas"]["AttackLogResponse"] | components["schemas"]["TornMuseumResponse"] | components["schemas"]["TornStockDetailedResponse"] | components["schemas"]["TornStocksResponse"] | components["schemas"]["TornTerritoriesResponse"] | components["schemas"]["TornTerritoriesNoLinksResponse"] | components["schemas"]["TornItemModsResponse"] | components["schemas"]["TornLookupResponse"] | components["schemas"]["TimestampResponse"];
                 };
             };
         };

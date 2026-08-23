@@ -4,6 +4,11 @@ name: Conformance
 # validate each response against its OpenAPI schema. Without the
 # TORN_TEST_API_KEY secret the harness runs in compile-check mode (no calls).
 # Non-gating for PRs; a real schema mismatch fails this run and notifies.
+#
+# Before every check the job syncs Torn's latest OpenAPI spec and regenerates
+# derived artifacts in-workspace (no commit). This guarantees conformance is
+# always evaluated against the current schema, not a potentially stale snapshot
+# committed days or weeks earlier.
 
 on:
   schedule:
@@ -34,6 +39,15 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+
+      # Sync Torn's latest OpenAPI spec and regenerate derived artifacts so the
+      # conformance check (and any baseline refresh) always uses the current
+      # schema. This step intentionally does NOT commit — the repo is left in a
+      # "dirty but correct" state for the steps that follow.
+      - name: Sync OpenAPI (no commit)
+        run: |
+          npm run sync-openapi
+          node scripts/generate-endpoints.mjs
 
       # Scheduled run, or manual run without the refresh box ticked: read-only
       # check. Fails the run on new drift; uploads the report.
