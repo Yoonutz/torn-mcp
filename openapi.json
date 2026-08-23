@@ -3,7 +3,7 @@
     "info": {
         "title": "Torn API",
         "description": "\n * The development of Torn's API v2 is still ongoing.\n * If selections remain unaltered, they will default to the API v1 version.\n * Unlike API v1, API v2 accepts both selections and IDs as path and query parameters.\n * If any discrepancies or errors are found, please submit a [bug report](https://www.torn.com/forums.php#/p=forums&f=19&b=0&a=0) on the Torn Forums.\n * In case you're using bots to check for changes on openapi.json file, make sure to specificy a custom user-agent header - CloudFlare sometimes prevents requests from default user-agents.",
-        "version": "6.9.0"
+        "version": "6.13.1"
     },
     "servers": [
         {
@@ -1356,6 +1356,45 @@
                 "x-stability": "Stable"
             }
         },
+        "/user/gym": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get your currently active gym",
+                "description": "Requires minimal access key. <br>",
+                "operationId": "getMyGym",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserGymResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Stable"
+            }
+        },
         "/user/hof": {
             "get": {
                 "tags": [
@@ -1981,6 +2020,9 @@
                     },
                     {
                         "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiNanostamp"
                     },
                     {
                         "$ref": "#/components/parameters/ApiComment"
@@ -4106,6 +4148,9 @@
                                             "$ref": "#/components/schemas/UserBattleStatsResponse"
                                         },
                                         {
+                                            "$ref": "#/components/schemas/UserGymResponse"
+                                        },
+                                        {
                                             "$ref": "#/components/schemas/UserTradeResponse"
                                         },
                                         {
@@ -4778,6 +4823,45 @@
                 "x-stability": "Stable"
             }
         },
+        "/faction/crimeexp": {
+            "get": {
+                "tags": [
+                    "Faction"
+                ],
+                "summary": "Get your faction members crime experience",
+                "description": "Requires minimal access key. <br>Members are ordered descending, from highest crime experience to lowest.",
+                "operationId": "getMyFactionCrimeExp",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyMinimal"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FactionCrimeExpResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Stable"
+            }
+        },
         "/faction/crimes": {
             "get": {
                 "tags": [
@@ -5038,6 +5122,60 @@
                     }
                 ],
                 "x-stability": "Stable"
+            }
+        },
+        "/faction/inventory": {
+            "get": {
+                "tags": [
+                    "Faction"
+                ],
+                "summary": "Get your faction's inventory items.",
+                "description": "<b>Cached selection (1 hour, all items cached at once).</b><br><br>Requires limited access key. <br> ",
+                "operationId": "getMyFactionInventory",
+                "parameters": [
+                    {
+                        "name": "cat",
+                        "in": "query",
+                        "description": "Armory category",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/FactionArmoryCategoryEnum"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiLimit100Default20"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiOffset"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyLimited"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FactionInventoryResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
             }
         },
         "/faction/members": {
@@ -6780,6 +6918,9 @@
                                     "$ref": "#/components/schemas/FactionRankedWarsCategoryEnum"
                                 },
                                 {
+                                    "$ref": "#/components/schemas/FactionArmoryCategoryEnum"
+                                },
+                                {
                                     "$ref": "#/components/schemas/ReportTypeEnum"
                                 },
                                 {
@@ -6925,6 +7066,12 @@
                                         },
                                         {
                                             "$ref": "#/components/schemas/FactionContributorsResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/FactionInventoryResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/FactionCrimeExpResponse"
                                         },
                                         {
                                             "$ref": "#/components/schemas/FactionRacketsResponse"
@@ -9694,6 +9841,45 @@
                 "x-stability": "Stable"
             }
         },
+        "/torn/bank": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get current bank rates",
+                "description": "Requires public access key. <br>",
+                "operationId": "getTornBank",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornBankResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
         "/torn/bounties": {
             "get": {
                 "tags": [
@@ -9776,6 +9962,132 @@
                     }
                 ],
                 "x-stability": "Stable"
+            }
+        },
+        "/torn/cards": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get casino playing cards",
+                "description": "Requires public access key. <br>",
+                "operationId": "getTornCards",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornCardsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
+        "/torn/cityshops": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get city shops stock information",
+                "description": "Requires public access key. <br>",
+                "operationId": "getTornCityShops",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornCityShopsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
+        "/torn/{shopId}/cityshops": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get stock information for a specific shop",
+                "description": "Requires public access key. <br>",
+                "operationId": "getTornCityShopSpecific",
+                "parameters": [
+                    {
+                        "name": "shopId",
+                        "in": "path",
+                        "description": "Shop id",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/CityShopId"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornCityShopsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
             }
         },
         "/torn/companies": {
@@ -10129,6 +10441,45 @@
                 "x-stability": "Stable"
             }
         },
+        "/torn/gyms": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get all gyms",
+                "description": "Requires public access key. <br>",
+                "operationId": "getTornGyms",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornGymsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
         "/torn/honors": {
             "get": {
                 "tags": [
@@ -10323,22 +10674,27 @@
                 "x-stability": "Stable"
             }
         },
-        "/torn/{id}/itemdetails": {
+        "/torn/{ids}/itemdetails": {
             "get": {
                 "tags": [
                     "Torn"
                 ],
-                "summary": "Get information about a specific item",
+                "summary": "Get details for specific item(s)",
                 "description": "Requires public key.",
                 "operationId": "getTornItemDetails",
                 "parameters": [
                     {
-                        "name": "id",
+                        "name": "ids",
                         "in": "path",
-                        "description": "Item uid",
+                        "description": "Item uid or a list of item uids (comma separated), 25 uids maximum",
                         "required": true,
+                        "style": "form",
+                        "explode": false,
                         "schema": {
-                            "$ref": "#/components/schemas/ItemUid"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/ItemUid"
+                            }
                         }
                     },
                     {
@@ -10408,6 +10764,59 @@
                     }
                 ],
                 "x-stability": "Stable"
+            }
+        },
+        "/torn/{ids}/itemstats": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get specific item(s) stats",
+                "description": "Requires public key.<br>",
+                "operationId": "getTornItemStats",
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "path",
+                        "description": "Item uid or a list of item uids (comma separated), 25 uids maximum",
+                        "required": true,
+                        "style": "form",
+                        "explode": false,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/ItemUid"
+                            }
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornItemStatsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
             }
         },
         "/torn/items": {
@@ -10852,6 +11261,45 @@
                 "x-stability": "Stable"
             }
         },
+        "/torn/pokertables": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get active poker tables",
+                "description": "Requires public access key. <br>",
+                "operationId": "getTornPokerTables",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornPokerTablesResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
         "/torn/properties": {
             "get": {
                 "tags": [
@@ -10889,6 +11337,45 @@
                     }
                 ],
                 "x-stability": "Stable"
+            }
+        },
+        "/torn/rockpaperscissors": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get rock paper scissors competition stats",
+                "description": "Requires public key.",
+                "operationId": "getTornRps",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornRockPaperScissorsResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
             }
         },
         "/torn/searchforcash": {
@@ -10956,6 +11443,45 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/TornShopliftingResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
+        "/torn/stats": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get daily city stats",
+                "description": "Requires public key.",
+                "operationId": "getTornCityStats",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornCityStatsResponse"
                                 }
                             }
                         }
@@ -11284,6 +11810,9 @@
                                     "$ref": "#/components/schemas/EliminationTeamId"
                                 },
                                 {
+                                    "$ref": "#/components/schemas/CityShopId"
+                                },
+                                {
                                     "$ref": "#/components/schemas/ItemUid"
                                 },
                                 {
@@ -11400,7 +11929,16 @@
                                             "$ref": "#/components/schemas/TornLogTypesResponse"
                                         },
                                         {
+                                            "$ref": "#/components/schemas/TornCardsResponse"
+                                        },
+                                        {
                                             "$ref": "#/components/schemas/TornItemsResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TornRockPaperScissorsResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TornCityStatsResponse"
                                         },
                                         {
                                             "$ref": "#/components/schemas/TornLogCategoriesResponse"
@@ -11415,6 +11953,9 @@
                                             "$ref": "#/components/schemas/TornOrganizedCrimeResponse"
                                         },
                                         {
+                                            "$ref": "#/components/schemas/TornItemStatsResponse"
+                                        },
+                                        {
                                             "$ref": "#/components/schemas/TornHonorsResponse"
                                         },
                                         {
@@ -11424,13 +11965,25 @@
                                             "$ref": "#/components/schemas/TornEliminationTeamsResponse"
                                         },
                                         {
+                                            "$ref": "#/components/schemas/TornCityShopsResponse"
+                                        },
+                                        {
                                             "$ref": "#/components/schemas/TornEliminationTeamPlayersResponse"
                                         },
                                         {
                                             "$ref": "#/components/schemas/TornMedalsResponse"
                                         },
                                         {
+                                            "$ref": "#/components/schemas/TornBankResponse"
+                                        },
+                                        {
                                             "$ref": "#/components/schemas/TornBountiesResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TornGymsResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TornPokerTablesResponse"
                                         },
                                         {
                                             "$ref": "#/components/schemas/TornItemAmmoResponse"
@@ -11493,6 +12046,42 @@
                     "C",
                     "D",
                     "E"
+                ]
+            },
+            "TornItemStatTitleEnum": {
+                "type": "string",
+                "enum": [
+                    "Damage",
+                    "Rounds fired",
+                    "Hits",
+                    "Misses",
+                    "Damage taken",
+                    "Reloads",
+                    "Highest damage",
+                    "Hits received",
+                    "Most damage taken",
+                    "Damage mitigated",
+                    "Most damage mitigated",
+                    "Finishing hits",
+                    "Critical hits",
+                    "First owner",
+                    "First faction owner",
+                    "Time created",
+                    "Respect earned"
+                ]
+            },
+            "FactionArmoryCategoryEnum": {
+                "type": "string",
+                "enum": [
+                    "weapons",
+                    "armor",
+                    "temporary",
+                    "medical",
+                    "consumables",
+                    "drugs",
+                    "boosters",
+                    "utilities",
+                    "loot"
                 ]
             },
             "MissionDifficultyEnum": {
@@ -15926,7 +16515,8 @@
                     "attacksdamaging",
                     "attacksrunaway",
                     "highestterritories",
-                    "territoryrespect"
+                    "territoryrespect",
+                    "membersamount"
                 ]
             },
             "FactionBranchStateEnum": {
@@ -16504,11 +17094,19 @@
                 "type": "integer",
                 "format": "int64"
             },
+            "ItemStatId": {
+                "type": "integer",
+                "format": "int34"
+            },
             "AuctionListingId": {
                 "type": "integer",
                 "format": "int32"
             },
             "ItemModId": {
+                "type": "integer",
+                "format": "int32"
+            },
+            "CityShopId": {
                 "type": "integer",
                 "format": "int32"
             },
@@ -16551,6 +17149,10 @@
             "TradeId": {
                 "type": "integer",
                 "format": "int64"
+            },
+            "PokerTableId": {
+                "type": "integer",
+                "format": "int32"
             },
             "StockId": {
                 "type": "integer",
@@ -16650,6 +17252,10 @@
                 "type": "integer",
                 "format": "int32"
             },
+            "GymId": {
+                "type": "integer",
+                "format": "int32"
+            },
             "ForumPostId": {
                 "type": "integer",
                 "format": "int32"
@@ -16722,6 +17328,21 @@
                 },
                 "type": "object"
             },
+            "RequestMetadataWithLinksAndNanostamp": {
+                "required": [
+                    "links"
+                ],
+                "properties": {
+                    "links": {
+                        "$ref": "#/components/schemas/RequestLinks"
+                    },
+                    "nanostamp": {
+                        "description": "Use to bypass system limitation when 100 or more logs were inserted within the same second.",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "ForumFeedTypeEnum": {
                 "description": "This represents the type of the activity. Values range from 1 to 8 where:\n *                    1 = 'X posted on a thread',\n *                    2 = 'X created a thread',\n *                    3 = 'X liked your thread',\n *                    4 = 'X disliked your thread',\n *                    5 = 'X liked your post',\n *                    6 = 'X disliked your post',\n *                    7 = 'X quoted your post'.",
                 "type": "integer",
@@ -16734,6 +17355,38 @@
                     5,
                     6,
                     7
+                ]
+            },
+            "GymClassEnum": {
+                "type": "string",
+                "enum": [
+                    "Basic",
+                    "Lightweight",
+                    "Middleweight",
+                    "Heavyweight",
+                    "Specialist"
+                ]
+            },
+            "ShopNameEnum": {
+                "type": "string",
+                "enum": [
+                    "Arms Dealer",
+                    "General Store",
+                    "Black Market",
+                    "Big Al's Gun Shop",
+                    "Sally's Sweet Shop",
+                    "TC Clothing",
+                    "Bits 'n' Bobs",
+                    "Jewelry Store",
+                    "Super Store",
+                    "Docks",
+                    "Post Office",
+                    "Pharmacy",
+                    "Nikeh Sports",
+                    "Print Shop",
+                    "Recycling Center",
+                    "Cyber Force",
+                    "Pawn Shop"
                 ]
             },
             "UserGenderEnum": {
@@ -17295,8 +17948,16 @@
                         "format": "float"
                     },
                     "chain": {
-                        "type": "integer",
-                        "format": "int32"
+                        "description": "Important! Starting January 1st, 2027, the value '0' will be replaced with 'null'.",
+                        "oneOf": [
+                            {
+                                "type": "integer",
+                                "format": "int32"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     },
                     "is_interrupted": {
                         "description": "This is an experimental flag which should help determine 'assist' attacks which have not contributed to the chain. For example, attacks such as where the opponent lost to someoene else before the attacker could finish the attack. This flag might not work entirely correctly, so use with caution.",
@@ -18850,6 +19511,25 @@
                 },
                 "type": "object"
             },
+            "ErrorCityStatsCronFailed": {
+                "required": [
+                    "code",
+                    "error"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "format": "int32",
+                        "enum": [
+                            31
+                        ]
+                    },
+                    "error": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "ApiError": {
                 "oneOf": [
                     {
@@ -18944,8 +19624,34 @@
                     },
                     {
                         "$ref": "#/components/schemas/ErrorFileDoesNotExist"
+                    },
+                    {
+                        "$ref": "#/components/schemas/ErrorCityStatsCronFailed"
                     }
                 ]
+            },
+            "UserGymResponse": {
+                "required": [
+                    "gym"
+                ],
+                "properties": {
+                    "gym": {
+                        "required": [
+                            "id",
+                            "name"
+                        ],
+                        "properties": {
+                            "id": {
+                                "$ref": "#/components/schemas/GymId"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
             },
             "UserSearch": {
                 "required": [
@@ -19847,6 +20553,30 @@
                 },
                 "type": "object"
             },
+            "UserEquipmentAmmo": {
+                "required": [
+                    "id",
+                    "name",
+                    "type",
+                    "quantity"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/AmmoId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "quantity": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/TornItemAmmoTypeEnum"
+                    }
+                },
+                "type": "object"
+            },
             "UserEquipment": {
                 "allOf": [
                     {
@@ -19870,28 +20600,14 @@
                                 }
                             },
                             "ammo": {
-                                "required": [
-                                    "id",
-                                    "name",
-                                    "type",
-                                    "quantity"
-                                ],
-                                "properties": {
-                                    "id": {
-                                        "$ref": "#/components/schemas/AmmoId"
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/UserEquipmentAmmo"
                                     },
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "quantity": {
-                                        "type": "integer",
-                                        "format": "int32"
-                                    },
-                                    "type": {
-                                        "$ref": "#/components/schemas/TornItemAmmoTypeEnum"
+                                    {
+                                        "type": "null"
                                     }
-                                },
-                                "type": "object"
+                                ]
                             }
                         },
                         "type": "object"
@@ -21101,7 +21817,8 @@
                             "karma",
                             "last_action",
                             "life",
-                            "donator_status"
+                            "donator_status",
+                            "revive_setting"
                         ],
                         "properties": {
                             "id": {
@@ -21165,6 +21882,10 @@
                             },
                             "honor_id": {
                                 "$ref": "#/components/schemas/HonorId"
+                            },
+                            "revive_setting": {
+                                "$ref": "#/components/schemas/ReviveSetting",
+                                "description": "This field is shown only for 'Limited' or 'Full' access keys and only for the key owner, otherwise, the status is 'Unknown'."
                             },
                             "property": {
                                 "required": [
@@ -21771,7 +22492,7 @@
                         }
                     },
                     "_metadata": {
-                        "$ref": "#/components/schemas/RequestMetadataWithLinks"
+                        "$ref": "#/components/schemas/RequestMetadataWithLinksAndNanostamp"
                     }
                 },
                 "type": "object"
@@ -22959,13 +23680,15 @@
                             "races_entered",
                             "races_won",
                             "is_removed",
-                            "parts"
+                            "parts",
+                            "car_name"
                         ],
                         "properties": {
                             "id": {
                                 "$ref": "#/components/schemas/RaceCarId"
                             },
-                            "name": {
+                            "car_name": {
+                                "description": "Car nickanme.",
                                 "oneOf": [
                                     {
                                         "type": "string"
@@ -23588,7 +24311,7 @@
             "UserSelectionName": {
                 "oneOf": [
                     {
-                        "description": "The following selections will fallback to API v1 and may change at any time: 'bazaar','criminalrecord','display','gym','networth','perks'.",
+                        "description": "The following selections will fallback to API v1 and may change at any time: 'bazaar','criminalrecord','display','networth'.",
                         "type": "string",
                         "enum": [
                             "ammo",
@@ -23614,6 +24337,7 @@
                             "forumposts",
                             "forumsubscribedthreads",
                             "forumthreads",
+                            "gym",
                             "hof",
                             "honors",
                             "icons",
@@ -23659,7 +24383,6 @@
                             "criminalrecord",
                             "display",
                             "education",
-                            "gym",
                             "perks"
                         ]
                     },
@@ -26848,6 +27571,98 @@
                     "arsonskill"
                 ]
             },
+            "FactionCrimeExpResponse": {
+                "required": [
+                    "crimeexp"
+                ],
+                "properties": {
+                    "crimeexp": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserId"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "FactionInventoryItem": {
+                "required": [
+                    "id",
+                    "name",
+                    "type",
+                    "amount",
+                    "uids",
+                    "loaned"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/ItemId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/MarketSpecializedBazaarCategoryEnum"
+                    },
+                    "amount": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "uids": {
+                        "description": "Returns up to 250 uids.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemUid"
+                        }
+                    },
+                    "loaned": {
+                        "oneOf": [
+                            {
+                                "required": [
+                                    "id",
+                                    "name"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "$ref": "#/components/schemas/UserId"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "FactionInventoryResponse": {
+                "required": [
+                    "inventory_timestamp",
+                    "inventory",
+                    "_metadata"
+                ],
+                "properties": {
+                    "inventory_timestamp": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "inventory": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FactionInventoryItem"
+                        }
+                    },
+                    "_metadata": {
+                        "$ref": "#/components/schemas/RequestMetadataWithLinksAndTotal"
+                    }
+                },
+                "type": "object"
+            },
             "FactionRaidReport": {
                 "required": [
                     "id",
@@ -29670,7 +30485,7 @@
             "FactionSelectionName": {
                 "oneOf": [
                     {
-                        "description": "The following selections will fallback to API v1 and may change at any time: 'armor', 'boosters', 'caches', 'cesium', 'crimeexp', 'drugs', 'medical', 'utilities', 'temporary', 'weapons'.\n *  The following selections are not available in API v2: 'armorynews', 'attacknews', 'crimenews', 'currency', 'donations', 'fundsnews', 'mainnews', 'membershipnews', 'territorynews'.",
+                        "description": "The following selections are not available in API v2: 'armorynews', 'attacknews', 'crimenews', 'currency', 'donations', 'fundsnews', 'mainnews', 'membershipnews', 'territorynews', 'armor', 'boosters', 'caches', 'cesium', 'drugs', 'medical', 'utilities', 'temporary', 'weapons'.",
                         "type": "string",
                         "enum": [
                             "applications",
@@ -29684,6 +30499,7 @@
                             "contributors",
                             "crime",
                             "crimes",
+                            "crimeexp",
                             "dirtbombs",
                             "hof",
                             "lookup",
@@ -29710,17 +30526,7 @@
                             "warfareraids",
                             "warfareranked",
                             "warfareterritory",
-                            "wars",
-                            "armor",
-                            "boosters",
-                            "caches",
-                            "cesium",
-                            "crimeexp",
-                            "drugs",
-                            "medical",
-                            "utilities",
-                            "temporary",
-                            "weapons"
+                            "wars"
                         ]
                     },
                     {
@@ -33181,6 +33987,988 @@
                 },
                 "type": "object"
             },
+            "TornItemStat": {
+                "required": [
+                    "id",
+                    "title",
+                    "value"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/ItemStatId"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "type": "object"
+            },
+            "TornItemStats": {
+                "required": [
+                    "id",
+                    "uid",
+                    "name",
+                    "type",
+                    "sub_type",
+                    "stats"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/ItemId"
+                    },
+                    "uid": {
+                        "$ref": "#/components/schemas/ItemUid"
+                    },
+                    "name": {
+                        "$ref": "#/components/schemas/TornItemStatTitleEnum"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/TornItemTypeEnum"
+                    },
+                    "sub_type": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/TornItemWeaponTypeEnum"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "stats": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornItemStat"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornItemStatsResponse": {
+                "required": [
+                    "itemdetails"
+                ],
+                "properties": {
+                    "itemdetails": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornItemStats"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornRockPaperScissorsResponse": {
+                "required": [
+                    "rockpaperscissors"
+                ],
+                "properties": {
+                    "rockpaperscissors": {
+                        "type": "array",
+                        "items": {
+                            "required": [
+                                "type",
+                                "count"
+                            ],
+                            "properties": {
+                                "type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "rock",
+                                        "paper",
+                                        "scissors"
+                                    ]
+                                },
+                                "count": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornCityStatsResponse": {
+                "required": [
+                    "stats"
+                ],
+                "properties": {
+                    "stats": {
+                        "required": [
+                            "users",
+                            "items",
+                            "trading",
+                            "currency",
+                            "attacking",
+                            "jobs",
+                            "jail",
+                            "hospital",
+                            "drugs",
+                            "traveling",
+                            "bounties",
+                            "crimes",
+                            "communication",
+                            "other"
+                        ],
+                        "properties": {
+                            "users": {
+                                "required": [
+                                    "total",
+                                    "male",
+                                    "female",
+                                    "enby",
+                                    "married"
+                                ],
+                                "properties": {
+                                    "total": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "male": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "female": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "enby": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "married": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "items": {
+                                "required": [
+                                    "found_in_city",
+                                    "found_in_dump",
+                                    "trashed",
+                                    "total"
+                                ],
+                                "properties": {
+                                    "found_in_city": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "found_in_dump": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "trashed": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "total": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "trading": {
+                                "required": [
+                                    "sold_on_market",
+                                    "sold_in_bazaar",
+                                    "sold_points",
+                                    "bazaar_profit",
+                                    "auctions",
+                                    "trades",
+                                    "items_sent"
+                                ],
+                                "properties": {
+                                    "sold_on_market": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "sold_in_bazaar": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "sold_points": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "bazaar_profit": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "auctions": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "trades": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "items_sent": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "currency": {
+                                "required": [
+                                    "money_on_hand",
+                                    "money_on_hand_average",
+                                    "money_in_bank",
+                                    "points_total",
+                                    "points_players",
+                                    "points_factions",
+                                    "points_market",
+                                    "points_used"
+                                ],
+                                "properties": {
+                                    "money_on_hand": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "money_on_hand_average": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "money_in_bank": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "points_total": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "points_players": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "points_factions": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "points_market": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "points_used": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "attacking": {
+                                "required": [
+                                    "attacks_won",
+                                    "attacks_lost",
+                                    "attacks_stalemated",
+                                    "attacks_stealthed",
+                                    "escapes",
+                                    "hits",
+                                    "misses",
+                                    "critical_hits",
+                                    "rounds_fired",
+                                    "money_mugged",
+                                    "respect_gained"
+                                ],
+                                "properties": {
+                                    "attacks_won": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "attacks_lost": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "attacks_stalemated": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "attacks_stealthed": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "escapes": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "hits": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "misses": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "critical_hits": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "rounds_fired": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "money_mugged": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "respect_gained": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "jobs": {
+                                "required": [
+                                    "army",
+                                    "grocer",
+                                    "casino",
+                                    "education",
+                                    "medical",
+                                    "law",
+                                    "company",
+                                    "unemployed"
+                                ],
+                                "properties": {
+                                    "army": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "grocer": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "casino": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "education": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "medical": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "law": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "company": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "unemployed": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "jail": {
+                                "required": [
+                                    "jailings",
+                                    "busts",
+                                    "busts_failed",
+                                    "bails",
+                                    "bails_spent"
+                                ],
+                                "properties": {
+                                    "jailings": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "busts": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "busts_failed": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "bails": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "bails_spent": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "hospital": {
+                                "required": [
+                                    "trips",
+                                    "medical_items_used",
+                                    "revives"
+                                ],
+                                "properties": {
+                                    "trips": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "medical_items_used": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "revives": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "drugs": {
+                                "required": [
+                                    "total_used",
+                                    "overdoses",
+                                    "cannabis",
+                                    "ecstasy",
+                                    "ketamine",
+                                    "lsd",
+                                    "opium",
+                                    "shrooms",
+                                    "speed",
+                                    "pcp",
+                                    "xanax",
+                                    "vicodin"
+                                ],
+                                "properties": {
+                                    "total_used": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "overdoses": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "cannabis": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "ecstasy": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "ketamine": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "lsd": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "opium": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "shrooms": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "speed": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "pcp": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "xanax": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "vicodin": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "traveling": {
+                                "required": [
+                                    "items_bought_abroad",
+                                    "total_trips",
+                                    "argentina",
+                                    "mexico",
+                                    "united_arab_emirates",
+                                    "hawaii",
+                                    "japan",
+                                    "united_kingdom",
+                                    "south_africa",
+                                    "switzerland",
+                                    "china",
+                                    "cayman_islands"
+                                ],
+                                "properties": {
+                                    "items_bought_abroad": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "total_trips": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "argentina": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "mexico": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "united_arab_emirates": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "hawaii": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "japan": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "united_kingdom": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "south_africa": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "switzerland": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "china": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "cayman_islands": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "bounties": {
+                                "required": [
+                                    "placed",
+                                    "money_spent"
+                                ],
+                                "properties": {
+                                    "placed": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "money_spent": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "crimes": {
+                                "required": [
+                                    "total",
+                                    "jail_sentences"
+                                ],
+                                "properties": {
+                                    "total": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "jail_sentences": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "communication": {
+                                "required": [
+                                    "total_messages",
+                                    "friends",
+                                    "coworkers",
+                                    "spouses",
+                                    "classified_ads_placed",
+                                    "personals_placed"
+                                ],
+                                "properties": {
+                                    "total_messages": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "friends": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "coworkers": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "spouses": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "classified_ads_placed": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "personals_placed": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "other": {
+                                "required": [
+                                    "logins",
+                                    "years_played",
+                                    "merits_bought",
+                                    "energy_refills",
+                                    "company_trains",
+                                    "stat_enhancers_used"
+                                ],
+                                "properties": {
+                                    "logins": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "years_played": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "merits_bought": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "energy_refills": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "company_trains": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "stat_enhancers_used": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "TornPokerTable": {
+                "required": [
+                    "id",
+                    "name",
+                    "blinds",
+                    "players",
+                    "speed"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/PokerTableId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "blinds": {
+                        "required": [
+                            "big",
+                            "small"
+                        ],
+                        "properties": {
+                            "big": {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            "small": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "players": {
+                        "required": [
+                            "current",
+                            "maximum"
+                        ],
+                        "properties": {
+                            "current": {
+                                "type": "integer",
+                                "format": "int32"
+                            },
+                            "maximum": {
+                                "type": "integer",
+                                "format": "int32"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "speed": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "type": "object"
+            },
+            "TornPokerTablesResponse": {
+                "required": [
+                    "pokertables"
+                ],
+                "properties": {
+                    "pokertables": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornPokerTable"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornCard": {
+                "required": [
+                    "name",
+                    "short_name",
+                    "class"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "short_name": {
+                        "type": "string"
+                    },
+                    "class": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "TornCardsResponse": {
+                "required": [
+                    "cards"
+                ],
+                "properties": {
+                    "cards": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornCard"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornBank": {
+                "required": [
+                    "days",
+                    "rate"
+                ],
+                "properties": {
+                    "days": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "rate": {
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "type": "object"
+            },
+            "TornBankResponse": {
+                "required": [
+                    "bank"
+                ],
+                "properties": {
+                    "bank": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornBank"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornCityShopItem": {
+                "required": [
+                    "id",
+                    "name",
+                    "price",
+                    "stock"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/ItemId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "stock": {
+                        "required": [
+                            "current",
+                            "default"
+                        ],
+                        "properties": {
+                            "current": {
+                                "type": "integer",
+                                "format": "int32"
+                            },
+                            "default": {
+                                "type": "integer",
+                                "format": "int32"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "TornCityShop": {
+                "required": [
+                    "id",
+                    "name",
+                    "items"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/CityShopId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornCityShopItem"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornCityShopsResponse": {
+                "required": [
+                    "cityshops"
+                ],
+                "properties": {
+                    "cityshops": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornCityShop"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornGymModifiers": {
+                "required": [
+                    "strength",
+                    "speed",
+                    "defense",
+                    "dexterity"
+                ],
+                "properties": {
+                    "strength": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "speed": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "defense": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "dexterity": {
+                        "type": "number",
+                        "format": "float"
+                    }
+                },
+                "type": "object"
+            },
+            "TornGym": {
+                "required": [
+                    "id",
+                    "name",
+                    "class",
+                    "energy_cost",
+                    "cost",
+                    "modifiers",
+                    "note"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/GymId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "class": {
+                        "$ref": "#/components/schemas/GymClassEnum"
+                    },
+                    "energy_cost": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "cost": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "modifiers": {
+                        "$ref": "#/components/schemas/TornGymModifiers"
+                    },
+                    "note": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "TornGymsResponse": {
+                "required": [
+                    "gyms"
+                ],
+                "properties": {
+                    "gyms": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornGym"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "TornSearchForCash": {
                 "required": [
                     "id",
@@ -33917,13 +35705,64 @@
                     }
                 ]
             },
+            "TornItemDetailsDeprecated": {
+                "description": "This object is deprecated, and starting on 1st January 2027 it will be replaced with an array of TornItemDetails.",
+                "deprecated": true,
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/ItemMarketListingItemDetails"
+                    },
+                    {
+                        "required": [
+                            "id",
+                            "name",
+                            "type",
+                            "sub_type"
+                        ],
+                        "properties": {
+                            "id": {
+                                "$ref": "#/components/schemas/ItemId"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "type": {
+                                "$ref": "#/components/schemas/TornItemTypeEnum"
+                            },
+                            "sub_type": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/TornItemWeaponTypeEnum"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
             "TornItemDetailsResponse": {
                 "required": [
                     "itemdetails"
                 ],
                 "properties": {
                     "itemdetails": {
-                        "$ref": "#/components/schemas/TornItemDetails"
+                        "description": "Starting 1st January 2027, this response will return only an array of TornItemDetails.",
+                        "oneOf": [
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/TornItemDetails"
+                                }
+                            },
+                            {
+                                "$ref": "#/components/schemas/TornItemDetailsDeprecated",
+                                "description": "This object is deprecated, and starting on 1st January 2027 it will be replaced with an array of TornItemDetails."
+                            }
+                        ]
                     }
                 },
                 "type": "object"
@@ -35488,6 +37327,45 @@
                 },
                 "type": "object"
             },
+            "TornItemShop": {
+                "required": [
+                    "country",
+                    "shop",
+                    "buy_price",
+                    "sell_price"
+                ],
+                "properties": {
+                    "country": {
+                        "$ref": "#/components/schemas/CountryEnum"
+                    },
+                    "shop": {
+                        "$ref": "#/components/schemas/ShopNameEnum"
+                    },
+                    "buy_price": {
+                        "oneOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "sell_price": {
+                        "oneOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
             "TornItem": {
                 "required": [
                     "id",
@@ -35562,13 +37440,13 @@
                     },
                     "value": {
                         "required": [
-                            "vendor",
-                            "buy_price",
-                            "sell_price",
-                            "market_price"
+                            "market_price",
+                            "shops"
                         ],
                         "properties": {
                             "vendor": {
+                                "description": "This field is replaced with shops array and will be removed on 1st of January 2027.",
+                                "deprecated": true,
                                 "oneOf": [
                                     {
                                         "required": [
@@ -35590,7 +37468,15 @@
                                     }
                                 ]
                             },
+                            "shops": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/TornItemShop"
+                                }
+                            },
                             "buy_price": {
+                                "description": "This field is replaced with shops array and will be removed on 1st of January 2027.",
+                                "deprecated": true,
                                 "oneOf": [
                                     {
                                         "type": "integer",
@@ -35602,6 +37488,8 @@
                                 ]
                             },
                             "sell_price": {
+                                "description": "This field is replaced with shops array and will be removed on 1st of January 2027.",
+                                "deprecated": true,
                                 "oneOf": [
                                     {
                                         "type": "integer",
@@ -35761,22 +37649,29 @@
             "TornSelectionName": {
                 "oneOf": [
                     {
-                        "description": "The following selections will fallback to API v1 and may change at any time: 'bank','cards','cityshops','companies','competition','gyms','itemdetails','itemstats','organisedcrimes','pawnshop','pokertables','rockpaperscissors','stats'.\n *   The following selections are not available in API v2: 'dirtybombs','raidreport','raids', 'chainreport', 'rackets', 'rankedwarreport', 'rankedwars', 'territorynames', 'territorywarreport', 'territorywars'.",
+                        "description": "The following selections will fallback to API v1 and may change at any time:'competition','organisedcrimes'.\n *   The following selections are not available in API v2: 'dirtybombs','raidreport','raids', 'chainreport', 'rackets', 'rankedwarreport', 'rankedwars', 'territorynames', 'territorywarreport', 'territorywars', 'pawnshop'.",
                         "type": "string",
                         "enum": [
                             "attacklog",
+                            "bank",
                             "bounties",
                             "calendar",
+                            "cards",
+                            "cityshops",
+                            "companies",
                             "crimes",
                             "education",
                             "elimination",
                             "eliminationteam",
                             "factionhof",
                             "factiontree",
+                            "gyms",
                             "hof",
                             "honors",
                             "itemammo",
+                            "itemdetails",
                             "itemmods",
+                            "itemstats",
                             "items",
                             "logcategories",
                             "logtypes",
@@ -35785,26 +37680,18 @@
                             "merits",
                             "museum",
                             "organizedcrimes",
+                            "pokertables",
                             "properties",
+                            "rockpaperscissors",
                             "searchforcash",
                             "shoplifting",
+                            "stats",
                             "stocks",
                             "subcrimes",
                             "territory",
                             "timestamp",
-                            "bank",
-                            "cards",
-                            "cityshops",
-                            "companies",
                             "competition",
-                            "gyms",
-                            "itemdetails",
-                            "itemstats",
-                            "organisedcrimes",
-                            "pawnshop",
-                            "pokertables",
-                            "rockpaperscissors",
-                            "stats"
+                            "organisedcrimes"
                         ]
                     },
                     {
@@ -35976,6 +37863,15 @@
                             "type": "string"
                         }
                     ]
+                }
+            },
+            "ApiNanostamp": {
+                "name": "nanostamp",
+                "in": "query",
+                "description": "Timestamp in nanoseconds to bypass system limitation when more than 100 logs were returned in the same second.",
+                "required": false,
+                "schema": {
+                    "type": "string"
                 }
             },
             "ApiFiltersIncomingOutgoing": {

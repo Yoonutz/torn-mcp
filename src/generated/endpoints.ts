@@ -1217,6 +1217,40 @@ export const ENDPOINTS = {
         "description": "User id or user discord id"
       }
     },
+    "gym": {
+      "requiresId": false,
+      "summary": "Get your currently active gym",
+      "description": "Requires minimal access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "gym",
+          "type": "object",
+          "fields": [
+            "id",
+            "name"
+          ]
+        }
+      ],
+      "path": "/user/gym"
+    },
     "hof": {
       "requiresId": false,
       "summary": "Get your hall of fame rankings",
@@ -1764,6 +1798,13 @@ export const ENDPOINTS = {
           "required": false,
           "type": "integer|string",
           "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "nanostamp",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Timestamp in nanoseconds to bypass system limitation when more than 100 logs were returned in the same second."
         },
         {
           "name": "comment",
@@ -2636,6 +2677,7 @@ export const ENDPOINTS = {
             "signed_up",
             "faction_id",
             "honor_id",
+            "revive_setting",
             "property",
             "image",
             "gender",
@@ -4238,7 +4280,8 @@ export const ENDPOINTS = {
             "attacksdamaging",
             "attacksrunaway",
             "highestterritories",
-            "territoryrespect"
+            "territoryrespect",
+            "membersamount"
           ]
         },
         {
@@ -4280,6 +4323,36 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/faction/contributors"
+    },
+    "crimeexp": {
+      "requiresId": false,
+      "summary": "Get your faction members crime experience",
+      "description": "Requires minimal access key. <br>Members are ordered descending, from highest crime experience to lowest.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "crimeexp",
+          "type": "array"
+        }
+      ],
+      "path": "/faction/crimeexp"
     },
     "crimes": {
       "requiresId": false,
@@ -4518,6 +4591,78 @@ export const ENDPOINTS = {
         "type": "integer",
         "description": "Faction id"
       }
+    },
+    "inventory": {
+      "requiresId": false,
+      "summary": "Get your faction's inventory items.",
+      "description": "<b>Cached selection (1 hour, all items cached at once).</b><br><br>Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "cat",
+          "in": "query",
+          "required": true,
+          "type": "enum",
+          "description": "Armory category",
+          "enum": [
+            "weapons",
+            "armor",
+            "temporary",
+            "medical",
+            "consumables",
+            "drugs",
+            "boosters",
+            "utilities",
+            "loot"
+          ]
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "offset",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "inventory_timestamp",
+          "type": "integer"
+        },
+        {
+          "name": "inventory",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "type",
+            "amount",
+            "uids",
+            "loaned"
+          ]
+        }
+      ],
+      "path": "/faction/inventory"
     },
     "members": {
       "requiresId": false,
@@ -8131,6 +8276,40 @@ export const ENDPOINTS = {
       ],
       "path": "/torn/attacklog"
     },
+    "bank": {
+      "requiresId": false,
+      "summary": "Get current bank rates",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "bank",
+          "type": "array",
+          "fields": [
+            "days",
+            "rate"
+          ]
+        }
+      ],
+      "path": "/torn/bank"
+    },
     "bounties": {
       "requiresId": false,
       "summary": "Get bounties",
@@ -8226,6 +8405,82 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/torn/calendar"
+    },
+    "cards": {
+      "requiresId": false,
+      "summary": "Get casino playing cards",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "cards",
+          "type": "array",
+          "fields": [
+            "name",
+            "short_name",
+            "class"
+          ]
+        }
+      ],
+      "path": "/torn/cards"
+    },
+    "cityshops": {
+      "requiresId": false,
+      "summary": "Get city shops stock information",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "cityshops",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "items"
+          ]
+        }
+      ],
+      "path": "/torn/cityshops",
+      "idPath": "/torn/{shopId}/cityshops",
+      "idParam": {
+        "name": "shopId",
+        "type": "integer",
+        "description": "Shop id"
+      }
     },
     "companies": {
       "requiresId": false,
@@ -8543,6 +8798,45 @@ export const ENDPOINTS = {
       ],
       "path": "/torn/factiontree"
     },
+    "gyms": {
+      "requiresId": false,
+      "summary": "Get all gyms",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "gyms",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "class",
+            "energy_cost",
+            "cost",
+            "modifiers",
+            "note"
+          ]
+        }
+      ],
+      "path": "/torn/gyms"
+    },
     "honors": {
       "requiresId": false,
       "summary": "Get all honors",
@@ -8715,7 +9009,7 @@ export const ENDPOINTS = {
     },
     "itemdetails": {
       "requiresId": true,
-      "summary": "Get information about a specific item",
+      "summary": "Get details for specific item(s)",
       "description": "Requires public key.",
       "keyLevel": "public",
       "stability": "Stable",
@@ -8738,24 +9032,14 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "itemdetails",
-          "type": "object",
-          "fields": [
-            "uid",
-            "stats",
-            "bonuses",
-            "rarity",
-            "id",
-            "name",
-            "type",
-            "sub_type"
-          ]
+          "type": "oneOf"
         }
       ],
-      "idPath": "/torn/{id}/itemdetails",
+      "idPath": "/torn/{ids}/itemdetails",
       "idParam": {
-        "name": "id",
-        "type": "integer",
-        "description": "Item uid"
+        "name": "ids",
+        "type": "array<integer>",
+        "description": "Item uid or a list of item uids (comma separated), 25 uids maximum"
       }
     },
     "itemmods": {
@@ -8795,6 +9079,49 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/torn/itemmods"
+    },
+    "itemstats": {
+      "requiresId": true,
+      "summary": "Get specific item(s) stats",
+      "description": "Requires public key.<br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "itemdetails",
+          "type": "array",
+          "fields": [
+            "id",
+            "uid",
+            "name",
+            "type",
+            "sub_type",
+            "stats"
+          ]
+        }
+      ],
+      "idPath": "/torn/{ids}/itemstats",
+      "idParam": {
+        "name": "ids",
+        "type": "array<integer>",
+        "description": "Item uid or a list of item uids (comma separated), 25 uids maximum"
+      }
     },
     "items": {
       "requiresId": false,
@@ -9125,6 +9452,43 @@ export const ENDPOINTS = {
       ],
       "path": "/torn/organizedcrimes"
     },
+    "pokertables": {
+      "requiresId": false,
+      "summary": "Get active poker tables",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "pokertables",
+          "type": "array",
+          "fields": [
+            "id",
+            "name",
+            "blinds",
+            "players",
+            "speed"
+          ]
+        }
+      ],
+      "path": "/torn/pokertables"
+    },
     "properties": {
       "requiresId": false,
       "summary": "Get properties details",
@@ -9163,6 +9527,40 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/torn/properties"
+    },
+    "rockpaperscissors": {
+      "requiresId": false,
+      "summary": "Get rock paper scissors competition stats",
+      "description": "Requires public key.",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "rockpaperscissors",
+          "type": "array",
+          "fields": [
+            "type",
+            "count"
+          ]
+        }
+      ],
+      "path": "/torn/rockpaperscissors"
     },
     "searchforcash": {
       "requiresId": false,
@@ -9232,6 +9630,52 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/torn/shoplifting"
+    },
+    "stats": {
+      "requiresId": false,
+      "summary": "Get daily city stats",
+      "description": "Requires public key.",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "stats",
+          "type": "object",
+          "fields": [
+            "users",
+            "items",
+            "trading",
+            "currency",
+            "attacking",
+            "jobs",
+            "jail",
+            "hospital",
+            "drugs",
+            "traveling",
+            "bounties",
+            "crimes",
+            "communication",
+            "other"
+          ]
+        }
+      ],
+      "path": "/torn/stats"
     },
     "stocks": {
       "requiresId": false,
