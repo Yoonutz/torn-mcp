@@ -11,6 +11,13 @@ import { dirname, join } from "node:path";
 import Ajv from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import { buildCatalog } from "./lib/catalog.mjs";
+import {
+  createConformanceThrottle,
+  parsePositiveInt,
+  DEFAULT_RATE_LIMIT_BATCH,
+  DEFAULT_RATE_LIMIT_PAUSE_MS,
+  DEFAULT_MIN_CALL_SPACING_MS,
+} from "./lib/conformance-throttle.mjs";
 import { RETURNS_OVERRIDES } from "./lib/returns-overrides.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -92,14 +99,34 @@ const DOCUMENTED_SKIPS = {
   "company/snapshot": "returns CSV, not JSON — outside schema scope",
 };
 
-// ── Throttle (≈90/min, under Torn's 100/min) ────────────────────────
-let lastCall = 0;
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-async function gate() {
-  const wait = 650 - (Date.now() - lastCall);
-  if (wait > 0) await sleep(wait);
-  lastCall = Date.now();
-}
+// ── Throttle (proactive batches + reactive Torn code 5 retry) ────────
+// Tune with:
+// - TORN_CONFORMANCE_RATE_LIMIT_BATCH (or TORN_RATE_LIMIT_BATCH), default 90
+// - TORN_CONFORMANCE_RATE_LIMIT_PAUSE_MS (or TORN_RATE_LIMIT_PAUSE_MS), default 60000
+const RATE_LIMIT_BATCH = parsePositiveInt(
+  process.env.TORN_CONFORMANCE_RATE_LIMIT_BATCH ?? process.env.TORN_RATE_LIMIT_BATCH,
+  DEFAULT_RATE_LIMIT_BATCH,
+);
+const RATE_LIMIT_PAUSE_MS = parsePositiveInt(
+  process.env.TORN_CONFORMANCE_RATE_LIMIT_PAUSE_MS ?? process.env.TORN_RATE_LIMIT_PAUSE_MS,
+  DEFAULT_RATE_LIMIT_PAUSE_MS,
+);
+
+const throttle = createConformanceThrottle({
+  batchSize: RATE_LIMIT_BATCH,
+  pauseMs: RATE_LIMIT_PAUSE_MS,
+  minCallSpacingMs: DEFAULT_MIN_CALL_SPACING_MS,
+  onBatchPause: ({ batchSize, pauseMs }) => {
+    console.log(`[conformance] Sent ${batchSize} Torn requests; pausing ${Math.round(pauseMs / 1000)}s to avoid rate limits.`);
+  },
+  onRetry: ({ pauseMs }) => {
+    console.warn(
+      `[conformance] Torn 5: Too many requests. Waiting ${Math.round(
+        pauseMs / 1000,
+      )}s and retrying once...`,
+    );
+  },
+});
 
 function buildUrl(path, params) {
   const u = new URL(`https://api.torn.com/v2${path}`);
@@ -126,17 +153,18 @@ const PARAM_OVERRIDES = {
 
 const cache = new Map(); // source "tag/ep" or "ctx:userId" → resolved value
 async function tornGet(path, params) {
-  await gate();
-  const t = Date.now();
-  let res, json, err;
-  try {
-    res = await fetch(buildUrl(path, params), { headers: { "User-Agent": "torn-mcp-conformance" } });
-    json = await res.json();
-    if (json && json.error) err = `Torn ${json.error.code}: ${json.error.error}`;
-  } catch (e) {
-    err = e.message;
-  }
-  return { json, err, ms: Date.now() - t, status: res?.status };
+  return throttle.run(async () => {
+    const t = Date.now();
+    let res, json, err;
+    try {
+      res = await fetch(buildUrl(path, params), { headers: { "User-Agent": "torn-mcp-conformance" } });
+      json = await res.json();
+      if (json && json.error) err = `Torn ${json.error.code}: ${json.error.error}`;
+    } catch (e) {
+      err = e.message;
+    }
+    return { json, err, ms: Date.now() - t, status: res?.status };
+  });
 }
 
 /** Collapse array indices so repeated per-item errors read as one. */
