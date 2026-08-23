@@ -1,5 +1,26 @@
 # Torn OpenAPI change log
 
+## 2026-08-23 — OpenAPI 6.13.1
+
+**OpenAPI version:** 6.9.0 → 6.13.1
+**Endpoints:** 175 → 186 catalog (from 222 → 234 raw operations) — +11 −0 ~3, 172 unchanged
+
+| Category | Endpoints | + Added | − Removed | ~ Changed |
+|----------|-----------|---------|-----------|-----------|
+| user | 69 | +1 | 0 | 1 |
+| faction | 42 | +2 | 0 | 1 |
+| torn | 38 | +8 | 0 | 1 |
+| company | 10 | 0 | 0 | 0 |
+| market | 9 | 0 | 0 | 0 |
+| racing | 8 | 0 | 0 | 0 |
+| forum | 6 | 0 | 0 | 0 |
+| key | 2 | 0 | 0 | 0 |
+| property | 2 | 0 | 0 | 0 |
+| **Total** | **186** | **+11** | **0** | **3** |
+
+**Added:** faction/crimeexp, faction/inventory, torn/bank, torn/cards, torn/cityshops, torn/gyms, torn/itemstats, torn/pokertables, torn/rockpaperscissors, torn/stats, user/gym
+**Changed (params/enums):** faction/contributors, torn/itemdetails, user/log
+
 ## 2026-08-17 — OpenAPI 6.9.0
 
 **OpenAPI version:** 6.6.1 → 6.9.0
