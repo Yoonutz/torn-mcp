@@ -116,8 +116,12 @@ const throttle = createConformanceThrottle({
   batchSize: RATE_LIMIT_BATCH,
   pauseMs: RATE_LIMIT_PAUSE_MS,
   minCallSpacingMs: DEFAULT_MIN_CALL_SPACING_MS,
-  onBatchPause: ({ batchSize, pauseMs }) => {
-    console.log(`[conformance] Sent ${batchSize} Torn requests; pausing ${Math.round(pauseMs / 1000)}s to avoid rate limits.`);
+  onBatchPause: ({ requestsInBatch, pauseMs }) => {
+    console.log(
+      `[conformance] Sent ${requestsInBatch} Torn requests; pausing ${Math.round(
+        pauseMs / 1000,
+      )}s to avoid rate limits.`,
+    );
   },
   onRetry: ({ pauseMs }) => {
     console.warn(
