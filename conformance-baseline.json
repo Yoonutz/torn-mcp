@@ -1,16 +1,13 @@
 {
-  "torn/factiontree": [
-    "value at /factionTree/*/branches/*/upgrades/*/challenge/stat is not one of the allowed values",
-    "wrong type at /factionTree/*/branches/*/upgrades/*/challenge — schema expects null"
+  "company/applications": [
+    "wrong type at /applications/*/player/stats/manual_labor — schema expects integer",
+    "wrong type at /applications/*/player/stats/intelligence — schema expects integer",
+    "wrong type at /applications/*/player/stats/endurance — schema expects integer"
   ],
   "torn/hof": [
     "wrong type at /hof/*/value — schema expects string"
   ],
-  "torn/organizedcrimes": [
-    "wrong type at /organizedcrimes/*/slots/*/name — schema expects string"
-  ],
   "user/equipment": [
-    "wrong type at /equipment/*/ammo — schema expects object",
     "wrong type at /equipment/*/stats — schema expects object"
   ],
   "user/missions": [

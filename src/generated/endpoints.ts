@@ -9032,7 +9032,17 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "itemdetails",
-          "type": "oneOf"
+          "type": "object",
+          "fields": [
+            "id",
+            "name",
+            "uid",
+            "type",
+            "sub_type",
+            "stats",
+            "bonuses",
+            "rarity"
+          ]
         }
       ],
       "idPath": "/torn/{ids}/itemdetails",
@@ -9040,7 +9050,8 @@ export const ENDPOINTS = {
         "name": "ids",
         "type": "array<integer>",
         "description": "Item uid or a list of item uids (comma separated), 25 uids maximum"
-      }
+      },
+      "returnsNote": "auto-derived from live response (structural drift vs spec)"
     },
     "itemmods": {
       "requiresId": false,
