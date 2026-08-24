@@ -42,26 +42,25 @@ function offendingKey(e) {
   return null; // required: the key is absent
 }
 
+// A context object at or under this serialized size is shown whole; anything
+// larger is slimmed to identity + offending fields so the payload stays quiet.
+const WHOLE_OBJECT_LIMIT = 120;
+
 /**
- * Trim a context object: always keep offending keys, then identity keys, then
- * remaining keys while the serialized size stays within budget. Large nested
- * values on non-offending keys are dropped rather than truncated.
+ * Slim a context object for display: small objects stay whole; large ones keep
+ * only `id`, the first present name-ish key, and the offending fields — in that
+ * order, so the marked line lands last where the eye stops.
  */
-function trimObject(obj, offendingKeys, budget) {
+function slimObject(obj, offendingKeys) {
   if (obj == null || typeof obj !== "object" || Array.isArray(obj)) return obj;
+  if (JSON.stringify(obj).length <= WHOLE_OBJECT_LIMIT) return obj;
   const out = {};
-  let size = 2;
-  const add = (k, force) => {
-    if (k in out || !(k in obj)) return;
-    const s = JSON.stringify(obj[k]);
-    const cost = (s ? s.length : 4) + k.length + 4;
-    if (!force && (cost > 120 || size + cost > budget)) return;
-    out[k] = obj[k];
-    size += cost;
-  };
-  for (const k of offendingKeys) add(k, true);
-  for (const k of IDENTITY_KEYS) add(k, false);
-  for (const k of Object.keys(obj)) add(k, false);
+  if ("id" in obj) out.id = obj.id;
+  const nameKey = IDENTITY_KEYS.find((k) => k !== "id" && k in obj);
+  if (nameKey) out[nameKey] = obj[nameKey];
+  for (const k of offendingKeys) {
+    if (k in obj && !(k in out)) out[k] = obj[k];
+  }
   return out;
 }
 
@@ -92,25 +91,6 @@ function statement(e) {
       return `\`${key}\` (at \`${at}\`) is not in the spec`;
     default:
       return `${at}: ${e.message}`;
-  }
-}
-
-function note(e) {
-  switch (e.keyword) {
-    case "type": {
-      const t = liveType(e.data);
-      const article = /^[aeiou]/.test(t) ? "an" : "a";
-      const tt = t === "null" ? "null" : `${article} ${t}`;
-      return `\`${offendingKey(e)}\` is ${tt}, not the documented ${e.params?.type}.`;
-    }
-    case "required":
-      return `No \`${e.params?.missingProperty}\` key anywhere on the object.`;
-    case "enum":
-      return `Live value ${shortJson(e.data)} is outside the documented enum.`;
-    case "additionalProperties":
-      return `\`${offendingKey(e)}\` is present in the live response but undocumented.`;
-    default:
-      return null;
   }
 }
 
@@ -168,7 +148,7 @@ function annotate(payload, errs, ctxSegs) {
 /**
  * Build dev-facing findings from a live JSON body and its ajv errors.
  * Errors sharing a context object merge into one finding with one payload.
- * Returns [{ statements: string[], payload: string|null, notes: string[] }].
+ * Returns [{ statements: string[], payload: string|null }].
  * Payloads are JSON plus `// <--` markers on the offending lines.
  */
 export function buildDevFindings(json, errors, { budget = 600 } = {}) {
@@ -186,29 +166,26 @@ export function buildDevFindings(json, errors, { budget = 600 } = {}) {
   for (const { ctxSegs, errors: errs } of groups.values()) {
     const seen = new Set();
     const statements = [];
-    const notes = [];
     for (const e of errs) {
       const s = statement(e);
       if (seen.has(s)) continue;
       seen.add(s);
       statements.push(s);
-      const n = note(e);
-      if (n) notes.push(n);
     }
     let payload = null;
     const ctx = valueAt(json, ctxSegs);
     if (ctx !== undefined) {
       const offKeys = [...new Set(errs.map(offendingKey).filter((k) => k != null))];
-      const trimmed = trimObject(ctx, offKeys, budget);
+      const slimmed = slimObject(ctx, offKeys);
       try {
-        payload = JSON.stringify(wrapSkeleton(json, ctxSegs, trimmed), null, 2);
+        payload = JSON.stringify(wrapSkeleton(json, ctxSegs, slimmed), null, 2);
         payload = annotate(payload, errs, ctxSegs);
       } catch {
         payload = null;
       }
       if (payload && payload.length > budget * 4) payload = null; // untrimmable — omit
     }
-    findings.push({ statements, payload, notes });
+    findings.push({ statements, payload });
   }
   return findings;
 }

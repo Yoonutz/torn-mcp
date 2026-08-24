@@ -50,21 +50,13 @@ jobs:
           node scripts/generate-endpoints.mjs
 
       # Scheduled run, or manual run without the refresh box ticked: read-only
-      # check. Fails the run on new drift; uploads the report.
+      # check. Fails the run on new drift. Both reports land in the run summary;
+      # no artifact upload needed.
       - name: Run conformance
         if: ${{ inputs.update_baseline != true }}
         env:
           TORN_TEST_API_KEY: ${{ secrets.TORN_TEST_API_KEY }}
         run: node scripts/conformance.mjs
-      - name: Upload report
-        if: ${{ always() && inputs.update_baseline != true }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: conformance-report
-          path: |
-            conformance-report.md
-            conformance-for-torn.md
-            conformance.json
 
       # Manual refresh: re-snapshot Torn's standing drift into the baseline, show
       # exactly what moved in the run summary, then commit only if it changed.

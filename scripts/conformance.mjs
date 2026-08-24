@@ -660,7 +660,7 @@ if (devDrift.length) {
     dev.push(`### \`GET ${specPath(r.ep)}\`${sch ? ` (schema \`${sch}\`)` : ""}`);
     const findings = r.findings.length
       ? r.findings
-      : [{ statements: r.reasons.map((x) => `\`${x}\``), payload: null, notes: [] }];
+      : [{ statements: r.reasons.map((x) => `\`${x}\``), payload: null }];
     for (const f of findings) {
       dev.push("");
       dev.push(f.statements.join(";\n") + ":");
@@ -671,10 +671,6 @@ if (devDrift.length) {
         dev.push("```");
       } else {
         dev.push("Payload omitted - large response; a trimmed sample is available on request.");
-      }
-      if (f.notes.length) {
-        dev.push("");
-        dev.push(f.notes[0]);
       }
     }
   }

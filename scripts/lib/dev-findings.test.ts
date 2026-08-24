@@ -23,7 +23,21 @@ describe("buildDevFindings", () => {
   it("builds a nested single-item sample for an array-item type error", () => {
     const json = {
       hof: [
-        { id: 1517799, username: "Penicillin", position: 1, value: 4718046455504, rank: "#26 Invincible" },
+        {
+          id: 1517799,
+          username: "Penicillin",
+          position: 1,
+          value: 4718046455504,
+          rank: "#26 Invincible",
+          faction_id: 9533,
+          level: 100,
+          last_action: 1787586317,
+          rank_name: "Invincible",
+          rank_number: 26,
+          signed_up: 1292702928,
+          age_in_days: 5727,
+          criminal_offenses: 297104,
+        },
         { id: 2, username: "Other", position: 2, value: 1, rank: "#1" },
       ],
     };
@@ -33,13 +47,13 @@ describe("buildDevFindings", () => {
     const f = findings[0];
     expect(f.statements).toEqual(["spec says `value` is string; API returns number (at `/hof/*/value`)"]);
     // the offending line is marked for first-time readers
-    expect(f.payload!).toMatch(/"value": 4718046455504,? \/\/ <-- spec says string, API returns number/);
+    expect(f.payload!).toMatch(/"value": 4718046455504 \/\/ <-- spec says string, API returns number/);
     const payload = parsePayload(f.payload!);
-    // one item only, offending + identity fields kept
+    // one item only; slim: identity first, then the marked field, nothing else
     expect(payload.hof).toHaveLength(1);
+    expect(Object.keys(payload.hof[0])).toEqual(["id", "username", "value"]);
     expect(payload.hof[0].value).toBe(4718046455504);
     expect(payload.hof[0].id).toBe(1517799);
-    expect(f.notes[0]).toBe("`value` is a number, not the documented string.");
   });
 
   it("keeps the whole branch for a deep object path", () => {
@@ -62,12 +76,11 @@ describe("buildDevFindings", () => {
     expect(f.statements).toEqual([
       "spec marks `escpaes` required (at `/personalstats/attacking`); the live response has no such field",
     ]);
-    // missing field: the containing object's line is marked
+    // missing field: the containing object's line is marked; small objects stay whole
     expect(f.payload!).toMatch(/"attacking": \{ \/\/ <-- spec expects "escpaes" here; the API never returns it/);
     const payload = parsePayload(f.payload!);
     expect(payload.personalstats.attacking.escapes).toEqual({ player: 28, foes: 0 });
     expect(payload.other).toBeUndefined();
-    expect(f.notes[0]).toBe("No `escpaes` key anywhere on the object.");
   });
 
   it("reports enum violations with the live value", () => {
@@ -86,7 +99,6 @@ describe("buildDevFindings", () => {
       'spec allows only "Standard", "Tracer" at `/missions/rewards/*/details/type`; API returns "Weapon"',
     ]);
     expect(f.payload!).toMatch(/"type": "Weapon",? \/\/ <-- not one of the spec's allowed values/);
-    expect(f.notes[0]).toBe('Live value "Weapon" is outside the documented enum.');
   });
 
   it("merges sibling errors into one finding with one payload", () => {
@@ -130,18 +142,15 @@ describe("buildDevFindings", () => {
     expect(payload.hof[0].id).toBe(1);
   });
 
-  it("trims large sibling fields to stay within budget but always keeps the offending field", () => {
+  it("slims large objects to identity plus the offending field", () => {
     const item: Record<string, unknown> = { id: 7, wanted: null };
     for (let i = 0; i < 50; i++) item[`filler_${i}`] = "x".repeat(40);
     const json = { things: [item] };
-    const findings = buildDevFindings(json, [typeErr("/things/0/wanted", "object", null)], {
-      budget: 300,
-    });
+    const findings = buildDevFindings(json, [typeErr("/things/0/wanted", "object", null)]);
 
     const f = findings[0];
-    expect(f.payload!.length).toBeLessThanOrEqual(450); // budget + skeleton and marker slack
     const payload = parsePayload(f.payload!);
+    expect(Object.keys(payload.things[0])).toEqual(["id", "wanted"]);
     expect(payload.things[0].wanted).toBeNull();
-    expect(payload.things[0].id).toBe(7);
   });
 });
