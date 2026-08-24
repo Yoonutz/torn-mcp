@@ -139,9 +139,3 @@ These return CSV while the spec documents an `application/json` response: `GET /
 ## Low priority — enum fields that also allow any string (23 endpoints)
 
 Many fields are documented as `oneOf: [<enum>, string]`, so every value matches both branches and the enum constrains nothing. Dropping the `string` branch (or the enum) would make these fields validatable. Endpoints: `GET /company/employees`, `GET /company/{typeId}/companies`, `GET /company/profile`, `GET /company/lookup`, `GET /faction/members`, `GET /faction/lookup`, `GET /forum/lookup`, `GET /key/info`, `GET /market/{id}/auctionhouselisting`, `GET /market/auctionhouse`, `GET /market/{id}/itemmarket`, `GET /market/lookup`, `GET /property/lookup`, `GET /racing/lookup`, `GET /torn/lookup`, `GET /user/basic`, `GET /user/icons`, `GET /user/list`, `GET /user/personalstats`, `GET /user/profile`, `GET /user/properties`, `GET /user/skills`, `GET /user/lookup`
-
-## Fixed since the previous run — confirmed live, thank you (3)
-
-- `GET /torn/factiontree`: `value at /factionTree/*/branches/*/upgrades/*/challenge/stat is not one of the allowed values`; `wrong type at /factionTree/*/branches/*/upgrades/*/challenge — schema expects null`
-- `GET /torn/organizedcrimes`: `wrong type at /organizedcrimes/*/slots/*/name — schema expects string`
-- `GET /user/equipment`: `wrong type at /equipment/*/ammo — schema expects object`

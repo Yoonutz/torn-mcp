@@ -63,6 +63,7 @@ jobs:
           name: conformance-report
           path: |
             conformance-report.md
+            conformance-for-torn.md
             conformance.json
 
       # Manual refresh: re-snapshot Torn's standing drift into the baseline, show

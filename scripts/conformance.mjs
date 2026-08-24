@@ -601,6 +601,7 @@ writeFileSync(join(root, "conformance-report.md"), report + "\n");
 // This one is written FOR them: the ask up front, only actionable sections,
 // reasons in backticks so `*` survives markdown rendering.
 // Live mode only — a compile-check run has no pass/drift data and would misreport everything.
+let devReport = null;
 if (!COMPILE_ONLY) {
 const devDrift = [
   ...newDrift.map((r) => ({ ep: r.ep, reasons: r.newReasons ?? [], evidence: r.evidence ?? {}, findings: r.devFindings ?? [] })),
@@ -707,7 +708,8 @@ if (resolved.length) {
     dev.push(`- \`GET ${specPath(r.ep)}\`: ${r.gone.map((x) => `\`${x}\``).join("; ")}`);
   }
 }
-writeFileSync(join(root, "conformance-for-torn.md"), dev.join("\n") + "\n");
+devReport = dev.join("\n") + "\n";
+writeFileSync(join(root, "conformance-for-torn.md"), devReport);
 }
 writeFileSync(
   join(root, "conformance.json"),
@@ -729,7 +731,12 @@ writeFileSync(
     2,
   ),
 );
-if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, report + "\n");
+// CI run summary: maintenance report first, then the forum-ready dev report —
+// otherwise the dev report regenerated in-workspace is discarded unseen.
+if (process.env.GITHUB_STEP_SUMMARY) {
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, report + "\n");
+  if (devReport) appendFileSync(process.env.GITHUB_STEP_SUMMARY, "\n---\n\n" + devReport);
+}
 
 // Fail the run ONLY on new drift — known Torn spec bugs don't break the pipeline.
 console.log(`\n${newDrift.length} new drift failure(s); ${knownDrift.length} known (accepted).`);
