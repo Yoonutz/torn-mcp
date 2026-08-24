@@ -19,6 +19,7 @@ import {
   DEFAULT_MIN_CALL_SPACING_MS,
 } from "./lib/conformance-throttle.mjs";
 import { RETURNS_OVERRIDES } from "./lib/returns-overrides.mjs";
+import { buildDevFindings } from "./lib/dev-findings.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const spec = JSON.parse(readFileSync(join(root, "openapi.json"), "utf8"));
@@ -412,6 +413,7 @@ for (const tag of catalog.tagList) {
     let status = "pass";
     let reasons = [];
     let evidence = {};
+    let devFindings = [];
     if (validate && !validate._compileError) {
       if (!validate(json)) {
         const errs = validate.errors ?? [];
@@ -429,11 +431,14 @@ for (const tag of catalog.tagList) {
             if (n) evidence[key] = n;
           }
         }
+        // Forum-ready statement + trimmed sample payload + closing note per
+        // mismatch, built while the live body is still in scope. Display-only.
+        if (status === "fail") devFindings = buildDevFindings(json, relevant);
       }
     } else {
       reasons = ["no schema to validate against"];
     }
-    results.push({ ep: `${tag}/${name}`, status, ms, reasons, evidence, note });
+    results.push({ ep: `${tag}/${name}`, status, ms, reasons, evidence, devFindings, note });
   }
 }
 
@@ -598,8 +603,8 @@ writeFileSync(join(root, "conformance-report.md"), report + "\n");
 // Live mode only — a compile-check run has no pass/drift data and would misreport everything.
 if (!COMPILE_ONLY) {
 const devDrift = [
-  ...newDrift.map((r) => ({ ep: r.ep, reasons: r.newReasons ?? [], evidence: r.evidence ?? {} })),
-  ...knownDrift.map((r) => ({ ep: r.ep, reasons: r.reasons ?? [], evidence: r.evidence ?? {} })),
+  ...newDrift.map((r) => ({ ep: r.ep, reasons: r.newReasons ?? [], evidence: r.evidence ?? {}, findings: r.devFindings ?? [] })),
+  ...knownDrift.map((r) => ({ ep: r.ep, reasons: r.reasons ?? [], evidence: r.evidence ?? {}, findings: r.devFindings ?? [] })),
 ];
 const csvEndpoints = skips.filter((r) => /is not valid JSON/.test(r.note ?? "")).map((r) => r.ep);
 // Spec-facing identifiers. The internal `tag/name` labels are NOT 1:1 with
@@ -642,26 +647,41 @@ if (devDrift.length) {
   dev.push(`## Spec/response mismatches (${devDrift.length} endpoints)`);
   dev.push("");
   dev.push(
-    "The endpoint paths and schema names below are copied verbatim from `openapi.json`, " +
-      "so both can be searched in the spec directly. In the mismatch text, the path is " +
-      "where inside the JSON response body, `*` stands for " +
-      "any array index or numeric key, and the mismatch is between the spec's declared " +
-      "type there and the value the live API returned.",
+    "Sample payloads are live API v2 responses, trimmed to the relevant branch; " +
+      "`// <--` marks the offending line in each payload. " +
+      "Endpoint paths and schema names are copied verbatim from `openapi.json`, so both " +
+      "can be searched in the spec directly. In each mismatch, the path is where inside " +
+      "the JSON response body, and `*` stands for any array index or numeric key.",
   );
-  dev.push("");
-  dev.push("| Endpoint (spec path) | Response schema | Mismatch |");
-  dev.push("|----------------------|-----------------|----------|");
   for (const r of devDrift) {
     const sch = specSchema(r.ep);
-    dev.push(
-      `| \`GET ${specPath(r.ep)}\` | ${sch ? `\`${sch}\`` : "—"} | ` +
-        `${r.reasons.map((x) => `\`${x}${r.evidence?.[x] ? ` — ${r.evidence[x]}` : ""}\``).join("<br>") || "—"} |`,
-    );
+    dev.push("");
+    dev.push(`### \`GET ${specPath(r.ep)}\`${sch ? ` (schema \`${sch}\`)` : ""}`);
+    const findings = r.findings.length
+      ? r.findings
+      : [{ statements: r.reasons.map((x) => `\`${x}\``), payload: null, notes: [] }];
+    for (const f of findings) {
+      dev.push("");
+      dev.push(f.statements.join(";\n") + ":");
+      dev.push("");
+      if (f.payload) {
+        dev.push("```json");
+        dev.push(f.payload);
+        dev.push("```");
+      } else {
+        dev.push("Payload omitted - large response; a trimmed sample is available on request.");
+      }
+      if (f.notes.length) {
+        dev.push("");
+        dev.push(f.notes[0]);
+      }
+    }
   }
 }
 if (csvEndpoints.length) {
   dev.push("");
   dev.push(`## Content-type mismatch (${csvEndpoints.length} endpoints)`);
+  dev.push("");
   dev.push(
     "These return CSV while the spec documents an `application/json` response: " +
       csvEndpoints.map((ep) => `\`GET ${specPath(ep)}\``).join(", ") +
@@ -671,6 +691,7 @@ if (csvEndpoints.length) {
 if (smells.length) {
   dev.push("");
   dev.push(`## Low priority — enum fields that also allow any string (${smells.length} endpoints)`);
+  dev.push("");
   dev.push(
     "Many fields are documented as `oneOf: [<enum>, string]`, so every value matches both " +
       "branches and the enum constrains nothing. Dropping the `string` branch (or the enum) " +
@@ -681,6 +702,7 @@ if (smells.length) {
 if (resolved.length) {
   dev.push("");
   dev.push(`## Fixed since the previous run — confirmed live, thank you (${resolved.length})`);
+  dev.push("");
   for (const r of resolved) {
     dev.push(`- \`GET ${specPath(r.ep)}\`: ${r.gone.map((x) => `\`${x}\``).join("; ")}`);
   }
