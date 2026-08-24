@@ -13,6 +13,7 @@ CLAUDE.local.md
 
 # Conformance run output (uploaded as a CI artifact, not committed)
 conformance-report.md
+conformance-for-torn.md
 conformance.json
 
 # Wrangler local secrets + state
