@@ -4,7 +4,7 @@
 
 export const MANIFEST = {
   openapiVersion: "6.13.1",
-  specHash: "f0a204a9b9dd7f163d5befedb395951cf51f5729d1ce4e2a00eec162b126a96a",
+  specHash: "b9eccc10bb474e32dd277e92afc55a4ea91e52bb4ece24a08e679e42b4c75161",
   tags: 9,
   endpoints: 186,
   rawOperations: 234,
