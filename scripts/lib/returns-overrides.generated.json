@@ -16,6 +16,25 @@
       }
     ]
   },
+  "torn/itemdetails": {
+    "note": "auto-derived from live response (structural drift vs spec)",
+    "returns": [
+      {
+        "name": "itemdetails",
+        "type": "object",
+        "fields": [
+          "id",
+          "name",
+          "uid",
+          "type",
+          "sub_type",
+          "stats",
+          "bonuses",
+          "rarity"
+        ]
+      }
+    ]
+  },
   "torn/stocks": {
     "note": "auto-derived from live response (structural drift vs spec)",
     "returns": [

@@ -28,7 +28,8 @@ const specCatalog = buildCatalog(spec, { skipOverrides: true });
 const KEY = process.env.TORN_TEST_API_KEY;
 const COMPILE_ONLY = process.argv.includes("--compile") || !KEY;
 
-const ajv = new Ajv({ strict: false, allErrors: true, validateFormats: false });
+// verbose: errors carry the offending live value (e.data) for evidence notes.
+const ajv = new Ajv({ strict: false, allErrors: true, validateFormats: false, verbose: true });
 addFormats(ajv);
 ajv.addSchema(spec, "spec");
 
@@ -97,6 +98,8 @@ const DOCUMENTED_SKIPS = {
   "user/trade": "transient — tested when an active trade exists, quietly skipped when there are none",
   "torn/eliminationteam": "seasonal elimination event; team id rejected off-season (Torn 'Incorrect ID')",
   "company/snapshot": "returns CSV, not JSON — outside schema scope",
+  "faction/snapshot": "returns CSV, not JSON — outside schema scope",
+  "user/snapshot": "returns CSV, not JSON — outside schema scope",
 };
 
 // ── Throttle (proactive batches + reactive Torn code 5 retry) ────────
@@ -172,6 +175,39 @@ async function tornGet(path, params) {
 }
 
 /** Collapse array indices so repeated per-item errors read as one. */
+/**
+ * Display-only evidence for a validation error: the live value ajv saw, and for
+ * enums the values the spec allows. NEVER folded into the reason strings — those
+ * are matched against conformance-baseline.json and must stay stable while live
+ * sample values change run to run.
+ */
+function liveNote(e) {
+  if (!("data" in e)) return null;
+  const v = e.data;
+  const t = v === null ? "null" : Array.isArray(v) ? "array" : typeof v;
+  let sample = JSON.stringify(v);
+  // keep table cells intact: short, no pipes/backticks
+  if (typeof sample === "string") {
+    sample = sample.replace(/[|`]/g, "'");
+    if (sample.length > 60) sample = sample.slice(0, 57) + "...";
+  }
+  if (e.keyword === "type") {
+    return `live API returns ${t}${sample !== undefined && t !== "null" ? ` (e.g. ${sample})` : ""}`;
+  }
+  if (e.keyword === "enum") {
+    const parts = [`live value: ${sample}`];
+    let allowed = (e.params?.allowedValues ?? []).map((x) => JSON.stringify(x)).join(", ");
+    if (allowed) {
+      allowed = allowed.replace(/[|`]/g, "'");
+      if (allowed.length > 100) allowed = allowed.slice(0, 97) + "...";
+      parts.push(`spec allows: ${allowed}`);
+    }
+    return parts.join("; ");
+  }
+  // required/additionalProperties already name the field in the reason
+  return null;
+}
+
 function normPath(p) {
   return (p || "(root)").replace(/\/\d+/g, "/*");
 }
@@ -375,6 +411,7 @@ for (const tag of catalog.tagList) {
     recordOverride(tag, name, json); // capture live shape if it structurally drifts
     let status = "pass";
     let reasons = [];
+    let evidence = {};
     if (validate && !validate._compileError) {
       if (!validate(json)) {
         const errs = validate.errors ?? [];
@@ -385,11 +422,18 @@ for (const tag of catalog.tagList) {
         status = onlyOneOf ? "smell" : "fail";
         const relevant = status === "fail" ? errs.filter((e) => e.keyword !== "oneOf") : errs;
         reasons = [...new Set(relevant.map(explain))];
+        for (const e of relevant) {
+          const key = explain(e);
+          if (evidence[key] === undefined) {
+            const n = liveNote(e);
+            if (n) evidence[key] = n;
+          }
+        }
       }
     } else {
       reasons = ["no schema to validate against"];
     }
-    results.push({ ep: `${tag}/${name}`, status, ms, reasons, note });
+    results.push({ ep: `${tag}/${name}`, status, ms, reasons, evidence, note });
   }
 }
 
@@ -545,6 +589,104 @@ if (compileIssues.length) {
 const report = lines.join("\n");
 console.log(report);
 writeFileSync(join(root, "conformance-report.md"), report + "\n");
+
+// ── Dev-facing report ───────────────────────────────────────────────
+// The report above is maintenance tooling (baselines, seeds, skip lists) and
+// confused Torn's devs when sent as-is ("what are you asking us to do?").
+// This one is written FOR them: the ask up front, only actionable sections,
+// reasons in backticks so `*` survives markdown rendering.
+// Live mode only — a compile-check run has no pass/drift data and would misreport everything.
+if (!COMPILE_ONLY) {
+const devDrift = [
+  ...newDrift.map((r) => ({ ep: r.ep, reasons: r.newReasons ?? [], evidence: r.evidence ?? {} })),
+  ...knownDrift.map((r) => ({ ep: r.ep, reasons: r.reasons ?? [], evidence: r.evidence ?? {} })),
+];
+const csvEndpoints = skips.filter((r) => /is not valid JSON/.test(r.note ?? "")).map((r) => r.ep);
+// Spec-facing identifiers. The internal `tag/name` labels are NOT 1:1 with
+// openapi.json: the name is the last non-{param} path segment, and id/no-id
+// variants of an endpoint are merged into one catalog entry. Devs search the
+// spec by path and schema name, so translate before showing them anything.
+const epDef = (ep) => {
+  const [tag, name] = ep.split("/");
+  return catalog.tags?.[tag]?.[name];
+};
+const specPath = (ep) => {
+  const def = epDef(ep);
+  return def ? (def.path ?? def.idPath) : ep;
+};
+const specSchema = (ep) => {
+  const def = epDef(ep);
+  return (def && responseRef(def)) || null;
+};
+const dev = [];
+dev.push(`# Torn API — OpenAPI spec vs live responses`);
+dev.push("");
+dev.push(
+  `An automated check called every GET endpoint in the public OpenAPI spec ` +
+    `(v${catalog.openapiVersion}) with a real key and validated each live JSON response ` +
+    `against the response schema the spec documents for it. ` +
+    `${pass.length} of ${results.length} endpoints matched exactly; the exceptions are below. ` +
+    `(Id-scoped and unscoped variants of the same endpoint are counted once, so the total is ` +
+    `lower than the spec's raw GET operation count.)`,
+);
+dev.push("");
+dev.push(
+  `**The ask: for each endpoint listed, correct the OpenAPI spec so the documented ` +
+    `response shape matches what the API actually returns** (or change the response, if the ` +
+    `spec is the intended shape). This is documentation drift, not a gameplay bug report — ` +
+    `the endpoints all work; their documented types are what's off. It bites anyone ` +
+    `generating typed clients or validating responses from the spec.`,
+);
+if (devDrift.length) {
+  dev.push("");
+  dev.push(`## Spec/response mismatches (${devDrift.length} endpoints)`);
+  dev.push("");
+  dev.push(
+    "The endpoint paths and schema names below are copied verbatim from `openapi.json`, " +
+      "so both can be searched in the spec directly. In the mismatch text, the path is " +
+      "where inside the JSON response body, `*` stands for " +
+      "any array index or numeric key, and the mismatch is between the spec's declared " +
+      "type there and the value the live API returned.",
+  );
+  dev.push("");
+  dev.push("| Endpoint (spec path) | Response schema | Mismatch |");
+  dev.push("|----------------------|-----------------|----------|");
+  for (const r of devDrift) {
+    const sch = specSchema(r.ep);
+    dev.push(
+      `| \`GET ${specPath(r.ep)}\` | ${sch ? `\`${sch}\`` : "—"} | ` +
+        `${r.reasons.map((x) => `\`${x}${r.evidence?.[x] ? ` — ${r.evidence[x]}` : ""}\``).join("<br>") || "—"} |`,
+    );
+  }
+}
+if (csvEndpoints.length) {
+  dev.push("");
+  dev.push(`## Content-type mismatch (${csvEndpoints.length} endpoints)`);
+  dev.push(
+    "These return CSV while the spec documents an `application/json` response: " +
+      csvEndpoints.map((ep) => `\`GET ${specPath(ep)}\``).join(", ") +
+      ". If CSV is intended, documenting `text/csv` in the spec would fix it.",
+  );
+}
+if (smells.length) {
+  dev.push("");
+  dev.push(`## Low priority — enum fields that also allow any string (${smells.length} endpoints)`);
+  dev.push(
+    "Many fields are documented as `oneOf: [<enum>, string]`, so every value matches both " +
+      "branches and the enum constrains nothing. Dropping the `string` branch (or the enum) " +
+      "would make these fields validatable. Endpoints: " +
+      smells.map((r) => `\`GET ${specPath(r.ep)}\``).join(", "),
+  );
+}
+if (resolved.length) {
+  dev.push("");
+  dev.push(`## Fixed since the previous run — confirmed live, thank you (${resolved.length})`);
+  for (const r of resolved) {
+    dev.push(`- \`GET ${specPath(r.ep)}\`: ${r.gone.map((x) => `\`${x}\``).join("; ")}`);
+  }
+}
+writeFileSync(join(root, "conformance-for-torn.md"), dev.join("\n") + "\n");
+}
 writeFileSync(
   join(root, "conformance.json"),
   JSON.stringify(
