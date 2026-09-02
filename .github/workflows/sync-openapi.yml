@@ -32,9 +32,8 @@ jobs:
       - run: npm test
       - name: Commit regenerated files if the spec changed
         run: |
-          # .sync-msg.txt is gitignored; its presence means sync detected changes.
-          if [ -z "$(git status --porcelain openapi.json src/generated docs/generated .sync-msg.txt)" ]; then
-            echo "Torn spec unchanged — nothing to commit."
+          if [ ! -f .sync-msg.txt ]; then
+            echo "No sync changes — nothing to commit."
             exit 0
           fi
           git config user.name "torn-mcp-sync"
