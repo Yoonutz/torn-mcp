@@ -1,14 +1,9 @@
 {
-  "company/applications": [
-    "wrong type at /applications/*/player/stats/manual_labor — schema expects integer",
-    "wrong type at /applications/*/player/stats/intelligence — schema expects integer",
-    "wrong type at /applications/*/player/stats/endurance — schema expects integer"
-  ],
   "torn/hof": [
     "wrong type at /hof/*/value — schema expects string"
   ],
-  "user/equipment": [
-    "wrong type at /equipment/*/stats — schema expects object"
+  "user/competition": [
+    "missing required field 'competition' (at (root))"
   ],
   "user/missions": [
     "value at /missions/rewards/*/details/type is not one of the allowed values"

@@ -537,13 +537,20 @@ export const ENDPOINTS = {
       ],
       "returns": [
         {
-          "name": "competition",
-          "type": "object",
-          "fields": [
-            "name",
-            "status",
-            "hp"
-          ]
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "score",
+          "type": "number"
+        },
+        {
+          "name": "team",
+          "type": "string"
+        },
+        {
+          "name": "attacks",
+          "type": "number"
         }
       ],
       "path": "/user/competition",
@@ -3603,11 +3610,7 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "virus",
-          "type": "object",
-          "fields": [
-            "item",
-            "until"
-          ]
+          "type": "object"
         }
       ],
       "path": "/user/virus",
