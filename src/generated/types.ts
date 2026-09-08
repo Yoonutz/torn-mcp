@@ -4859,7 +4859,7 @@ export interface components {
         RaceCarUpgradeId: number;
         /** Format: int64 */
         ItemId: number;
-        /** Format: int34 */
+        /** Format: int32 */
         ItemStatId: number;
         /** Format: int32 */
         AuctionListingId: number;
@@ -5550,7 +5550,15 @@ export interface components {
             code: 31;
             error: string;
         };
-        ApiError: components["schemas"]["ErrorUnknown"] | components["schemas"]["ErrorKeyEmpty"] | components["schemas"]["ErrorIncorrectKey"] | components["schemas"]["ErrorWrongType"] | components["schemas"]["ErrorWrongFields"] | components["schemas"]["ErrorTooManyRequests"] | components["schemas"]["ErrorIncorrectId"] | components["schemas"]["ErrorIncorrectIdEntityRelation"] | components["schemas"]["ErrorIpBlocked"] | components["schemas"]["ErrorApiDisabled"] | components["schemas"]["ErrorKeyOwnerInFederalJail"] | components["schemas"]["ErrorKeyChangeCooldown"] | components["schemas"]["ErrorKeyReadError"] | components["schemas"]["ErrorKeyTemporaryDisabled"] | components["schemas"]["ErrorDailyReadLimitReached"] | components["schemas"]["ErrorLogUnavailable"] | components["schemas"]["ErrorAccessLevelTooLow"] | components["schemas"]["ErrorBackendError"] | components["schemas"]["ErrorApiKeyPaused"] | components["schemas"]["ErrorMustMigrateToCrimesV2"] | components["schemas"]["ErrorRaceNotFinished"] | components["schemas"]["ErrorIncorrectCategory"] | components["schemas"]["ErrorOnlyAvailableInApiV1"] | components["schemas"]["ErrorOnlyAvailableInApiV2"] | components["schemas"]["ErrorClosedTemporarily"] | components["schemas"]["ErrorInvalidStatRequested"] | components["schemas"]["ErrorOnlyCategoryOrStatsAllowed"] | components["schemas"]["ErrorMustMigrateToOrganizedCrimesV2"] | components["schemas"]["ErrorIncorrectLogId"] | components["schemas"]["ErrorCategorySelectionUnavailableForInteractionLogs"] | components["schemas"]["ErrorFileDoesNotExist"] | components["schemas"]["ErrorCityStatsCronFailed"];
+        ErrorEndpointClosedUntilAttackingPeriod: {
+            /**
+             * Format: int32
+             * @enum {integer}
+             */
+            code: 32;
+            error: string;
+        };
+        ApiError: components["schemas"]["ErrorUnknown"] | components["schemas"]["ErrorKeyEmpty"] | components["schemas"]["ErrorIncorrectKey"] | components["schemas"]["ErrorWrongType"] | components["schemas"]["ErrorWrongFields"] | components["schemas"]["ErrorTooManyRequests"] | components["schemas"]["ErrorIncorrectId"] | components["schemas"]["ErrorIncorrectIdEntityRelation"] | components["schemas"]["ErrorIpBlocked"] | components["schemas"]["ErrorApiDisabled"] | components["schemas"]["ErrorKeyOwnerInFederalJail"] | components["schemas"]["ErrorKeyChangeCooldown"] | components["schemas"]["ErrorKeyReadError"] | components["schemas"]["ErrorKeyTemporaryDisabled"] | components["schemas"]["ErrorDailyReadLimitReached"] | components["schemas"]["ErrorLogUnavailable"] | components["schemas"]["ErrorAccessLevelTooLow"] | components["schemas"]["ErrorBackendError"] | components["schemas"]["ErrorApiKeyPaused"] | components["schemas"]["ErrorMustMigrateToCrimesV2"] | components["schemas"]["ErrorRaceNotFinished"] | components["schemas"]["ErrorIncorrectCategory"] | components["schemas"]["ErrorOnlyAvailableInApiV1"] | components["schemas"]["ErrorOnlyAvailableInApiV2"] | components["schemas"]["ErrorClosedTemporarily"] | components["schemas"]["ErrorInvalidStatRequested"] | components["schemas"]["ErrorOnlyCategoryOrStatsAllowed"] | components["schemas"]["ErrorMustMigrateToOrganizedCrimesV2"] | components["schemas"]["ErrorIncorrectLogId"] | components["schemas"]["ErrorCategorySelectionUnavailableForInteractionLogs"] | components["schemas"]["ErrorFileDoesNotExist"] | components["schemas"]["ErrorCityStatsCronFailed"] | components["schemas"]["ErrorEndpointClosedUntilAttackingPeriod"];
         UserGymResponse: {
             gym: {
                 id: components["schemas"]["GymId"];
@@ -6042,6 +6050,7 @@ export interface components {
             /** Format: int32 */
             score: number;
             team: string;
+            team_id: components["schemas"]["EliminationTeamId"] | null;
             /** Format: int32 */
             attacks: number;
         };
@@ -9319,7 +9328,7 @@ export interface components {
         };
         ItemMarketListingItemDetails: {
             uid: components["schemas"]["ItemUid"];
-            stats: components["schemas"]["ItemMarketListingItemStats"];
+            stats: components["schemas"]["ItemMarketListingItemStats"] | null;
             bonuses: components["schemas"]["ItemMarketListingItemBonus"][];
             rarity: ("yellow" | "orange" | "red") | null;
         };
@@ -10004,7 +10013,10 @@ export interface components {
             losses: number;
             eliminated: boolean;
             eliminated_timestamp: number | null;
-            leaders: components["schemas"]["TornEliminationTeamLeader"][];
+            leaders: {
+                captain: components["schemas"]["TornEliminationTeamLeader"] | null;
+                vice_captains: components["schemas"]["TornEliminationTeamLeader"][];
+            };
         };
         TornEliminationTeamsResponse: {
             elimination: components["schemas"]["TornEliminationTeam"][];

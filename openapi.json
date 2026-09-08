@@ -3,7 +3,7 @@
     "info": {
         "title": "Torn API",
         "description": "\n * The development of Torn's API v2 is still ongoing.\n * If selections remain unaltered, they will default to the API v1 version.\n * Unlike API v1, API v2 accepts both selections and IDs as path and query parameters.\n * If any discrepancies or errors are found, please submit a [bug report](https://www.torn.com/forums.php#/p=forums&f=19&b=0&a=0) on the Torn Forums.\n * In case you're using bots to check for changes on openapi.json file, make sure to specificy a custom user-agent header - CloudFlare sometimes prevents requests from default user-agents.",
-        "version": "6.13.1"
+        "version": "6.13.4"
     },
     "servers": [
         {
@@ -17096,7 +17096,7 @@
             },
             "ItemStatId": {
                 "type": "integer",
-                "format": "int34"
+                "format": "int32"
             },
             "AuctionListingId": {
                 "type": "integer",
@@ -19530,6 +19530,25 @@
                 },
                 "type": "object"
             },
+            "ErrorEndpointClosedUntilAttackingPeriod": {
+                "required": [
+                    "code",
+                    "error"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "format": "int32",
+                        "enum": [
+                            32
+                        ]
+                    },
+                    "error": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "ApiError": {
                 "oneOf": [
                     {
@@ -19627,6 +19646,9 @@
                     },
                     {
                         "$ref": "#/components/schemas/ErrorCityStatsCronFailed"
+                    },
+                    {
+                        "$ref": "#/components/schemas/ErrorEndpointClosedUntilAttackingPeriod"
                     }
                 ]
             },
@@ -21527,7 +21549,8 @@
                     "name",
                     "score",
                     "attacks",
-                    "team"
+                    "team",
+                    "team_id"
                 ],
                 "properties": {
                     "name": {
@@ -21542,6 +21565,16 @@
                     },
                     "team": {
                         "type": "string"
+                    },
+                    "team_id": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/EliminationTeamId"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     },
                     "attacks": {
                         "type": "integer",
@@ -33169,7 +33202,14 @@
                         "$ref": "#/components/schemas/ItemUid"
                     },
                     "stats": {
-                        "$ref": "#/components/schemas/ItemMarketListingItemStats"
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ItemMarketListingItemStats"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     },
                     "bonuses": {
                         "type": "array",
@@ -35590,10 +35630,29 @@
                         ]
                     },
                     "leaders": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TornEliminationTeamLeader"
-                        }
+                        "required": [
+                            "captain",
+                            "vice_captains"
+                        ],
+                        "properties": {
+                            "captain": {
+                                "oneOf": [
+                                    {
+                                        "$ref": "#/components/schemas/TornEliminationTeamLeader"
+                                    },
+                                    {
+                                        "type": "null"
+                                    }
+                                ]
+                            },
+                            "vice_captains": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/TornEliminationTeamLeader"
+                                }
+                            }
+                        },
+                        "type": "object"
                     }
                 },
                 "type": "object"
