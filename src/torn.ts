@@ -39,6 +39,46 @@ export function resolveEndpointPath(
   return def.path as string;
 }
 
+/** One numeric id, or a comma-separated list of them (`206` / `206,207`). */
+const NUMERIC_LIST = /^\d+(,\d+)*$/;
+
+/** Endpoints whose id is a Torn item TYPE id — an item name may be resolved to it. */
+export const ITEM_NAME_ENDPOINTS = new Set(["market/itemmarket", "market/bazaar", "torn/items"]);
+
+/** Endpoints whose id is an item instance UID — never an item name, never resolvable. */
+export const ITEM_UID_ENDPOINTS = new Set(["torn/itemdetails", "torn/itemstats"]);
+
+export type ItemIdClass =
+  | { kind: "passthrough"; id: string | undefined }
+  | { kind: "numeric"; id: string }
+  | { kind: "name"; id: string };
+
+/**
+ * Decide what an `id` argument means for an item endpoint. Numeric ids and
+ * numeric lists pass through untouched; an item name is flagged for name→id
+ * resolution on item-type endpoints only. Throws on inputs that can never be
+ * valid, so the model gets a precise reason instead of Torn's "Incorrect ID".
+ */
+export function classifyItemId(tag: string, endpoint: string, id: string | undefined): ItemIdClass {
+  const key = `${tag}/${endpoint}`;
+  const isItemEndpoint = ITEM_NAME_ENDPOINTS.has(key) || ITEM_UID_ENDPOINTS.has(key);
+  if (!id || !isItemEndpoint) return { kind: "passthrough", id };
+  if (NUMERIC_LIST.test(id)) return { kind: "numeric", id };
+  if (ITEM_UID_ENDPOINTS.has(key)) {
+    throw new Error(
+      `Endpoint '${endpoint}' takes item uids (numeric, comma-separated), not item names. ` +
+        `Item uids come from inventory/market listings (item.uid).`,
+    );
+  }
+  if (id.includes(",")) {
+    throw new Error(
+      `Comma-separated ids must all be numeric for endpoint '${endpoint}'; ` +
+        `an item name can only be given on its own.`,
+    );
+  }
+  return { kind: "name", id };
+}
+
 /**
  * Validate query params against the endpoint catalog before calling Torn:
  * required params present, enum params within range. Returns a helpful message
@@ -58,17 +98,33 @@ export function validateParams(
 
   // Schema-grounded id check: when the path id is typed integer, reject a
   // non-numeric value (e.g. an item name) up front instead of letting Torn
-  // return an opaque "Incorrect ID".
-  if (
-    id !== undefined &&
-    id !== "" &&
-    def.idParam?.type === "integer" &&
-    !/^\d+$/.test(String(id))
-  ) {
-    return `'${id}' is not a valid id for endpoint '${endpoint}' — it must be a numeric Torn id.`;
+  // return an opaque "Incorrect ID". `array<integer>` ids (`ids`, `categoryIds`)
+  // accept a comma-separated numeric list.
+  if (id !== undefined && id !== "") {
+    const idType = def.idParam?.type ?? "";
+    if (idType === "integer" && !/^\d+$/.test(String(id))) {
+      return `'${id}' is not a valid id for endpoint '${endpoint}' — it must be a numeric Torn id.`;
+    }
+    if (idType.startsWith("array<integer") && !NUMERIC_LIST.test(String(id))) {
+      return `'${id}' is not a valid id for endpoint '${endpoint}' — it must be a numeric id or a comma-separated list of numeric ids.`;
+    }
   }
 
-  for (const q of def.query) {
+  // The id variant of an endpoint can carry a different query contract than
+  // the plain one (e.g. /torn/{ids}/honors takes no limit/offset). Validate
+  // against the variant that will actually be called.
+  const withId = id !== undefined && id !== "";
+  const query = withId && def.idQuery ? def.idQuery : def.query;
+  const accepted = new Set(query.map((q) => q.name));
+  for (const name of Object.keys(params)) {
+    if (!accepted.has(name)) {
+      const scope = withId && def.idQuery ? " when an id is given" : "";
+      const list = accepted.size ? [...accepted].join(", ") : "none";
+      return `Query param '${name}' is not accepted by endpoint '${endpoint}'${scope}. Accepted: ${list}.`;
+    }
+  }
+
+  for (const q of query) {
     const val = params[q.name];
     const missing = val === undefined || val === "";
     if (q.required && missing) {
@@ -96,9 +152,19 @@ export function validateParams(
  * optional params that carry an enum (e.g. `cat` on items/inventory) — those
  * are the ones the model needs to know exist to get useful results.
  */
+/** Enum values shown inline in a tool description; longer lists are elided. */
+export const MAX_INLINE_ENUM = 6;
+
 export function paramsHint(def: EndpointDef): string {
-  // Show the full enum — the model needs every value (e.g. inventory cat=Drug).
-  const fmtEnum = (q: QueryParam): string => `${q.name}=${(q.enum ?? []).join("|")}`;
+  // Short enums are shown whole (the model needs e.g. inventory cat=Drug);
+  // long ones are elided and live in full in torn_list_endpoints, so the
+  // always-on description stays within client display budgets.
+  const fmtEnum = (q: QueryParam): string => {
+    const values = q.enum ?? [];
+    if (values.length <= MAX_INLINE_ENUM) return `${q.name}=${values.join("|")}`;
+    const shown = values.slice(0, MAX_INLINE_ENUM - 1);
+    return `${q.name}=${shown.join("|")}|…(+${values.length - shown.length} more)`;
+  };
   const segs: string[] = [];
   const reqs = def.query.filter((q) => q.required).map((q) => (q.enum ? fmtEnum(q) : q.name));
   if (reqs.length) segs.push(`requires ${reqs.join(", ")}`);
@@ -129,8 +195,33 @@ export function returnsHint(def: EndpointDef): string {
 export function endpointBadges(def: EndpointDef): string {
   const badges: string[] = [];
   if (def.keyLevel && def.keyLevel !== "public") badges.push(`[key: ${def.keyLevel}]`);
+  if (def.responseType === "csv") badges.push("[csv]");
   if (def.stability === "Unstable") badges.push("⚠ unstable");
   return badges.length ? ` ${badges.join(" ")}` : "";
+}
+
+export type BodyFormat = "json" | "csv";
+
+/** Body format an endpoint answers with, per the spec's documented content type. */
+export function responseFormat(tag: string, endpoint: string): BodyFormat {
+  const def = (ENDPOINTS[tag as TornTag] as Record<string, EndpointDef> | undefined)?.[endpoint];
+  return def?.responseType === "csv" ? "csv" : "json";
+}
+
+/**
+ * Turn a Torn response body into the value a tool returns. Torn signals errors
+ * as an HTTP 200 JSON envelope on every endpoint, CSV ones included, so the
+ * envelope check runs first. A CSV body is wrapped rather than parsed.
+ */
+export function parseTornBody(text: string, format: BodyFormat): unknown {
+  const tornErr = parseTornError(text);
+  if (tornErr) throw new Error(tornErr);
+  if (format === "csv") return { csv: text, format: "text/csv" };
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error("Torn API returned a non-JSON response.");
+  }
 }
 
 const TS_MIN = 1_000_000_000; // 2001-09

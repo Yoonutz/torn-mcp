@@ -150,7 +150,10 @@ export function buildCatalog(spec, { skipOverrides = false } = {}) {
     if (segs.length < 2) continue;
     const hasParam = segs.some((s) => s.startsWith("{"));
     const name = [...segs].reverse().find((s) => !s.startsWith("{"));
-    if (!name || name === tag) continue;
+    // Bare root selection paths (`/user`, `/faction`, …) are not data endpoints
+    // and are skipped. A parameterized path whose last literal segment happens
+    // to equal the tag (`/property/{id}/property`) IS one, so it stays.
+    if (!name || (name === tag && !hasParam)) continue;
 
     const params = (op.parameters || []).map(describeParam);
     const pathParam = params.find((p) => p.in === "path");
@@ -162,6 +165,10 @@ export function buildCatalog(spec, { skipOverrides = false } = {}) {
     const keyLevel = keyRef ? keyRef.split("/").pop().replace("ApiKey", "").toLowerCase() : undefined;
     const stability = op["x-stability"];
     const { returns, selectionBased } = describeReturns(op);
+    // Three snapshot endpoints answer text/csv; the server must not JSON-parse them.
+    const contentTypes = Object.keys(op.responses?.["200"]?.content ?? {});
+    const responseType =
+      contentTypes.includes("text/csv") && !contentTypes.includes("application/json") ? "csv" : undefined;
 
     tags[tag] = tags[tag] || {};
     const entry = tags[tag][name] || {
@@ -174,6 +181,7 @@ export function buildCatalog(spec, { skipOverrides = false } = {}) {
     };
     if (returns) entry.returns = returns;
     if (selectionBased) entry.selectionBased = true;
+    if (responseType) entry.responseType = responseType;
     if (hasParam) {
       entry.idPath = rawPath;
       if (pathParam)
@@ -182,6 +190,10 @@ export function buildCatalog(spec, { skipOverrides = false } = {}) {
           type: pathParam.type,
           description: pathParam.description,
         };
+      // The id variant keeps its own contract; reconciled against the plain
+      // variant below (dropped when identical, kept when it differs).
+      entry.idQuery = query;
+      entry.idSummary = (op.summary || "").trim() || undefined;
     } else {
       entry.path = rawPath;
       entry.summary = (op.summary || "").trim() || entry.summary;
@@ -199,6 +211,10 @@ export function buildCatalog(spec, { skipOverrides = false } = {}) {
     for (const nm of Object.keys(tags[tag])) {
       const e = tags[tag][nm];
       e.requiresId = !e.path && !!e.idPath;
+      // Per-variant contract: only worth carrying when a plain variant exists
+      // AND the id variant actually differs from it.
+      if (e.requiresId || JSON.stringify(e.idQuery) === JSON.stringify(e.query)) delete e.idQuery;
+      if (e.requiresId || e.idSummary === e.summary || e.idSummary === undefined) delete e.idSummary;
       // Reality-derived correction: for endpoints whose spec response shape is
       // wrong, replace the spec-derived `returns` with the real live shape so
       // discovery doesn't mislead agents. Manual overrides are the curated
@@ -275,14 +291,20 @@ export interface EndpointDef {
   keyLevel?: string;
   /** Torn contract stability: "Stable" | "Unstable" (x-stability). */
   stability?: string;
-  /** Accepted query parameters (auth key excluded). */
+  /** Accepted query parameters (auth key excluded) for the plain path. */
   query: QueryParam[];
+  /** Query params of the id variant, present only when they differ from 'query'. */
+  idQuery?: QueryParam[];
+  /** Summary of the id variant, present only when it differs from 'summary'. */
+  idSummary?: string;
   /** Top-level response shape: envelope keys + one level of nested fields. */
   returns?: ResponseField[];
   /** Why the live shape differs from the spec, when 'returns' was corrected from reality. */
   returnsNote?: string;
   /** True when the 200 body is a oneOf/anyOf union — shape varies by 'selections'. */
   selectionBased?: boolean;
+  /** "csv" when the spec documents a text/csv body (snapshots); JSON otherwise. */
+  responseType?: "csv";
 }
 `;
   out += `\nexport const ENDPOINTS = ${JSON.stringify(tags, null, 2)} as const satisfies Record<string, Record<string, EndpointDef>>;\n`;
@@ -313,6 +335,9 @@ function signature(entry) {
     idPath: entry.idPath ?? null,
     requiresId: entry.requiresId,
     query: (entry.query || [])
+      .map((q) => ({ n: q.name, req: q.required, en: (q.enum || []).slice().sort() }))
+      .sort((a, b) => (a.n < b.n ? -1 : 1)),
+    idQuery: (entry.idQuery || [])
       .map((q) => ({ n: q.name, req: q.required, en: (q.enum || []).slice().sort() }))
       .sort((a, b) => (a.n < b.n ? -1 : 1)),
   });

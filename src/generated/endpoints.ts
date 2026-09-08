@@ -38,14 +38,20 @@ export interface EndpointDef {
   keyLevel?: string;
   /** Torn contract stability: "Stable" | "Unstable" (x-stability). */
   stability?: string;
-  /** Accepted query parameters (auth key excluded). */
+  /** Accepted query parameters (auth key excluded) for the plain path. */
   query: QueryParam[];
+  /** Query params of the id variant, present only when they differ from 'query'. */
+  idQuery?: QueryParam[];
+  /** Summary of the id variant, present only when it differs from 'summary'. */
+  idSummary?: string;
   /** Top-level response shape: envelope keys + one level of nested fields. */
   returns?: ResponseField[];
   /** Why the live shape differs from the spec, when 'returns' was corrected from reality. */
   returnsNote?: string;
   /** True when the 200 body is a oneOf/anyOf union — shape varies by 'selections'. */
   selectionBased?: boolean;
+  /** "csv" when the spec documents a text/csv body (snapshots); JSON otherwise. */
+  responseType?: "csv";
 }
 
 export const ENDPOINTS = {
@@ -351,7 +357,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idSummary": "Get basic profile information for a specific user"
     },
     "battlestats": {
       "requiresId": false,
@@ -444,7 +451,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idSummary": "Get bounties placed on a specific user"
     },
     "calendar": {
       "requiresId": false,
@@ -537,20 +545,8 @@ export const ENDPOINTS = {
       ],
       "returns": [
         {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "score",
-          "type": "number"
-        },
-        {
-          "name": "team",
-          "type": "string"
-        },
-        {
-          "name": "attacks",
-          "type": "number"
+          "name": "competition",
+          "type": "oneOf"
         }
       ],
       "path": "/user/competition",
@@ -560,7 +556,7 @@ export const ENDPOINTS = {
         "type": "integer|string",
         "description": "User id or user discord id"
       },
-      "returnsNote": "auto-derived from live response (structural drift vs spec)"
+      "idSummary": "Get competition information for a specific player"
     },
     "cooldowns": {
       "requiresId": false,
@@ -679,7 +675,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idSummary": "Get discord information for a specific user"
     },
     "education": {
       "requiresId": false,
@@ -910,15 +907,7 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "faction",
-          "type": "object",
-          "fields": [
-            "id",
-            "name",
-            "tag",
-            "tag_image",
-            "position",
-            "days_in_faction"
-          ]
+          "type": "oneOf"
         }
       ],
       "path": "/user/faction",
@@ -928,7 +917,7 @@ export const ENDPOINTS = {
         "type": "integer|string",
         "description": "User id or user discord id"
       },
-      "returnsNote": "auto-derived from live response (structural drift vs spec)"
+      "idSummary": "Get faction information for a specific player"
     },
     "forumfeed": {
       "requiresId": false,
@@ -1102,7 +1091,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idSummary": "Get posts for a specific player"
     },
     "forumsubscribedthreads": {
       "requiresId": false,
@@ -1222,7 +1212,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idSummary": "Get threads for a specific player"
     },
     "gym": {
       "requiresId": false,
@@ -1309,7 +1300,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idSummary": "Get hall of fame rankings for a specific player"
     },
     "honors": {
       "requiresId": false,
@@ -1370,13 +1362,7 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "icons",
-          "type": "array",
-          "fields": [
-            "id",
-            "title",
-            "description",
-            "until"
-          ]
+          "type": "oneOf"
         }
       ],
       "path": "/user/icons",
@@ -1386,7 +1372,7 @@ export const ENDPOINTS = {
         "type": "integer|string",
         "description": "User id or user discord id"
       },
-      "returnsNote": "auto-derived from live response (structural drift vs spec)"
+      "idSummary": "Get icons information for a specific player"
     },
     "inventory": {
       "requiresId": false,
@@ -1574,16 +1560,7 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "job",
-          "type": "object",
-          "fields": [
-            "type",
-            "id",
-            "type_id",
-            "name",
-            "rating",
-            "position",
-            "days_in_company"
-          ]
+          "type": "oneOf"
         }
       ],
       "path": "/user/job",
@@ -1593,7 +1570,7 @@ export const ENDPOINTS = {
         "type": "integer|string",
         "description": "User id or user discord id"
       },
-      "returnsNote": "auto-derived from live response (structural drift vs spec)"
+      "idSummary": "Get job information for a specific player"
     },
     "jobpoints": {
       "requiresId": false,
@@ -1874,7 +1851,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idSummary": "Get medals achieved by a specific player"
     },
     "merits": {
       "requiresId": false,
@@ -2242,25 +2220,10 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "organizedCrime",
-          "type": "object",
-          "fields": [
-            "id",
-            "previous_crime_id",
-            "name",
-            "difficulty",
-            "status",
-            "created_at",
-            "planning_at",
-            "executed_at",
-            "ready_at",
-            "expired_at",
-            "slots",
-            "rewards"
-          ]
+          "type": "oneOf"
         }
       ],
-      "path": "/user/organizedcrime",
-      "returnsNote": "auto-derived from live response (structural drift vs spec)"
+      "path": "/user/organizedcrime"
     },
     "organizedcrimes": {
       "requiresId": false,
@@ -2634,7 +2597,282 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idQuery": [
+        {
+          "name": "cat",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "enum": [
+            "all",
+            "popular",
+            "attacking",
+            "battle_stats",
+            "jobs",
+            "trading",
+            "jail",
+            "hospital",
+            "finishing_hits",
+            "communication",
+            "crimes",
+            "bounties",
+            "investments",
+            "items",
+            "travel",
+            "drugs",
+            "missions",
+            "racing",
+            "networth",
+            "other",
+            "itemmarketcustomers",
+            "itemmarketsales",
+            "itemmarketrevenue",
+            "itemmarketfees"
+          ]
+        },
+        {
+          "name": "stat",
+          "in": "query",
+          "required": false,
+          "type": "array<enum>",
+          "description": "Stat names (10 maximum). Used to fetch historical stat values",
+          "enum": [
+            "attackswon",
+            "attackslost",
+            "attacksdraw",
+            "attacksassisted",
+            "defendswon",
+            "defendslost",
+            "defendsstalemated",
+            "elo",
+            "yourunaway",
+            "theyrunaway",
+            "unarmoredwon",
+            "bestkillstreak",
+            "attackhits",
+            "attackmisses",
+            "attackdamage",
+            "bestdamage",
+            "onehitkills",
+            "attackcriticalhits",
+            "roundsfired",
+            "specialammoused",
+            "hollowammoused",
+            "tracerammoused",
+            "piercingammoused",
+            "incendiaryammoused",
+            "attacksstealthed",
+            "retals",
+            "moneymugged",
+            "largestmug",
+            "itemslooted",
+            "highestbeaten",
+            "respectforfaction",
+            "rankedwarhits",
+            "raidhits",
+            "territoryjoins",
+            "territoryclears",
+            "territorytime",
+            "jobpointsused",
+            "trainsreceived",
+            "marketitemsbought",
+            "auctionswon",
+            "auctionsells",
+            "itemssent",
+            "trades",
+            "cityitemsbought",
+            "pointsbought",
+            "pointssold",
+            "bazaarcustomers",
+            "bazaarsales",
+            "bazaarprofit",
+            "jailed",
+            "peoplebusted",
+            "failedbusts",
+            "peoplebought",
+            "peopleboughtspent",
+            "hospital",
+            "medicalitemsused",
+            "bloodwithdrawn",
+            "reviveskill",
+            "revives",
+            "revivesreceived",
+            "heavyhits",
+            "machinehits",
+            "riflehits",
+            "smghits",
+            "shotgunhits",
+            "pistolhits",
+            "temphits",
+            "piercinghits",
+            "slashinghits",
+            "clubbinghits",
+            "mechanicalhits",
+            "h2hhits",
+            "mailssent",
+            "friendmailssent",
+            "factionmailssent",
+            "companymailssent",
+            "spousemailssent",
+            "classifiedadsplaced",
+            "personalsplaced",
+            "criminaloffensesold",
+            "sellillegalgoods",
+            "theftold",
+            "autotheftcrime",
+            "drugdealscrime",
+            "computercrime",
+            "fraudold",
+            "murdercrime",
+            "othercrime",
+            "organizedcrimes",
+            "bountiesplaced",
+            "totalbountyspent",
+            "bountiescollected",
+            "totalbountyreward",
+            "bountiesreceived",
+            "receivedbountyvalue",
+            "cityfinds",
+            "dumpfinds",
+            "itemsdumped",
+            "booksread",
+            "boostersused",
+            "consumablesused",
+            "candyused",
+            "alcoholused",
+            "energydrinkused",
+            "statenhancersused",
+            "eastereggsfound",
+            "eastereggsused",
+            "virusescoded",
+            "traveltimes",
+            "timespenttraveling",
+            "itemsboughtabroad",
+            "attackswonabroad",
+            "defendslostabroad",
+            "argtravel",
+            "mextravel",
+            "uaetravel",
+            "hawtravel",
+            "japtravel",
+            "uktravel",
+            "satravel",
+            "switravel",
+            "chitravel",
+            "cantravel",
+            "caytravel",
+            "drugsused",
+            "overdosed",
+            "rehabs",
+            "rehabcost",
+            "cantaken",
+            "exttaken",
+            "kettaken",
+            "lsdtaken",
+            "opitaken",
+            "pcptaken",
+            "shrtaken",
+            "spetaken",
+            "victaken",
+            "xantaken",
+            "missionscompleted",
+            "contractscompleted",
+            "dukecontractscompleted",
+            "missioncreditsearned",
+            "racingskill",
+            "racingpointsearned",
+            "racesentered",
+            "raceswon",
+            "networth",
+            "timeplayed",
+            "activestreak",
+            "bestactivestreak",
+            "awards",
+            "refills",
+            "nerverefills",
+            "tokenrefills",
+            "meritsbought",
+            "daysbeendonator",
+            "criminaloffenses",
+            "vandalism",
+            "theft",
+            "counterfeiting",
+            "fraud",
+            "illicitservices",
+            "cybercrime",
+            "extortion",
+            "illegalproduction",
+            "currentkillstreak",
+            "strength",
+            "defense",
+            "speed",
+            "dexterity",
+            "totalstats",
+            "manuallabor",
+            "intelligence",
+            "endurance",
+            "totalworkingstats",
+            "moneyinvested",
+            "investedprofit",
+            "investamount",
+            "banktimeleft",
+            "stockprofits",
+            "stocklosses",
+            "stockfees",
+            "stocknetprofits",
+            "stockpayouts",
+            "networthwallet",
+            "networthvault",
+            "networthbank",
+            "networthcayman",
+            "networthpoints",
+            "networthitems",
+            "networthdisplaycase",
+            "networthbazaar",
+            "networthitemmarket",
+            "networthproperties",
+            "networthstockmarket",
+            "networthauctionhouse",
+            "networthbookie",
+            "networthcompany",
+            "networthenlistedcars",
+            "networthpiggybank",
+            "networthpending",
+            "networthloan",
+            "networthunpaidfees",
+            "huntingskill",
+            "searchforcashskill",
+            "bootleggingskill",
+            "graffitiskill",
+            "shopliftingskill",
+            "pickpocketingskill",
+            "cardskimmingskill",
+            "burglaryskill",
+            "hustlingskill",
+            "disposalskill",
+            "crackingskill",
+            "forgeryskill",
+            "scammingskill",
+            "arsonskill"
+          ]
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer",
+          "description": "Returns stats until this timestamp (converted to nearest date)."
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "idSummary": "Get a player's personal stats"
     },
     "profile": {
       "requiresId": false,
@@ -2708,7 +2946,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idSummary": "Get profile information for a specific player"
     },
     "properties": {
       "requiresId": false,
@@ -2767,7 +3006,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idSummary": "Get specific user's properties"
     },
     "property": {
       "requiresId": false,
@@ -2814,7 +3054,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer|string",
         "description": "User id or user discord id"
-      }
+      },
+      "idSummary": "Get specific user's property"
     },
     "races": {
       "requiresId": false,
@@ -3384,6 +3625,7 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "responseType": "csv",
       "path": "/user/snapshot"
     },
     "stocks": {
@@ -3610,11 +3852,10 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "virus",
-          "type": "object"
+          "type": "oneOf"
         }
       ],
-      "path": "/user/virus",
-      "returnsNote": "auto-derived from live response (structural drift vs spec)"
+      "path": "/user/virus"
     },
     "weaponexp": {
       "requiresId": false,
@@ -4059,7 +4300,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Faction id"
-      }
+      },
+      "idSummary": "Get a faction's basic details"
     },
     "chain": {
       "requiresId": false,
@@ -4105,7 +4347,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Faction id"
-      }
+      },
+      "idSummary": "Get a faction's current chain"
     },
     "chains": {
       "requiresId": false,
@@ -4179,7 +4422,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Faction id"
-      }
+      },
+      "idSummary": "Get a list of a faction's completed chains"
     },
     "chainreport": {
       "requiresId": false,
@@ -4225,7 +4469,8 @@ export const ENDPOINTS = {
         "name": "chainId",
         "type": "integer",
         "description": "Chain id"
-      }
+      },
+      "idSummary": "Get a chain report"
     },
     "contributors": {
       "requiresId": false,
@@ -4593,7 +4838,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Faction id"
-      }
+      },
+      "idSummary": "Get a faction's hall of fame rankings."
     },
     "inventory": {
       "requiresId": false,
@@ -4726,7 +4972,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Faction id"
-      }
+      },
+      "idSummary": "Get a list of a faction's members"
     },
     "news": {
       "requiresId": false,
@@ -5014,7 +5261,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Faction id"
-      }
+      },
+      "idSummary": "Get a faction's raids history"
     },
     "rankedwars": {
       "requiresId": false,
@@ -5095,7 +5343,36 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Faction id"
-      }
+      },
+      "idQuery": [
+        {
+          "name": "offset",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "idSummary": "Get a faction's ranked wars history"
     },
     "rankedwarreport": {
       "requiresId": true,
@@ -5509,6 +5786,7 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "responseType": "csv",
       "path": "/faction/snapshot"
     },
     "stats": {
@@ -5590,7 +5868,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Faction id"
-      }
+      },
+      "idSummary": "Get a list of a faction's territories"
     },
     "territoryownership": {
       "requiresId": false,
@@ -5714,7 +5993,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Faction id"
-      }
+      },
+      "idSummary": "Get a faction's territory wars history"
     },
     "territorywarreport": {
       "requiresId": true,
@@ -6157,19 +6437,10 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "warfare",
-          "type": "array",
-          "fields": [
-            "id",
-            "start",
-            "end",
-            "target",
-            "winner",
-            "factions"
-          ]
+          "type": "oneOf"
         }
       ],
-      "path": "/faction/warfare",
-      "returnsNote": "auto-derived from live response (structural drift vs spec)"
+      "path": "/faction/warfare"
     },
     "wars": {
       "requiresId": false,
@@ -6219,7 +6490,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Faction id"
-      }
+      },
+      "idSummary": "Get a faction's wars & pacts details"
     },
     "lookup": {
       "requiresId": false,
@@ -6371,7 +6643,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Company id"
-      }
+      },
+      "idSummary": "Get a company's employees"
     },
     "news": {
       "requiresId": false,
@@ -6603,7 +6876,8 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Company id"
-      }
+      },
+      "idSummary": "Get a company's profile"
     },
     "search": {
       "requiresId": false,
@@ -6700,6 +6974,7 @@ export const ENDPOINTS = {
           "description": "Comment for your tool/service/bot/website to be visible in the logs."
         }
       ],
+      "responseType": "csv",
       "path": "/company/snapshot"
     },
     "stock": {
@@ -7066,7 +7341,8 @@ export const ENDPOINTS = {
         "name": "categoryIds",
         "type": "array<integer>",
         "description": "Category id or a list of category ids (comma separated)"
-      }
+      },
+      "idSummary": "Get threads for specific public forum category or categories"
     },
     "lookup": {
       "requiresId": false,
@@ -7336,6 +7612,7 @@ export const ENDPOINTS = {
         "type": "integer",
         "description": "Item id"
       },
+      "idSummary": "Get specific item auction house listings",
       "path": "/market/auctionhouse"
     },
     "bazaar": {
@@ -7408,7 +7685,24 @@ export const ENDPOINTS = {
         "name": "id",
         "type": "integer",
         "description": "Item id"
-      }
+      },
+      "idQuery": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "idSummary": "Get item specialized bazaar directory"
     },
     "itemmarket": {
       "requiresId": true,
@@ -8148,6 +8442,54 @@ export const ENDPOINTS = {
     }
   },
   "property": {
+    "property": {
+      "requiresId": true,
+      "summary": "Get a specific property",
+      "description": "Requires public access key. <br>",
+      "keyLevel": "public",
+      "stability": "Stable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "property",
+          "type": "object",
+          "fields": [
+            "id",
+            "owner",
+            "property",
+            "happy",
+            "upkeep",
+            "market_price",
+            "modifications",
+            "staff",
+            "used_by",
+            "status",
+            "rented_by"
+          ]
+        }
+      ],
+      "idPath": "/property/{id}/property",
+      "idParam": {
+        "name": "id",
+        "type": "integer",
+        "description": "Property id"
+      }
+    },
     "lookup": {
       "requiresId": false,
       "summary": "Get all available property selections",
@@ -8483,7 +8825,8 @@ export const ENDPOINTS = {
         "name": "shopId",
         "type": "integer",
         "description": "Shop id"
-      }
+      },
+      "idSummary": "Get stock information for a specific shop"
     },
     "companies": {
       "requiresId": false,
@@ -8528,7 +8871,8 @@ export const ENDPOINTS = {
         "name": "typeId",
         "type": "integer",
         "description": "Company type id"
-      }
+      },
+      "idSummary": "Get specific company details"
     },
     "crimes": {
       "requiresId": false,
@@ -8907,7 +9251,24 @@ export const ENDPOINTS = {
         "name": "ids",
         "type": "array<integer>",
         "description": "Honor id or a list of honor ids (comma separated)"
-      }
+      },
+      "idQuery": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "idSummary": "Get specific honors"
     },
     "hof": {
       "requiresId": false,
@@ -9035,17 +9396,7 @@ export const ENDPOINTS = {
       "returns": [
         {
           "name": "itemdetails",
-          "type": "object",
-          "fields": [
-            "id",
-            "name",
-            "uid",
-            "type",
-            "sub_type",
-            "stats",
-            "bonuses",
-            "rarity"
-          ]
+          "type": "oneOf"
         }
       ],
       "idPath": "/torn/{ids}/itemdetails",
@@ -9053,8 +9404,7 @@ export const ENDPOINTS = {
         "name": "ids",
         "type": "array<integer>",
         "description": "Item uid or a list of item uids (comma separated), 25 uids maximum"
-      },
-      "returnsNote": "auto-derived from live response (structural drift vs spec)"
+      }
     },
     "itemmods": {
       "requiresId": false,
@@ -9236,7 +9586,34 @@ export const ENDPOINTS = {
         "name": "ids",
         "type": "array<integer>",
         "description": "Item id or a list of item ids (comma separated)"
-      }
+      },
+      "idQuery": [
+        {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "description": "Sort rows from newest to oldest<br>Default ordering is ascending",
+          "enum": [
+            "DESC",
+            "ASC"
+          ]
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ]
     },
     "logcategories": {
       "requiresId": false,
@@ -9310,7 +9687,8 @@ export const ENDPOINTS = {
         "name": "logCategoryId",
         "type": "integer",
         "description": "Log category id"
-      }
+      },
+      "idSummary": "Get available log ids for a specific log category"
     },
     "medals": {
       "requiresId": false,
@@ -9355,7 +9733,8 @@ export const ENDPOINTS = {
         "name": "ids",
         "type": "array<integer>",
         "description": "Medal id or a list of medal ids (comma separated)"
-      }
+      },
+      "idSummary": "Get specific medals"
     },
     "merits": {
       "requiresId": false,
@@ -9734,7 +10113,8 @@ export const ENDPOINTS = {
         "type": "integer",
         "description": "Stock id"
       },
-      "returnsNote": "auto-derived from live response (structural drift vs spec)"
+      "idSummary": "Get specific stock with chart history",
+      "returnsNote": "auto-derived from live response (container type differs from spec)"
     },
     "subcrimes": {
       "requiresId": true,

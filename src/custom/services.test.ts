@@ -43,14 +43,37 @@ describe("analyzePlayer", () => {
     expect(r.personalstats).toEqual({ foo: 1 });
   });
 
-  it("tolerates a failing personalstats call", async () => {
-    const call: TornCall = async (tag, endpoint) => {
-      if (endpoint === "personalstats") throw new Error("no access");
+  it("requests personalstats with the 'all' category Torn requires", async () => {
+    const seen: Array<{ endpoint: string; params?: Record<string, string | number> }> = [];
+    const call: TornCall = async (_tag, endpoint, _id, params) => {
+      seen.push({ endpoint, params });
+      return endpoint === "personalstats"
+        ? { personalstats: { foo: 1 } }
+        : { profile: { id: 1, name: "Bob" } };
+    };
+    await analyzePlayer(call, "1");
+    const ps = seen.find((s) => s.endpoint === "personalstats");
+    expect(ps?.params).toEqual({ cat: "all" });
+  });
+
+  it("surfaces a failing personalstats call instead of a silent null", async () => {
+    const call: TornCall = async (_tag, endpoint) => {
+      if (endpoint === "personalstats") throw new Error("Torn API error 21: Incorrect category");
       return { profile: { id: 1, name: "Bob" } };
     };
     const r = await analyzePlayer(call, "1");
     expect(r.name).toBe("Bob");
     expect(r.personalstats).toBeNull();
+    expect(r.personalstats_error).toBe("Torn API error 21: Incorrect category");
+  });
+
+  it("omits personalstats_error when personalstats succeeds", async () => {
+    const call = mockCall({
+      "user/profile": { profile: { id: 1, name: "Bob" } },
+      "user/personalstats": { personalstats: { foo: 1 } },
+    });
+    const r = await analyzePlayer(call, "1");
+    expect(r.personalstats_error).toBeUndefined();
   });
 });
 

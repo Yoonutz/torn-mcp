@@ -34,3 +34,9 @@ new_sqlite_classes = ["TornMCP", "RateLimiter"]
 
 [observability]
 enabled = true
+
+# Invocation logs record "<Method> <URL>" for every request and persist for
+# 3-7 days. Keep them off so a key a misconfigured client puts in the URL can
+# never be persisted; console logs (none in this code) stay available.
+[observability.logs]
+invocation_logs = false

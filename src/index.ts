@@ -2,17 +2,17 @@
 import { DurableObject } from "cloudflare:workers";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
-import { z } from "zod";
 import {
   buildUrl,
-  endpointBadges,
+  classifyItemId,
   ensureKey,
+  parseTornBody,
   parseTornError,
-  paramsHint,
   resolveEndpointPath,
-  returnsHint,
+  responseFormat,
   sha256Hex,
   validateParams,
+  type BodyFormat,
 } from "./torn.js";
 import {
   annotate,
@@ -23,75 +23,38 @@ import {
   WINDOW_NOTE,
   MAX_PAGES,
 } from "./enrich.js";
-import { ENDPOINTS, TAGS, type EndpointDef, type TornTag } from "./generated/endpoints.js";
+import { type TornTag } from "./generated/endpoints.js";
 import { MANIFEST } from "./generated/manifest.js";
 import { RateLimiter, LIMIT, type RateCheck } from "./rateLimiter.js";
-import { dualResult, errorResult, textResult, type ToolResult } from "./mcpResult.js";
-import { registerCustomTools } from "./custom/tools.js";
+import { dualResult, errorResult, type ToolResult } from "./mcpResult.js";
+import { registerAllTools } from "./tools.js";
+import { KEY_HEADER, MISSING_KEY_ERROR, keyFromHeaders } from "./auth.js";
+import { isStaleSessionRequest, staleSessionResponse } from "./session.js";
 
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.10.0";
+const VERSION = "0.11.0";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
-const KEY_HEADER = "x-torn-api-key";
-const KEY_QUERY = "key";
-const MISSING_KEY_ERROR = "Missing Torn API key. Send ?key= or X-Torn-Api-Key header.";
 
 interface Env {
   MCP_OBJECT: DurableObjectNamespace;
   RATE_LIMITER: DurableObjectNamespace;
-  /** Optional fallback key, used only when the request omits the header/query. */
+  /** Optional fallback key, used only when the request omits the header. */
   TORN_API_KEY?: string;
 }
 
-function cloneWithSameQuery(target: string, sourceUrl: URL): string {
-  const out = new URL(target);
-  if (!out.search) out.search = sourceUrl.search;
-  return out.toString();
-}
-
-function keyFromRequest(request: Request, env: Env): string {
-  const headerKey = request.headers.get(KEY_HEADER) ?? request.headers.get("X-Torn-Api-Key");
-  if (headerKey) return headerKey;
-  const queryKey = new URL(request.url).searchParams.get(KEY_QUERY);
-  if (queryKey) return queryKey;
-  return env.TORN_API_KEY ?? "";
-}
-
 /**
- * Read the Torn API key from per-request headers/query (already normalized by
- * the Worker fetch handler and propagated through the DO boundary).
+ * Read the Torn API key from per-request headers (already normalized by the
+ * Worker fetch handler and propagated through the DO boundary).
  */
 function keyFromExtra(extra: unknown, env: Env): string {
   const headers = (extra as { requestInfo?: { headers?: Record<string, unknown> } })
     ?.requestInfo?.headers;
   const raw = headers?.[KEY_HEADER];
   const key = typeof raw === "string" ? raw : Array.isArray(raw) ? String(raw[0]) : undefined;
-  return key ?? env.TORN_API_KEY ?? "";
-}
-
-function endpointNames(tag: TornTag): [string, ...string[]] {
-  return Object.keys(ENDPOINTS[tag]) as [string, ...string[]];
-}
-
-/** Build an authoritative tool description from the spec's real summaries. */
-function describeTag(tag: TornTag): string {
-  const map = ENDPOINTS[tag] as Record<string, EndpointDef>;
-  const lines = Object.entries(map).map(([name, def]) => {
-    const summary = (def.summary ?? "").replace(/\s+/g, " ").slice(0, 90);
-    // Name the actual path param (e.g. tradeId) so id-scoped endpoints like
-    // `trade` read clearly against their list sibling `trades`.
-    const idNote = def.requiresId ? ` (requires ${def.idParam?.name ?? "id"})` : "";
-    return `- ${name}${idNote}: ${summary}${paramsHint(def)}${returnsHint(def)}${endpointBadges(def)}`;
-  });
-  return (
-    `Fetch Torn ${tag} data (Torn API v2). Set 'endpoint' to one of:\n` +
-    lines.join("\n") +
-    `\nProvide 'id' for id-scoped endpoints. Use 'params' for query options ` +
-    `(call torn_list_endpoints with this tag to see each endpoint's accepted params).`
-  );
+  return key || env.TORN_API_KEY || "";
 }
 
 /**
@@ -99,14 +62,6 @@ function describeTag(tag: TornTag): string {
  * Workers-native Streamable HTTP transport; the Worker routes each session
  * (by Mcp-Session-Id) to the same DO.
  */
-/** Endpoints whose id is a Torn item id — eligible for name→id resolution. */
-const ITEM_ID_ENDPOINTS = new Set([
-  "market/itemmarket",
-  "market/bazaar",
-  "torn/items",
-  "torn/itemdetails",
-]);
-
 export class TornMCP extends DurableObject<Env> {
   private mcp: McpServer;
   private transport: WebStandardStreamableHTTPServerTransport | null = null;
@@ -116,10 +71,23 @@ export class TornMCP extends DurableObject<Env> {
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.mcp = new McpServer({ name: `Torn MCP v${VERSION}`, version: VERSION });
-    this.registerTools();
+    registerAllTools(this.mcp, {
+      callTorn: (extra, tag, endpoint, id, params) =>
+        this.callTorn(keyFromExtra(extra, this.env), tag, endpoint, id, params),
+      makeCall: (extra) => {
+        const apiKey = keyFromExtra(extra, this.env);
+        return (tag, endpoint, id, params) => this.call(apiKey, tag, endpoint, id, params);
+      },
+    });
   }
 
   async fetch(request: Request): Promise<Response> {
+    // A request naming a session that this (fresh) instance does not hold means
+    // the DO was evicted or redeployed: answer 404 so the client re-initializes
+    // instead of the SDK's 400 "Server not initialized", which clients treat as fatal.
+    if (isStaleSessionRequest(this.transport !== null, request)) {
+      return staleSessionResponse(request);
+    }
     if (!this.transport) {
       // The Worker supplies this session's id (X-DO-Session); the transport
       // echoes it back to the client as Mcp-Session-Id.
@@ -130,47 +98,6 @@ export class TornMCP extends DurableObject<Env> {
       await this.mcp.connect(this.transport);
     }
     return this.transport.handleRequest(request);
-  }
-
-  private registerTools(): void {
-    // Generated layer: one grouped tool per Torn tag.
-    for (const tag of TAGS) {
-      this.mcp.tool(
-        `torn_${tag}`,
-        describeTag(tag),
-        {
-          endpoint: z.enum(endpointNames(tag)).describe(`The ${tag} data type to fetch.`),
-          id: z.string().optional().describe("Optional entity id (player/faction/item/etc.)."),
-          params: z
-            .record(z.union([z.string(), z.number()]))
-            .optional()
-            .describe("Optional extra query parameters."),
-        },
-        async ({ endpoint, id, params }, extra) =>
-          this.callTorn(keyFromExtra(extra, this.env), tag, endpoint, id, params),
-      );
-    }
-
-    // Intelligence layer: each tool binds the per-request key from its `extra`.
-    registerCustomTools(this.mcp, (extra: unknown) => {
-      const apiKey = keyFromExtra(extra, this.env);
-      return (tag, endpoint, id, params) => this.call(apiKey, tag, endpoint, id, params);
-    });
-
-    // Discovery tool (no key needed).
-    this.mcp.tool(
-      "torn_list_endpoints",
-      "Discover Torn endpoints. Pass a 'tag' for that tag's full endpoint " +
-        "details (summary, description, accepted query params, and the response " +
-        "fields each endpoint returns). Omit 'tag' for a compact index of every " +
-        "tag and its endpoint names.",
-      { tag: z.enum(TAGS).optional().describe("Optional tag to filter by.") },
-      async ({ tag }) => {
-        if (tag) return textResult(JSON.stringify(ENDPOINTS[tag], null, 2));
-        const index = Object.fromEntries(TAGS.map((t) => [t, Object.keys(ENDPOINTS[t])]));
-        return textResult(JSON.stringify(index, null, 2));
-      },
-    );
   }
 
   /** Lazily build a lowercase item-name → id map from the full /torn/items list. */
@@ -189,8 +116,9 @@ export class TornMCP extends DurableObject<Env> {
   }
 
   /**
-   * For item-id endpoints, resolve a non-numeric id (an item name) to its
-   * numeric id via /torn/items. Numeric ids and non-item endpoints pass through.
+   * For item-type endpoints, resolve an item name to its numeric id via
+   * /torn/items. Numeric ids, numeric id lists and non-item endpoints pass
+   * through; uid endpoints and mixed lists are rejected by classifyItemId.
    */
   private async resolveItemName(
     apiKey: string,
@@ -198,11 +126,11 @@ export class TornMCP extends DurableObject<Env> {
     endpoint: string,
     id: string | undefined,
   ): Promise<string | undefined> {
-    if (!id || /^\d+$/.test(id)) return id;
-    if (!ITEM_ID_ENDPOINTS.has(`${tag}/${endpoint}`)) return id;
-    const hit = (await this.itemNameToId(apiKey)).get(id.toLowerCase());
+    const cls = classifyItemId(tag, endpoint, id);
+    if (cls.kind !== "name") return cls.id;
+    const hit = (await this.itemNameToId(apiKey)).get(cls.id.toLowerCase());
     if (!hit) {
-      throw new Error(`No Torn item named '${id}'. Use the exact item name or a numeric item id.`);
+      throw new Error(`No Torn item named '${cls.id}'. Use the exact item name or a numeric item id.`);
     }
     return hit;
   }
@@ -241,8 +169,12 @@ export class TornMCP extends DurableObject<Env> {
     const paramErr = validateParams(tag, endpoint, resolved, id);
     if (paramErr) return errorResult(paramErr);
 
-    const fetched = await this.fetchMerged(apiKey, path, resolved);
+    const format = responseFormat(tag, endpoint);
+    const fetched = await this.fetchMerged(apiKey, path, resolved, format);
     if (!fetched.ok) return errorResult(fetched.error);
+    // CSV endpoints (snapshots): no pagination, no enrichment — hand back the
+    // text as-is with the canonical wrapper in the structured channel.
+    if (format === "csv") return dualResult(fetched.data, String(fetched.data?.csv ?? ""));
 
     // Canonical data (close to the schema): merged + window-filtered Torn data.
     let canonical: any = filterByTimeWindow(fetched.data, { from: resolved.from, to: resolved.to });
@@ -275,7 +207,7 @@ export class TornMCP extends DurableObject<Env> {
    * Re-attaches the key (follow links omit it). Throws on any error — the key
    * never appears in the message.
    */
-  private async rateLimitedFetch(apiKey: string, url: string): Promise<any> {
+  private async rateLimitedFetch(apiKey: string, url: string, format: BodyFormat = "json"): Promise<any> {
     if (!apiKey) {
       throw new Error(MISSING_KEY_ERROR);
     }
@@ -322,14 +254,12 @@ export class TornMCP extends DurableObject<Env> {
     if (!res) throw new Error("Network error contacting the Torn API.");
 
     const text = await res.text();
-    const tornErr = parseTornError(text);
-    if (tornErr) throw new Error(tornErr);
-    if (!res.ok) throw new Error(`Torn API returned HTTP ${res.status}.`);
-    try {
-      return JSON.parse(text);
-    } catch {
-      throw new Error("Torn API returned a non-JSON response.");
+    if (!res.ok) {
+      throw new Error(parseTornError(text) ?? `Torn API returned HTTP ${res.status}.`);
     }
+    // Torn signals errors as HTTP 200 + `{ error }` on every endpoint; parseTornBody
+    // checks that first, then parses JSON or wraps CSV per the spec's content type.
+    return parseTornBody(text, format);
   }
 
   /**
@@ -340,6 +270,7 @@ export class TornMCP extends DurableObject<Env> {
     apiKey: string,
     path: string,
     params: Record<string, string | number> | undefined,
+    format: BodyFormat = "json",
   ): Promise<{ ok: true; data: any; partial: boolean } | { ok: false; error: string }> {
     if (!apiKey) {
       return {
@@ -349,13 +280,14 @@ export class TornMCP extends DurableObject<Env> {
     }
     const resolved = resolveTimeParams(params, Date.now());
     const firstUrl = buildUrl(path, resolved, apiKey);
-    const fetchUrl = (url: string) => this.rateLimitedFetch(apiKey, url);
+    const fetchUrl = (url: string) => this.rateLimitedFetch(apiKey, url, format);
     let firstPage: any;
     try {
       firstPage = await fetchUrl(firstUrl);
     } catch (e) {
       return { ok: false, error: e instanceof Error ? e.message : "Torn request failed." };
     }
+    if (format === "csv") return { ok: true, data: firstPage, partial: false };
     const { merged, partial } = await followPages(firstPage, fetchUrl, MAX_PAGES);
     return { ok: true, data: merged, partial };
   }
@@ -372,14 +304,21 @@ export default {
       const headers = new Headers(request.headers);
       headers.set("X-DO-Session", sessionId);
 
-      // Normalize auth once at ingress (header preferred, then ?key=), then pass
-      // through header for all downstream MCP tool invocations.
-      const apiKey = keyFromRequest(request, env);
+      // Auth is header-only (see auth.ts). Normalize once at ingress so every
+      // downstream tool invocation reads the same header; the query string is
+      // deliberately NOT forwarded, so nothing placed there can be used or seen
+      // past this point.
+      const apiKey = keyFromHeaders(request.headers, env.TORN_API_KEY);
       if (apiKey) headers.set("X-Torn-Api-Key", apiKey);
 
-      // Preserve query string (especially ?key=) when routing to the DO/session.
-      const doUrl = cloneWithSameQuery("https://mcp-session/mcp", url);
-      return stub.fetch(new Request(doUrl, { method: request.method, headers, body: request.body, redirect: request.redirect }));
+      return stub.fetch(
+        new Request("https://mcp-session/mcp", {
+          method: request.method,
+          headers,
+          body: request.body,
+          redirect: request.redirect,
+        }),
+      );
     }
 
     if (url.pathname === "/health") {

@@ -4,9 +4,9 @@
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
 
-A remote [Model Context Protocol](https://modelcontextprotocol.io) server for the [Torn City](https://www.torn.com) API v2, running on **Cloudflare Workers**. Connect from VS Code (or any MCP client) anywhere — no local install. You supply your Torn API key via the `X-Torn-Api-Key` header; it is never stored, logged, or shown to the model.
+A remote [Model Context Protocol](https://modelcontextprotocol.io) server for the [Torn City](https://www.torn.com) API v2, running on **Cloudflare Workers**. Connect from VS Code (or any MCP client) anywhere — no local install. You supply your Torn API key via the `X-Torn-Api-Key` header; it is never stored, never shown to the model, and never read from the URL (see [Security & privacy](#security--privacy)).
 
-**Tools:** one grouped tool per Torn tag (`torn_user`, `torn_faction`, `torn_torn`, `torn_company`, `torn_market`, `torn_racing`, `torn_forum`, `torn_property`, `torn_key`) covering all 205 API paths via an `endpoint` argument — plus **12 intelligence tools** that aggregate endpoints into structured summaries (`analyze_player`, `war_readiness_report`, `find_profitable_items`, …) and `torn_list_endpoints` for discovery.
+**Tools:** one grouped tool per Torn tag (`torn_user`, `torn_faction`, `torn_torn`, `torn_company`, `torn_market`, `torn_racing`, `torn_forum`, `torn_property`, `torn_key`) covering all 187 endpoints across 234 operations of the spec via an `endpoint` argument — plus **12 intelligence tools** that aggregate endpoints into structured summaries (`analyze_player`, `war_readiness_report`, `find_profitable_items`, …) and `torn_list_endpoints` for discovery.
 
 > [!NOTE]
 > Read-only. The Torn API v2 exposes only `GET` endpoints — this server can never modify your account or take in-game actions.
@@ -202,28 +202,38 @@ Torn → **Settings → [API Keys](https://www.torn.com/preferences.php#tab=api)
 
 ## Tools
 
-One grouped tool per Torn tag, each covering all of that tag's endpoints:
+One grouped tool per Torn tag, each covering all of that tag's endpoints (table generated from the committed spec by `npm run generate`; counts are checked by the contract test):
 
-| Tool                  | Endpoints | Example `endpoint` values                                        |
-| --------------------- | --------- | ---------------------------------------------------------------- |
-| `torn_user`           | 64        | `profile`, `battlestats`, `bars`, `cooldowns`, `money`, `events` |
-| `torn_faction`        | 34        | `basic`, `members`, `wars`, `attacks`, `chain`                   |
-| `torn_torn`           | 26        | `items`, `stats`, `timestamp`, `territory`                       |
-| `torn_company`        | 10        | `profile`, `employees`, `stock`, `news`                          |
-| `torn_market`         | 8         | `itemmarket`, `bazaar`, `auctionhouse`                           |
-| `torn_racing`         | 8         | `races`, `cars`, `tracks`, `records`                             |
-| `torn_forum`          | 6         | `categories`, `threads`, `posts`                                 |
-| `torn_property`       | 2         | `property`                                                       |
-| `torn_key`            | 2         | `info`, `log`                                                    |
-| `torn_list_endpoints` | —         | discovery: lists every endpoint per tag                          |
+<!-- tools:start -->
+
+| Tool                  | Endpoints | Example `endpoint` values                                                                   |
+| --------------------- | --------- | ------------------------------------------------------------------------------------------- |
+| `torn_user`           | 69        | `ammo`, `attacks`, `attacksfull`, `bars`, `basic`, `battlestats`                            |
+| `torn_faction`        | 42        | `applications`, `attacks`, `attacksfull`, `balance`, `basic`, `chain`                       |
+| `torn_torn`           | 38        | `attacklog`, `bank`, `bounties`, `calendar`, `cards`, `cityshops`                           |
+| `torn_company`        | 10        | `applications`, `employees`, `news`, `companies`, `profile`, `search`                       |
+| `torn_market`         | 9         | `auctionhouselisting`, `auctionhouse`, `bazaar`, `itemmarket`, `properties`, `pointsmarket` |
+| `torn_racing`         | 8         | `cars`, `carupgrades`, `races`, `race`, `records`, `tracks`                                 |
+| `torn_forum`          | 6         | `categories`, `posts`, `thread`, `threads`, `lookup`, `timestamp`                           |
+| `torn_property`       | 3         | `property`, `lookup`, `timestamp`                                                           |
+| `torn_key`            | 2         | `log`, `info`                                                                               |
+| `torn_list_endpoints` | —         | discovery: lists every endpoint per tag                                                     |
+
+<!-- tools:end -->
 
 Each tool takes:
 
 - `endpoint` (required) — which data type to fetch (full list per tool, or call `torn_list_endpoints`).
-- `id` (optional) — entity id; used when the endpoint is entity-scoped or requires one.
-- `params` (optional) — extra query options (`limit`, `from`, `to`, `sort`, `cat`, …).
+- `id` (optional) — entity id; used when the endpoint is entity-scoped or requires one. Item endpoints (`market/itemmarket`, `market/bazaar`, `torn/items`) also accept an item **name**; `ids` endpoints accept a comma-separated numeric list; `torn/itemdetails` and `torn/itemstats` take item **uids**, never names.
+- `params` (optional) — extra query options (`limit`, `from`, `to`, `sort`, `cat`, …). Only the params the called variant accepts are allowed; anything else is rejected with the accepted list, so a typo cannot be silently ignored by Torn.
 
 The Torn key is **not** a tool parameter — it comes from the request header, so it never enters model context or client transcripts.
+
+### Errors and non-JSON responses
+
+- Torn reports every error as **HTTP 200** with a JSON envelope `{ "error": { "code": N, "error": "..." } }`; the OpenAPI spec documents only the 200 success shape. The server detects the envelope on every endpoint and returns it as a tool error `Torn API error N: message`.
+- Three endpoints (`user/snapshot`, `faction/snapshot`, `company/snapshot`) answer **CSV**, not JSON (the spec documents `text/csv`). They are marked `[csv]` in the tool description and return `{ "csv": "<text>", "format": "text/csv" }` in the structured channel with the raw CSV as text — no pagination, no enrichment.
+- Any other non-JSON body is reported as `Torn API returned a non-JSON response.`
 
 ### Intelligence tools
 
@@ -248,18 +258,19 @@ Higher-level tools that aggregate multiple endpoints and return structured summa
 
 ## Security & privacy
 
-- Key supplied via `X-Torn-Api-Key` header only — never a tool parameter.
-- Never stored, never logged, never returned in error messages.
+- Key supplied via the `X-Torn-Api-Key` header **only** — never a tool parameter, and never read from the URL. A `?key=` query parameter is ignored (the request fails with a "send the header" error), and the query string is not forwarded past the Worker's front door.
+- Never stored, never returned in error messages.
+- **Logging, precisely:** this code writes no logs. Cloudflare Workers invocation logs (which would record `<Method> <URL>` per request) are switched off in `wrangler.toml` (`[observability.logs] invocation_logs = false`), so a request URL is not persisted even if a misconfigured client puts a key in it. What this repository cannot control: Cloudflare's own edge/analytics data, and the upstream leg — the key reaches `api.torn.com` as the `key` query parameter Torn documents, which is Torn's log surface, not ours.
 - Upstream calls are pinned to `https://api.torn.com` (SSRF guard) with `User-Agent: torn-mcp`.
 - Per-key rate limiting (~100 req/min, Torn's cap) via a Durable Object — returns a clear error instead of hammering Torn.
 
-### Dependency advisories
+### Dependencies
 
-Dev/build tooling (`vitest`, `vite`, `esbuild`) and a transitive (`jsondiffpatch`) are pinned to patched versions. The remaining Dependabot alerts live in the `agents` SDK chain (`@ai-sdk/provider-utils`, `ai`, and `agents`' own AI-Playground / OAuth-callback / email-routing advisories). None are reachable here — this server exposes no playground, OAuth flow, or email routing — and the only offered upgrade (`agents@0.16`) forces a `zod` 3→4 major that conflicts with the MCP SDK. They are tracked, not exploitable, and will be cleared when `agents` ships a zod-3-compatible patch.
+The deployed Worker's runtime dependencies are `@modelcontextprotocol/sdk` and `zod`. Dev/build tooling advisories are pinned to patched versions via `overrides` in `package.json` (`esbuild`, `js-yaml`, `ws`); `npm audit` is part of the release check — see [SECURITY.md](SECURITY.md).
 
 ## Scope & roadmap
 
-Covered: all 9 Torn tags (160 endpoints / all 205 paths) as raw JSON, plus 12 intelligence tools and a discovery tool. Still on the roadmap from the retired Fastify/Docker design ([superseded spec](docs/superpowers/specs/2026-06-14-torn-mcp-server-design.md)): MCP resources, prompts, and richer per-endpoint output typing.
+Covered: all 9 Torn tags — every documented data endpoint (the counts in the table above are derived from the committed spec) as raw JSON, plus 12 intelligence tools and a discovery tool. The spec is re-synced from Torn weekly; see [docs/ROADMAP.md](docs/ROADMAP.md) for what shipped and what is proposed (MCP resources, prompts, richer per-endpoint output typing).
 
 ## License
 

@@ -4,12 +4,14 @@
 // generator change) fails here.
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
-import { buildCatalog } from "../../scripts/lib/catalog.mjs";
+import { buildCatalog, specHashOf } from "../../scripts/lib/catalog.mjs";
+import { syncReadme } from "../../scripts/lib/readme.mjs";
 import { resolveEndpointPath } from "../torn.js";
 import { ENDPOINTS, TAGS, type EndpointDef, type TornTag } from "./endpoints.js";
 import { MANIFEST } from "./manifest.js";
 
-const spec = JSON.parse(readFileSync("openapi.json", "utf8"));
+const specText = readFileSync("openapi.json", "utf8");
+const spec = JSON.parse(specText);
 const built = buildCatalog(spec);
 
 describe("catalog ↔ spec contract", () => {
@@ -23,6 +25,15 @@ describe("catalog ↔ spec contract", () => {
     expect(MANIFEST.endpoints).toBe(built.endpoints);
     expect(MANIFEST.rawOperations).toBe(built.rawOps);
     expect(MANIFEST.tags).toBe(built.tagList.length);
+  });
+
+  it("manifest specHash is the hash of the committed openapi.json (generated from this spec, not another revision)", () => {
+    expect(MANIFEST.specHash).toBe(specHashOf(specText));
+  });
+
+  it("README tool table is generated from this catalog (no hand-edited counts)", () => {
+    const readme = readFileSync("README.md", "utf8");
+    expect(syncReadme(readme, built)).toBe(readme);
   });
 
   it("every catalog path is a real GET endpoint in the spec", () => {

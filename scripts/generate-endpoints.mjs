@@ -12,6 +12,7 @@ import {
   renderEndpointsTs,
   renderManifestTs,
 } from "./lib/catalog.mjs";
+import { syncReadme } from "./lib/readme.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const specText = readFileSync(join(root, "openapi.json"), "utf8");
@@ -22,6 +23,10 @@ const genDir = join(root, "src", "generated");
 mkdirSync(genDir, { recursive: true });
 writeFileSync(join(genDir, "endpoints.ts"), renderEndpointsTs(catalog));
 writeFileSync(join(genDir, "manifest.ts"), renderManifestTs(catalog, hash));
+
+// README tool table + counts are derived, never hand-edited (contract test enforces).
+const readmePath = join(root, "README.md");
+writeFileSync(readmePath, syncReadme(readFileSync(readmePath, "utf8"), catalog));
 
 console.log(
   `Generated ${catalog.endpoints} endpoints across ${catalog.tagList.length} tags ` +

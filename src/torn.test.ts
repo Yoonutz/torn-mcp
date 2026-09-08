@@ -2,12 +2,16 @@
 import { describe, it, expect } from "vitest";
 import {
   buildUrl,
+  classifyItemId,
   endpointBadges,
   ensureKey,
   humanizeTimestamps,
+  MAX_INLINE_ENUM,
   paramsHint,
+  parseTornBody,
   parseTornError,
   resolveEndpointPath,
+  responseFormat,
   returnsHint,
   validateParams,
 } from "./torn.js";
@@ -93,13 +97,72 @@ describe("validateParams", () => {
   it("accepts a numeric id for an integer-id endpoint", () => {
     expect(validateParams("market", "itemmarket", {}, "206")).toBeNull();
   });
+  it("rejects a query param the endpoint does not accept, naming the accepted ones", () => {
+    const msg = validateParams("torn", "timestamp", { limit: 5 });
+    expect(msg).toMatch(/'limit' is not accepted by endpoint 'timestamp'/);
+    expect(msg).toMatch(/Accepted: timestamp, comment/);
+  });
+  it("validates against the id variant's params when an id is given", () => {
+    // /torn/honors accepts limit/offset/sort; /torn/{ids}/honors accepts none of them.
+    expect(validateParams("torn", "honors", { limit: 5 })).toBeNull();
+    expect(validateParams("torn", "honors", { limit: 5 }, "1")).toMatch(
+      /'limit' is not accepted by endpoint 'honors' when an id is given/,
+    );
+    // /faction/rankedwars accepts from/to/sort; /faction/{id}/rankedwars does not.
+    expect(validateParams("faction", "rankedwars", { from: 1 })).toBeNull();
+    expect(validateParams("faction", "rankedwars", { from: 1 }, "1")).toMatch(/'from' is not accepted/);
+    expect(validateParams("faction", "rankedwars", { limit: 1 }, "1")).toBeNull();
+  });
+  it("uses the shared params when the id variant has the same contract", () => {
+    expect(validateParams("user", "profile", { striptags: "true" }, "1")).toBeNull();
+    expect(validateParams("user", "profile", { striptags: "true" })).toBeNull();
+  });
+  it("accepts a comma-separated numeric list for an ids endpoint", () => {
+    expect(validateParams("torn", "items", {}, "206,207")).toBeNull();
+    expect(validateParams("torn", "itemdetails", {}, "1,2")).toBeNull();
+  });
+  it("rejects a non-numeric value for an ids endpoint", () => {
+    expect(validateParams("torn", "itemdetails", {}, "abc")).toMatch(/numeric/);
+    expect(validateParams("torn", "items", {}, "206,Xanax")).toMatch(/numeric/);
+  });
+});
+
+describe("classifyItemId", () => {
+  it("passes a single numeric id through", () => {
+    expect(classifyItemId("torn", "items", "206")).toEqual({ kind: "numeric", id: "206" });
+  });
+  it("passes a comma-separated numeric list through", () => {
+    expect(classifyItemId("torn", "items", "206,207")).toEqual({ kind: "numeric", id: "206,207" });
+  });
+  it("flags an item name on an item-type endpoint for name resolution", () => {
+    expect(classifyItemId("torn", "items", "Xanax")).toEqual({ kind: "name", id: "Xanax" });
+    expect(classifyItemId("market", "itemmarket", "Xanax")).toEqual({ kind: "name", id: "Xanax" });
+  });
+  it("never name-resolves uid endpoints", () => {
+    expect(() => classifyItemId("torn", "itemdetails", "Xanax")).toThrow(/uid/i);
+    expect(() => classifyItemId("torn", "itemstats", "Xanax")).toThrow(/uid/i);
+  });
+  it("rejects a mixed name/number list", () => {
+    expect(() => classifyItemId("torn", "items", "Xanax,206")).toThrow(/numeric/);
+  });
+  it("leaves non-item endpoints untouched", () => {
+    expect(classifyItemId("user", "profile", "KamiRen")).toEqual({ kind: "passthrough", id: "KamiRen" });
+    expect(classifyItemId("user", "profile", undefined)).toEqual({ kind: "passthrough", id: undefined });
+  });
 });
 
 describe("paramsHint", () => {
-  it("surfaces optional enum params as a filter (incl. Drug)", () => {
+  it("surfaces optional enum params as a filter, eliding long enums", () => {
+    // inventory `cat` has 13 values: the first few are shown, the rest are
+    // counted so the model knows to consult torn_list_endpoints.
     const hint = paramsHint(ENDPOINTS.user.inventory);
-    expect(hint).toMatch(/filter cat=/);
-    expect(hint).toMatch(/Drug/);
+    expect(hint).toMatch(/filter cat=Collectible\|/);
+    expect(hint).toMatch(/\+\d+ more\)/);
+    const shown = hint.match(/cat=(.*?)\|…/)?.[1]?.split("|").length ?? 0;
+    expect(shown).toBe(MAX_INLINE_ENUM - 1);
+  });
+  it("shows a short enum in full", () => {
+    expect(paramsHint(ENDPOINTS.faction.chains)).toBe(" · filter sort=DESC|ASC");
   });
   it("shows required enum params", () => {
     expect(paramsHint(ENDPOINTS.faction.news)).toMatch(/requires cat=/);
@@ -159,6 +222,39 @@ describe("endpointBadges", () => {
   });
   it("flags unstable endpoints", () => {
     expect(endpointBadges(def("public", "Unstable"))).toBe(" ⚠ unstable");
+  });
+  it("flags CSV endpoints", () => {
+    const csv = { keyLevel: "public", requiresId: false, query: [], responseType: "csv" } as any;
+    expect(endpointBadges(csv)).toBe(" [csv]");
+    expect(endpointBadges(ENDPOINTS.user.snapshot as any)).toMatch(/\[csv\]/);
+  });
+});
+
+describe("responseFormat", () => {
+  it("is csv for the snapshot endpoints and json elsewhere", () => {
+    expect(responseFormat("user", "snapshot")).toBe("csv");
+    expect(responseFormat("faction", "snapshot")).toBe("csv");
+    expect(responseFormat("company", "snapshot")).toBe("csv");
+    expect(responseFormat("user", "bars")).toBe("json");
+    expect(responseFormat("nope", "nope")).toBe("json");
+  });
+});
+
+describe("parseTornBody", () => {
+  it("parses a JSON body", () => {
+    expect(parseTornBody('{"bars":{"energy":1}}', "json")).toEqual({ bars: { energy: 1 } });
+  });
+  it("wraps a CSV body instead of failing on it", () => {
+    const csv = "id,name\n1,Bob\n";
+    expect(parseTornBody(csv, "csv")).toEqual({ csv, format: "text/csv" });
+  });
+  it("still surfaces a Torn error envelope on a CSV endpoint", () => {
+    expect(() => parseTornBody('{"error":{"code":2,"error":"Incorrect key"}}', "csv")).toThrow(
+      /Torn API error 2: Incorrect key/,
+    );
+  });
+  it("throws a clear error for non-JSON where JSON was expected", () => {
+    expect(() => parseTornBody("<html>", "json")).toThrow(/non-JSON/);
   });
 });
 

@@ -19,6 +19,7 @@ import {
   diffCatalogs,
   renderReport,
 } from "./lib/catalog.mjs";
+import { syncReadme } from "./lib/readme.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const specPath = join(root, "openapi.json");
@@ -49,6 +50,8 @@ const genDir = join(root, "src", "generated");
 mkdirSync(genDir, { recursive: true });
 writeFileSync(join(genDir, "endpoints.ts"), renderEndpointsTs(newCat));
 writeFileSync(join(genDir, "manifest.ts"), renderManifestTs(newCat, hash));
+const readmePath = join(root, "README.md");
+writeFileSync(readmePath, syncReadme(readFileSync(readmePath, "utf8"), newCat));
 
 if (diff.hasChanges) {
   // Prepend a dated entry to the committed changelog.

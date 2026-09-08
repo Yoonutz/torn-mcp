@@ -47,12 +47,28 @@ function depth(listings: any[]): number {
 
 // ── Player ──────────────────────────────────────────────────────────
 
+/**
+ * Run an optional secondary call. A failure never sinks the whole tool, but it
+ * is reported (`error`) rather than silently collapsed into null.
+ */
+async function optional<T>(p: Promise<T>): Promise<{ data: T | null; error?: string }> {
+  try {
+    return { data: await p };
+  } catch (e) {
+    return { data: null, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
 export async function analyzePlayer(call: TornCall, id?: string) {
-  const [profileRes, statsRes] = await Promise.all([
+  // Torn rejects personalstats without a category (error 21 "Incorrect
+  // category") even though the spec marks `cat` optional; 'all' returns the
+  // full public stat set.
+  const [profileRes, stats] = await Promise.all([
     call("user", "profile", id) as Promise<S["UserProfileResponse"]>,
-    call("user", "personalstats", id).catch(() => null) as Promise<S["UserPersonalStatsResponse"] | null>,
+    optional(call("user", "personalstats", id, { cat: "all" }) as Promise<S["UserPersonalStatsResponse"]>),
   ]);
   const p = profileRes?.profile;
+  const statsRes = stats.data;
   return {
     id: p?.id,
     name: p?.name,
@@ -72,6 +88,7 @@ export async function analyzePlayer(call: TornCall, id?: string) {
       karma: p?.karma,
     },
     personalstats: statsRes?.personalstats ?? null,
+    ...(stats.error ? { personalstats_error: stats.error } : {}),
   };
 }
 

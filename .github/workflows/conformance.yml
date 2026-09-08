@@ -60,25 +60,34 @@ jobs:
 
       # Manual refresh: re-snapshot Torn's standing drift into the baseline, show
       # exactly what moved in the run summary, then commit only if it changed.
+      #
+      # Atomic with the spec: the sync step above may have pulled a newer
+      # openapi.json, so the spec, every generated artifact (catalog, manifest,
+      # types, README table, changelog) and the baseline are committed TOGETHER.
+      # Committing endpoints.ts alone against an older committed spec would fail
+      # the contract test's specHash check on main.
       - name: Refresh baseline
         if: ${{ inputs.update_baseline == true }}
         env:
           TORN_TEST_API_KEY: ${{ secrets.TORN_TEST_API_KEY }}
         run: |
           # Live run snapshots the baseline AND writes auto-derived overrides;
-          # then bake those overrides into the committed catalog.
+          # then bake those overrides into the committed catalog + types + README.
           node scripts/conformance.mjs --update-baseline
-          node scripts/generate-endpoints.mjs
-          FILES="conformance-baseline.json scripts/lib/returns-overrides.generated.json src/generated/endpoints.ts"
+          npm run generate
+          npm run typecheck
+          npm test
+          FILES="conformance-baseline.json scripts/lib/returns-overrides.generated.json openapi.json src/generated docs/generated README.md"
           if [ -z "$(git status --porcelain $FILES)" ]; then
-            echo "Baseline and overrides unchanged — nothing to commit." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "Baseline, overrides and spec unchanged — nothing to commit." | tee -a "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
           {
             echo "### Conformance refresh"
             echo "Review the accepted drift and auto-derived shapes below before trusting the next run:"
             echo '```diff'
-            git --no-pager diff $FILES
+            git --no-pager diff --stat $FILES
+            git --no-pager diff conformance-baseline.json scripts/lib/returns-overrides.generated.json
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           git config user.name "torn-mcp-conformance"

@@ -6,6 +6,6 @@ export const MANIFEST = {
   openapiVersion: "6.13.1",
   specHash: "b9eccc10bb474e32dd277e92afc55a4ea91e52bb4ece24a08e679e42b4c75161",
   tags: 9,
-  endpoints: 186,
+  endpoints: 187,
   rawOperations: 234,
 } as const;

@@ -22,6 +22,8 @@ import { RETURNS_OVERRIDES } from "./lib/returns-overrides.mjs";
 import { buildDevFindings } from "./lib/dev-findings.mjs";
 import { relaxOverlappingOneOf } from "./lib/relax-oneof.mjs";
 import { classifyErrors } from "./lib/conformance-filter.mjs";
+import { reconcileBaseline } from "./lib/conformance-baseline.mjs";
+import { shouldAutoOverride } from "./lib/auto-override.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const spec = JSON.parse(readFileSync(join(root, "openapi.json"), "utf8"));
@@ -323,8 +325,6 @@ function fillId(template, id) {
 // left to the curated manual overrides.
 const generatedOverrides = {};
 
-const normType = (t) => (t === "array" ? "array" : t === "object" ? "object" : "scalar");
-
 /** Top-level response shape from a live JSON body: envelope keys + one nested level. */
 function liveShape(json) {
   if (!json || typeof json !== "object" || Array.isArray(json)) return null;
@@ -342,25 +342,21 @@ function liveShape(json) {
   return out.length ? out : null;
 }
 
-/** True only for structural drift: a different top-level key set, or a key whose container type differs. */
-function structuralDrift(specReturns, live) {
-  const sk = specReturns.map((r) => r.name).sort();
-  const lk = live.map((r) => r.name).sort();
-  if (JSON.stringify(sk) !== JSON.stringify(lk)) return true;
-  const lt = Object.fromEntries(live.map((r) => [r.name, r.type]));
-  return specReturns.some((r) => normType(r.type) !== normType(lt[r.name]));
-}
-
-/** Record an auto-override when a live response structurally drifts from the spec. */
+/**
+ * Record an auto-override when a live response's container type contradicts the
+ * spec for a key the spec defines. Schema structure wins otherwise: a different
+ * key set or a union-typed key is left to the validator to report as drift (see
+ * lib/auto-override.mjs).
+ */
 function recordOverride(tag, name, json) {
   if (RETURNS_OVERRIDES[`${tag}/${name}`]) return; // manual is the authority
   const live = liveShape(json);
   if (!live) return; // no data on the test account — don't override
   const specReturns = specCatalog.tags[tag]?.[name]?.returns;
   if (!specReturns) return; // selection-based or no documented shape
-  if (!structuralDrift(specReturns, live)) return;
+  if (!shouldAutoOverride(specReturns, live)) return;
   generatedOverrides[`${tag}/${name}`] = {
-    note: "auto-derived from live response (structural drift vs spec)",
+    note: "auto-derived from live response (container type differs from spec)",
     returns: live,
   };
 }
@@ -474,29 +470,12 @@ if (process.argv.includes("--update-baseline")) {
 }
 
 const baseline = existsSync(BASELINE_PATH) ? JSON.parse(readFileSync(BASELINE_PATH, "utf8")) : {};
-// Normalize for matching so minor formatting (dashes, spacing, case) in the
-// baseline doesn't false-flag; field names + paths still must match.
-const norm = (s) => s.toLowerCase().replace(/[—–]/g, "-").replace(/\s+/g, " ").trim();
-const newDrift = []; // drift not in the baseline → fail the run
-const knownDrift = []; // drift already accepted → reported, not fatal
-for (const r of driftResults) {
-  const accepted = (baseline[r.ep] ?? []).map(norm);
-  const fresh = (r.reasons ?? []).filter((x) => !accepted.includes(norm(x)));
-  if (fresh.length) {
-    r.newReasons = fresh;
-    newDrift.push(r);
-  } else {
-    knownDrift.push(r);
-  }
-}
-// Resolved: baseline entries Torn has since fixed → prompt to prune the baseline.
-const resolved = [];
-for (const [ep, reasons] of Object.entries(baseline)) {
-  const cur = results.find((r) => r.ep === ep);
-  const stillThere = (cur?.status === "fail" ? (cur.reasons ?? []) : []).map(norm);
-  const gone = reasons.filter((x) => !stillThere.includes(norm(x)));
-  if (gone.length) resolved.push({ ep, gone });
-}
+// newDrift fails the run; knownDrift is accepted; resolved needs RUNTIME
+// evidence (a compile-check run or a skipped endpoint can never resolve a
+// baseline entry — those land in notEvaluated). See lib/conformance-baseline.mjs.
+const { newDrift, knownDrift, resolved, notEvaluated } = reconcileBaseline(results, baseline, {
+  compileOnly: COMPILE_ONLY,
+});
 
 // ── Report (human-first) ────────────────────────────────────────────
 const pass = results.filter((r) => r.status === "pass");
@@ -540,6 +519,13 @@ if (resolved.length) {
   lines.push("");
   lines.push(`## ✅ Resolved — Torn fixed these; prune the baseline (${resolved.length})`);
   for (const r of resolved) lines.push(`- \`${r.ep}\`: ${r.gone.join("; ")}`);
+}
+
+if (notEvaluated.length) {
+  lines.push("");
+  lines.push(`## ⏸️ Baseline not evaluated — no runtime evidence this run (${notEvaluated.length})`);
+  lines.push("These accepted-drift entries were neither confirmed nor resolved; nothing to act on.");
+  for (const r of notEvaluated) lines.push(`- \`${r.ep}\`: ${r.why}`);
 }
 
 if (knownDrift.length) {
