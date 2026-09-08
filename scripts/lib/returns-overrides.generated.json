@@ -56,13 +56,20 @@
     "note": "auto-derived from live response (structural drift vs spec)",
     "returns": [
       {
-        "name": "competition",
-        "type": "object",
-        "fields": [
-          "name",
-          "status",
-          "hp"
-        ]
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "score",
+        "type": "number"
+      },
+      {
+        "name": "team",
+        "type": "string"
+      },
+      {
+        "name": "attacks",
+        "type": "number"
       }
     ]
   },
@@ -144,11 +151,7 @@
     "returns": [
       {
         "name": "virus",
-        "type": "object",
-        "fields": [
-          "item",
-          "until"
-        ]
+        "type": "object"
       }
     ]
   }
