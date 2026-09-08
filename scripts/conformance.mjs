@@ -20,6 +20,8 @@ import {
 } from "./lib/conformance-throttle.mjs";
 import { RETURNS_OVERRIDES } from "./lib/returns-overrides.mjs";
 import { buildDevFindings } from "./lib/dev-findings.mjs";
+import { relaxOverlappingOneOf } from "./lib/relax-oneof.mjs";
+import { classifyErrors } from "./lib/conformance-filter.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const spec = JSON.parse(readFileSync(join(root, "openapi.json"), "utf8"));
@@ -32,7 +34,9 @@ const COMPILE_ONLY = process.argv.includes("--compile") || !KEY;
 // verbose: errors carry the offending live value (e.data) for evidence notes.
 const ajv = new Ajv({ strict: false, allErrors: true, validateFormats: false, verbose: true });
 addFormats(ajv);
-ajv.addSchema(spec, "spec");
+// Validation only — relaxOverlappingOneOf's clone never feeds the catalog or
+// dev report, both of which keep reading the original `spec`.
+ajv.addSchema(relaxOverlappingOneOf(spec), "spec");
 
 /** Response schema $ref name for a catalog endpoint, via its spec path. */
 function responseRef(def) {
@@ -226,7 +230,7 @@ function explain(e) {
     case "additionalProperties":
       return `unexpected extra field '${e.params?.additionalProperty}' at ${at}`;
     case "oneOf":
-      return `value at ${at} matches more than one schema branch (Torn enum|string overlap)`;
+      return `value at ${at} matches more than one schema branch — unexpected overlap, not one relax-oneof.mjs already accounts for`;
     default:
       return `${at}: ${e.message}`;
   }
@@ -417,12 +421,12 @@ for (const tag of catalog.tagList) {
     if (validate && !validate._compileError) {
       if (!validate(json)) {
         const errs = validate.errors ?? [];
-        // Torn's spec uses `oneOf: [Enum, string]`, where a value matches both
-        // branches. That's a known spec smell, not drift. Only non-oneOf errors
-        // (missing fields, wrong types) are real failures.
-        const onlyOneOf = errs.every((e) => e.keyword === "oneOf");
-        status = onlyOneOf ? "smell" : "fail";
-        const relevant = status === "fail" ? errs.filter((e) => e.keyword !== "oneOf") : errs;
+        // relaxOverlappingOneOf already turns Torn's overlap-prone oneOf schemas
+        // into anyOf before validation; classifyErrors is the safety net for
+        // whatever still reaches ajv as an ambiguous oneOf failure.
+        const classified = classifyErrors(errs);
+        status = classified.status;
+        const relevant = classified.relevant;
         reasons = [...new Set(relevant.map(explain))];
         for (const e of relevant) {
           const key = explain(e);
@@ -550,8 +554,8 @@ if (smells.length) {
   lines.push("");
   lines.push(`## ⚠️ Spec smells — ignore (${smells.length})`);
   lines.push(
-    "Torn documents some fields as `enum OR string`, so a value matches both — a quirk in " +
-      "Torn's docs, not a real mismatch. Endpoints: " +
+    "A schema union whose branches genuinely overlap in a way relax-oneof.mjs doesn't " +
+      "already resolve — not real drift, but worth a look. Endpoints: " +
       smells.map((r) => `\`${r.ep}\``).join(", "),
   );
 }
@@ -683,17 +687,6 @@ if (csvEndpoints.length) {
     "These return CSV while the spec documents an `application/json` response: " +
       csvEndpoints.map((ep) => `\`GET ${specPath(ep)}\``).join(", ") +
       ". If CSV is intended, documenting `text/csv` in the spec would fix it.",
-  );
-}
-if (smells.length) {
-  dev.push("");
-  dev.push(`## Low priority — enum fields that also allow any string (${smells.length} endpoints)`);
-  dev.push("");
-  dev.push(
-    "Many fields are documented as `oneOf: [<enum>, string]`, so every value matches both " +
-      "branches and the enum constrains nothing. Dropping the `string` branch (or the enum) " +
-      "would make these fields validatable. Endpoints: " +
-      smells.map((r) => `\`GET ${specPath(r.ep)}\``).join(", "),
   );
 }
 if (resolved.length) {

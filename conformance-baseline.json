@@ -4,14 +4,8 @@
     "wrong type at /applications/*/player/stats/intelligence — schema expects integer",
     "wrong type at /applications/*/player/stats/endurance — schema expects integer"
   ],
-  "torn/hof": [
-    "wrong type at /hof/*/value — schema expects string"
-  ],
   "user/equipment": [
     "wrong type at /equipment/*/stats — schema expects object"
-  ],
-  "user/missions": [
-    "value at /missions/rewards/*/details/type is not one of the allowed values"
   ],
   "user/stocks": [
     "wrong type at /stocks/*/bonus/increment — schema expects integer",
