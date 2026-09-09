@@ -43,6 +43,7 @@ jobs:
             echo ".sync-msg.txt exists, but generated sync files are unchanged — nothing to commit."
             exit 0
           fi
-          git add -f .sync-msg.txt
+          # .sync-msg.txt is gitignored scratch: it is only the commit message
+          # (read by -F), never staged.
           git commit -F .sync-msg.txt
           git push
