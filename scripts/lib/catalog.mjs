@@ -243,9 +243,15 @@ export function buildCatalog(spec, { skipOverrides = false } = {}) {
   };
 }
 
-/** SHA-256 hex of the raw spec text. */
+/**
+ * SHA-256 hex of the spec text with line endings normalized to LF. The hash
+ * identifies the spec CONTENT, so it must not depend on whether the file was
+ * checked out with CRLF (Windows, core.autocrlf) or LF (Linux CI, the sync
+ * workflow) — otherwise the manifest written on one platform fails the
+ * contract test on the other.
+ */
 export function specHashOf(specText) {
-  return createHash("sha256").update(specText).digest("hex");
+  return createHash("sha256").update(specText.replace(/\r\n/g, "\n")).digest("hex");
 }
 
 export function renderEndpointsTs(catalog) {

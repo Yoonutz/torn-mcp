@@ -1,6 +1,6 @@
 // @license MIT
 import { describe, it, expect } from "vitest";
-import { buildCatalog } from "./catalog.mjs";
+import { buildCatalog, specHashOf } from "./catalog.mjs";
 
 const KEY = { $ref: "#/components/parameters/ApiKeyPublic" };
 const TIMESTAMP = { $ref: "#/components/parameters/ApiTimestamp" };
@@ -102,6 +102,19 @@ describe("buildCatalog: id/no-id variants keep their own contracts", () => {
     const prop = buildCatalog(propertySpec()).tags.property.property;
     expect(prop.idQuery).toBeUndefined();
     expect(prop.idSummary).toBeUndefined();
+  });
+});
+
+describe("specHashOf", () => {
+  it("is independent of line endings (Windows autocrlf checkouts must hash like Linux CI)", () => {
+    const lf = '{\n  "openapi": "3.1.0"\n}\n';
+    const crlf = lf.replace(/\n/g, "\r\n");
+    expect(specHashOf(crlf)).toBe(specHashOf(lf));
+    expect(specHashOf(lf)).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it("still distinguishes different spec content", () => {
+    expect(specHashOf('{"a":1}')).not.toBe(specHashOf('{"a":2}'));
   });
 });
 
