@@ -1,0 +1,10 @@
+# Every checkout gets LF, on every platform. The repo already stores LF only;
+# without this, Windows checkouts (core.autocrlf) get CRLF, so anything that
+# hashes or byte-compares a file (the manifest specHash, the README contract
+# test) passes locally and fails on Linux CI, or the other way round.
+* text=auto eol=lf
+
+# Binary assets never get touched.
+*.png binary
+*.jpg binary
+*.ico binary
