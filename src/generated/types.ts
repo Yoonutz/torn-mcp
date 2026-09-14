@@ -5694,6 +5694,7 @@ export interface components {
              * @description This field is depracted and replaced with 'completed_at' field.
              */
             timestamp?: number;
+            description: string;
             /** @description Populated when selected category is 'finished'. */
             completed_at: number | null;
             /** @description Populated when selected category is 'ongoing'. */
@@ -9996,11 +9997,18 @@ export interface components {
         TornEliminationTeamLeader: components["schemas"]["BasicUser"] & {
             active: boolean;
         };
+        TornEliminationTeamAttacksSummary: {
+            team_id: components["schemas"]["EliminationTeamId"];
+            /** Format: int32 */
+            attacks: number;
+        };
         TornEliminationTeam: {
             id: components["schemas"]["EliminationTeamId"];
             name: string;
             /** Format: int32 */
             participants: number;
+            /** Format: int32 */
+            participants_left: number;
             /** Format: int32 */
             position: number;
             /** Format: int32 */
@@ -10012,6 +10020,7 @@ export interface components {
             /** Format: int32 */
             losses: number;
             eliminated: boolean;
+            attacking_summary: components["schemas"]["TornEliminationTeamAttacksSummary"][];
             eliminated_timestamp: number | null;
             leaders: {
                 captain: components["schemas"]["TornEliminationTeamLeader"] | null;

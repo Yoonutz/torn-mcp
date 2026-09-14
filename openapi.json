@@ -3,7 +3,7 @@
     "info": {
         "title": "Torn API",
         "description": "\n * The development of Torn's API v2 is still ongoing.\n * If selections remain unaltered, they will default to the API v1 version.\n * Unlike API v1, API v2 accepts both selections and IDs as path and query parameters.\n * If any discrepancies or errors are found, please submit a [bug report](https://www.torn.com/forums.php#/p=forums&f=19&b=0&a=0) on the Torn Forums.\n * In case you're using bots to check for changes on openapi.json file, make sure to specificy a custom user-agent header - CloudFlare sometimes prevents requests from default user-agents.",
-        "version": "6.13.4"
+        "version": "6.13.5"
     },
     "servers": [
         {
@@ -20127,7 +20127,8 @@
                     "items",
                     "completed_at",
                     "expires_at",
-                    "modified_at"
+                    "modified_at",
+                    "description"
                 ],
                 "properties": {
                     "id": {
@@ -20138,6 +20139,9 @@
                         "type": "integer",
                         "format": "int32",
                         "deprecated": true
+                    },
+                    "description": {
+                        "type": "string"
                     },
                     "completed_at": {
                         "description": "Populated when selected category is 'finished'.",
@@ -35570,11 +35574,28 @@
                     }
                 ]
             },
+            "TornEliminationTeamAttacksSummary": {
+                "required": [
+                    "team_id",
+                    "attacks"
+                ],
+                "properties": {
+                    "team_id": {
+                        "$ref": "#/components/schemas/EliminationTeamId"
+                    },
+                    "attacks": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "type": "object"
+            },
             "TornEliminationTeam": {
                 "required": [
                     "id",
                     "name",
                     "participants",
+                    "participants_left",
                     "position",
                     "score",
                     "lives",
@@ -35582,7 +35603,8 @@
                     "losses",
                     "eliminated",
                     "eliminated_timestamp",
-                    "leaders"
+                    "leaders",
+                    "attacking_summary"
                 ],
                 "properties": {
                     "id": {
@@ -35592,6 +35614,10 @@
                         "type": "string"
                     },
                     "participants": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "participants_left": {
                         "type": "integer",
                         "format": "int32"
                     },
@@ -35617,6 +35643,12 @@
                     },
                     "eliminated": {
                         "type": "boolean"
+                    },
+                    "attacking_summary": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornEliminationTeamAttacksSummary"
+                        }
                     },
                     "eliminated_timestamp": {
                         "oneOf": [

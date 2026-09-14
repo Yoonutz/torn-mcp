@@ -3735,6 +3735,7 @@ export const ENDPOINTS = {
           "fields": [
             "id",
             "timestamp",
+            "description",
             "completed_at",
             "expires_at",
             "modified_at",
@@ -3774,6 +3775,7 @@ export const ENDPOINTS = {
           "fields": [
             "id",
             "timestamp",
+            "description",
             "completed_at",
             "expires_at",
             "modified_at",
@@ -8980,12 +8982,14 @@ export const ENDPOINTS = {
             "id",
             "name",
             "participants",
+            "participants_left",
             "position",
             "score",
             "lives",
             "wins",
             "losses",
             "eliminated",
+            "attacking_summary",
             "eliminated_timestamp",
             "leaders"
           ]
