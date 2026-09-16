@@ -28,10 +28,12 @@ This downloads the latest Torn OpenAPI spec, regenerates `src/generated/types.ts
 ## How to regenerate the TypeScript catalog
 
 ```sh
-npm run regenerate
+npm run generate
 ```
 
-Equivalent to `npm run generate` — produces `src/generated/endpoints.ts`, `src/generated/manifest.ts`, `src/generated/types.ts`, and updates the README tool table.
+Produces `src/generated/endpoints.ts`, `src/generated/manifest.ts`, `src/generated/types.ts`, and updates the README tool table from the **existing** `openapi.json`.
+
+To also fetch the latest spec before regenerating, use `npm run sync-openapi` instead.
 
 ## How to update the conformance baseline
 

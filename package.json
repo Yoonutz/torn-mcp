@@ -14,7 +14,6 @@
     "typecheck": "tsc --noEmit",
     "gen:types": "openapi-typescript openapi.json -o src/generated/types.ts",
     "generate": "node scripts/generate-endpoints.mjs && npm run gen:types",
-    "regenerate": "npm run generate",
     "sync-openapi": "node scripts/sync-openapi.mjs && npm run gen:types",
     "cf-typegen": "wrangler types"
   },

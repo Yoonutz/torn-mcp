@@ -8,6 +8,6 @@ This directory contains **machine-generated** documentation. Do not edit these f
 
 ## Regenerating
 
-Run `npm run sync-openapi` to refresh all files in this directory from the current `openapi.json`.
+Run `npm run sync-openapi` to download the latest Torn OpenAPI spec and regenerate all files in this directory along with the TypeScript catalog and README tool table.
 
-To regenerate the TypeScript catalog and README tool table instead, run `npm run regenerate`.
+To regenerate the TypeScript catalog and README tool table from the **existing** `openapi.json` (without fetching a new spec), run `npm run generate`.
