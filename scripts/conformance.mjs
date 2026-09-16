@@ -1,10 +1,17 @@
 // @license MIT
 // Live conformance harness. Calls every Torn endpoint with TORN_TEST_API_KEY,
 // validates each real response against its OpenAPI response schema (ajv), and
-// writes a report. See docs/superpowers/specs/2026-06-15-live-conformance-harness-design.md
+// writes a report.
 //
 //   node scripts/conformance.mjs              # full live run (needs the key)
 //   node scripts/conformance.mjs --compile    # compile every validator, no calls
+//
+// Helpers split into:
+//   scripts/lib/conformance-seeds.mjs   — SEEDS, PARAM_SEEDS, DOCUMENTED_SKIPS, PARAM_OVERRIDES
+//   scripts/lib/conformance-report.mjs  — buildMainReport, buildDevReport
+//   scripts/lib/conformance-baseline.mjs — reconcileBaseline
+//   scripts/lib/conformance-filter.mjs  — classifyErrors
+//   scripts/lib/conformance-throttle.mjs — rate-limit helpers
 import { readFileSync, writeFileSync, appendFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -24,6 +31,8 @@ import { relaxOverlappingOneOf } from "./lib/relax-oneof.mjs";
 import { classifyErrors } from "./lib/conformance-filter.mjs";
 import { reconcileBaseline } from "./lib/conformance-baseline.mjs";
 import { shouldAutoOverride } from "./lib/auto-override.mjs";
+import { SEEDS, PARAM_SEEDS, PARAM_OVERRIDES, DOCUMENTED_SKIPS } from "./lib/conformance-seeds.mjs";
+import { buildMainReport, buildDevReport } from "./lib/conformance-report.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const spec = JSON.parse(readFileSync(join(root, "openapi.json"), "utf8"));
@@ -55,59 +64,6 @@ function validatorFor(name) {
     return { _compileError: e.message };
   }
 }
-
-// ── Seed map: how to obtain an id for each id-required endpoint ──────
-// kind: "const" | "item" | "list" (pluck first array item's `field`, default id)
-const SEEDS = {
-  "company/companies": { kind: "const", value: "1" },
-  "market/properties": { kind: "const", value: "1" },
-  "market/rentals": { kind: "const", value: "1" },
-  "market/itemmarket": { kind: "item" },
-  "market/auctionhouselisting": { kind: "list", source: "market/auctionhouse" },
-  // itemdetails needs a specific item UID (instance), not the item type id; pull
-  // one from a live auction-house listing's nested item.uid.
-  "torn/itemdetails": { kind: "list", source: "market/auctionhouse", field: "item.uid" },
-  "faction/crime": { kind: "list", source: "faction/crimes" },
-  "faction/raidreport": { kind: "list", source: "faction/raids" },
-  "faction/rankedwarreport": { kind: "list", source: "faction/rankedwars" },
-  "faction/territorywarreport": { kind: "list", source: "faction/territorywars" },
-  "forum/thread": { kind: "list", source: "forum/threads" },
-  "forum/posts": { kind: "list", source: "forum/threads" },
-  "racing/race": {
-    kind: "list",
-    source: "racing/races",
-    sourceParams: { sort: "ASC" }, // oldest races are finished; race detail needs a finished race
-    where: { status: "finished" },
-  },
-  "racing/records": { kind: "list", source: "racing/tracks" },
-  // crimes & subcrimes key off a crime TYPE id (1-13 from torn/crimes), not an
-  // organized-crime id.
-  "torn/subcrimes": { kind: "list", source: "torn/crimes" },
-  "user/crimes": { kind: "list", source: "torn/crimes" },
-  "user/trade": { kind: "list", source: "user/trades" },
-  "torn/eliminationteam": { kind: "list", source: "torn/elimination" },
-};
-
-// ── Param seeds ─────────────────────────────────────────────────────
-// Some endpoints need a required QUERY param whose value must come from live
-// data (not an enum default and not a path id). Resolve it from a list source.
-const PARAM_SEEDS = {
-  // attacklog needs a 'log' code; every user/attacks row carries one.
-  "torn/attacklog": { param: "log", source: "user/attacks", field: "code" },
-};
-
-// ── Documented skips ────────────────────────────────────────────────
-// Endpoints that can't be live-validated with the test key, and why. Like the
-// drift baseline: a skip listed here is EXPECTED (account state or no id source,
-// verified 2026-06), so it's reported quietly. A skip NOT listed here is
-// unexpected — a seed broke, or a new endpoint needs one — and gets surfaced.
-const DOCUMENTED_SKIPS = {
-  "user/trade": "transient — tested when an active trade exists, quietly skipped when there are none",
-  "torn/eliminationteam": "seasonal elimination event; team id rejected off-season (Torn 'Incorrect ID')",
-  "company/snapshot": "returns CSV, not JSON — outside schema scope",
-  "faction/snapshot": "returns CSV, not JSON — outside schema scope",
-  "user/snapshot": "returns CSV, not JSON — outside schema scope",
-};
 
 // ── Throttle (proactive batches + reactive Torn code 5 retry) ────────
 // Tune with:
@@ -157,13 +113,6 @@ function defaultParams(def) {
   }
   return params;
 }
-
-// Some endpoints mark a param optional but the API needs it (e.g. inventory and
-// personalstats require a category). Supply a valid value so they can be tested.
-const PARAM_OVERRIDES = {
-  "user/inventory": { cat: "Collectible" },
-  "user/personalstats": { cat: "all" },
-};
 
 const cache = new Map(); // source "tag/ep" or "ctx:userId" → resolved value
 async function tornGet(path, params) {
@@ -477,7 +426,7 @@ const { newDrift, knownDrift, resolved, notEvaluated } = reconcileBaseline(resul
   compileOnly: COMPILE_ONLY,
 });
 
-// ── Report (human-first) ────────────────────────────────────────────
+// ── Classify results for reporting ──────────────────────────────────
 const pass = results.filter((r) => r.status === "pass");
 const smells = results.filter((r) => r.status === "smell");
 const skips = results.filter((r) => r.status === "skip");
@@ -494,198 +443,35 @@ const nowTestable = COMPILE_ONLY
       return r && r.status !== "skip";
     });
 
-const lines = [];
-lines.push(`# Torn conformance report`);
-lines.push("");
-lines.push(`OpenAPI ${catalog.openapiVersion} · ${results.length} endpoints · mode: ${COMPILE_ONLY ? "compile-check (no calls)" : "live"}`);
-lines.push("");
-lines.push(
-  `**${pass.length} ok** · **${newDrift.length} NEW drift** · ` +
-    `${knownDrift.length} known drift · ${smells.length} spec smell · ` +
-    `${skips.length} not tested (${unexpectedSkips.length} unexpected)`,
-);
-
-if (newDrift.length) {
-  lines.push("");
-  lines.push(`## ❌ NEW drift — fails the run, look at these (${newDrift.length})`);
-  lines.push("Not in the baseline — something changed since it was accepted.");
-  lines.push("");
-  lines.push("| Endpoint | What's new |");
-  lines.push("|----------|-----------|");
-  for (const r of newDrift) lines.push(`| \`${r.ep}\` | ${(r.newReasons ?? []).join("<br>") || "—"} |`);
-}
-
-if (resolved.length) {
-  lines.push("");
-  lines.push(`## ✅ Resolved — Torn fixed these; prune the baseline (${resolved.length})`);
-  for (const r of resolved) lines.push(`- \`${r.ep}\`: ${r.gone.join("; ")}`);
-}
-
-if (notEvaluated.length) {
-  lines.push("");
-  lines.push(`## ⏸️ Baseline not evaluated — no runtime evidence this run (${notEvaluated.length})`);
-  lines.push("These accepted-drift entries were neither confirmed nor resolved; nothing to act on.");
-  for (const r of notEvaluated) lines.push(`- \`${r.ep}\`: ${r.why}`);
-}
-
-if (knownDrift.length) {
-  lines.push("");
-  lines.push(`## 🟡 Known drift — accepted Torn spec bugs, not failing (${knownDrift.length})`);
-  lines.push("| Endpoint | What's wrong |");
-  lines.push("|----------|--------------|");
-  for (const r of knownDrift) lines.push(`| \`${r.ep}\` | ${(r.reasons ?? []).join("<br>") || "—"} |`);
-}
-
-if (smells.length) {
-  lines.push("");
-  lines.push(`## ⚠️ Spec smells — ignore (${smells.length})`);
-  lines.push(
-    "A schema union whose branches genuinely overlap in a way relax-oneof.mjs doesn't " +
-      "already resolve — not real drift, but worth a look. Endpoints: " +
-      smells.map((r) => `\`${r.ep}\``).join(", "),
-  );
-}
-
-if (unexpectedSkips.length) {
-  lines.push("");
-  lines.push(`## ⏭️ Unexpected skips — look at these (${unexpectedSkips.length})`);
-  lines.push("Not documented as un-seedable — a seed broke or a new endpoint needs one.");
-  lines.push("");
-  lines.push("| Endpoint | Why |");
-  lines.push("|----------|-----|");
-  for (const r of unexpectedSkips) lines.push(`| \`${r.ep}\` | ${r.note ?? ""} |`);
-}
-
-if (nowTestable.length) {
-  lines.push("");
-  lines.push(`## 🔓 Now testable — drop from DOCUMENTED_SKIPS (${nowTestable.length})`);
-  lines.push(
-    "These documented skips returned data this run, so they can be validated: " +
-      nowTestable.map((ep) => `\`${ep}\``).join(", "),
-  );
-}
-
-if (documentedSkips.length) {
-  lines.push("");
-  lines.push(`## 🟦 Expected skips — known un-seedable on the test account (${documentedSkips.length})`);
-  lines.push("| Endpoint | Reason | Torn said |");
-  lines.push("|----------|--------|-----------|");
-  for (const r of documentedSkips) {
-    lines.push(`| \`${r.ep}\` | ${DOCUMENTED_SKIPS[r.ep]} | ${r.note ?? ""} |`);
-  }
-}
-
-if (compileIssues.length) {
-  lines.push("");
-  lines.push(`## Schemas that wouldn't compile (${compileIssues.length})`);
-  for (const c of compileIssues) lines.push(`- ${c}`);
-}
-
-const report = lines.join("\n");
+// ── Build and write reports ──────────────────────────────────────────
+const report = buildMainReport({
+  catalog,
+  results,
+  pass,
+  newDrift,
+  knownDrift,
+  resolved,
+  notEvaluated,
+  smells,
+  skips,
+  documentedSkips,
+  unexpectedSkips,
+  nowTestable,
+  compileIssues,
+  DOCUMENTED_SKIPS,
+  compileOnly: COMPILE_ONLY,
+});
 console.log(report);
 writeFileSync(join(root, "conformance-report.md"), report + "\n");
 
-// ── Dev-facing report ───────────────────────────────────────────────
-// The report above is maintenance tooling (baselines, seeds, skip lists) and
-// confused Torn's devs when sent as-is ("what are you asking us to do?").
-// This one is written FOR them: the ask up front, only actionable sections,
-// reasons in backticks so `*` survives markdown rendering.
-// Live mode only — a compile-check run has no pass/drift data and would misreport everything.
+// The dev report is live-mode only — a compile-check run has no pass/drift data
+// and would misreport everything.
 let devReport = null;
 if (!COMPILE_ONLY) {
-const devDrift = [
-  ...newDrift.map((r) => ({ ep: r.ep, reasons: r.newReasons ?? [], evidence: r.evidence ?? {}, findings: r.devFindings ?? [] })),
-  ...knownDrift.map((r) => ({ ep: r.ep, reasons: r.reasons ?? [], evidence: r.evidence ?? {}, findings: r.devFindings ?? [] })),
-];
-const csvEndpoints = skips.filter((r) => /is not valid JSON/.test(r.note ?? "")).map((r) => r.ep);
-// Spec-facing identifiers. The internal `tag/name` labels are NOT 1:1 with
-// openapi.json: the name is the last non-{param} path segment, and id/no-id
-// variants of an endpoint are merged into one catalog entry. Devs search the
-// spec by path and schema name, so translate before showing them anything.
-const epDef = (ep) => {
-  const [tag, name] = ep.split("/");
-  return catalog.tags?.[tag]?.[name];
-};
-const specPath = (ep) => {
-  const def = epDef(ep);
-  return def ? (def.path ?? def.idPath) : ep;
-};
-const specSchema = (ep) => {
-  const def = epDef(ep);
-  return (def && responseRef(def)) || null;
-};
-const dev = [];
-dev.push(`# Torn API — OpenAPI spec vs live responses`);
-dev.push("");
-dev.push(
-  `An automated check called every GET endpoint in the public OpenAPI spec ` +
-    `(v${catalog.openapiVersion}) with a real key and validated each live JSON response ` +
-    `against the response schema the spec documents for it. ` +
-    `${pass.length} of ${results.length} endpoints matched exactly; the exceptions are below. ` +
-    `(Id-scoped and unscoped variants of the same endpoint are counted once, so the total is ` +
-    `lower than the spec's raw GET operation count.)`,
-);
-dev.push("");
-dev.push(
-  `**The ask: for each endpoint listed, correct the OpenAPI spec so the documented ` +
-    `response shape matches what the API actually returns** (or change the response, if the ` +
-    `spec is the intended shape). This is documentation drift, not a gameplay bug report — ` +
-    `the endpoints all work; their documented types are what's off. It bites anyone ` +
-    `generating typed clients or validating responses from the spec.`,
-);
-if (devDrift.length) {
-  dev.push("");
-  dev.push(`## Spec/response mismatches (${devDrift.length} endpoints)`);
-  dev.push("");
-  dev.push(
-    "Sample payloads are live API v2 responses, trimmed to the relevant branch; " +
-      "`// <--` marks the offending line in each payload. " +
-      "Endpoint paths and schema names are copied verbatim from `openapi.json`, so both " +
-      "can be searched in the spec directly. In each mismatch, the path is where inside " +
-      "the JSON response body, and `*` stands for any array index or numeric key.",
-  );
-  for (const r of devDrift) {
-    const sch = specSchema(r.ep);
-    dev.push("");
-    dev.push(`### \`GET ${specPath(r.ep)}\`${sch ? ` (schema \`${sch}\`)` : ""}`);
-    const findings = r.findings.length
-      ? r.findings
-      : [{ statements: r.reasons.map((x) => `\`${x}\``), payload: null }];
-    for (const f of findings) {
-      dev.push("");
-      dev.push(f.statements.join(";\n") + ":");
-      dev.push("");
-      if (f.payload) {
-        dev.push("```json");
-        dev.push(f.payload);
-        dev.push("```");
-      } else {
-        dev.push("Payload omitted - large response; a trimmed sample is available on request.");
-      }
-    }
-  }
+  devReport = buildDevReport({ catalog, results, pass, newDrift, knownDrift, skips, resolved, responseRef });
+  writeFileSync(join(root, "conformance-for-torn.md"), devReport);
 }
-if (csvEndpoints.length) {
-  dev.push("");
-  dev.push(`## Content-type mismatch (${csvEndpoints.length} endpoints)`);
-  dev.push("");
-  dev.push(
-    "These return CSV while the spec documents an `application/json` response: " +
-      csvEndpoints.map((ep) => `\`GET ${specPath(ep)}\``).join(", ") +
-      ". If CSV is intended, documenting `text/csv` in the spec would fix it.",
-  );
-}
-if (resolved.length) {
-  dev.push("");
-  dev.push(`## Fixed since the previous run — confirmed live, thank you (${resolved.length})`);
-  dev.push("");
-  for (const r of resolved) {
-    dev.push(`- \`GET ${specPath(r.ep)}\`: ${r.gone.map((x) => `\`${x}\``).join("; ")}`);
-  }
-}
-devReport = dev.join("\n") + "\n";
-writeFileSync(join(root, "conformance-for-torn.md"), devReport);
-}
+
 writeFileSync(
   join(root, "conformance.json"),
   JSON.stringify(
