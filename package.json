@@ -22,16 +22,16 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250510.0",
+    "@cloudflare/workers-types": "^5.20260916.1",
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "openapi-typescript": "^7.13.0",
     "typescript": "^5.5.4",
     "vitest": "^5.0.0",
-    "wrangler": "^4.103.0"
+    "wrangler": "^4.132.0"
   },
   "overrides": {
-    "esbuild": "^0.28.1",
+    "esbuild": "^0.28.2",
     "js-yaml": "^4.3.2",
     "ws": "^8.21.0"
   }
