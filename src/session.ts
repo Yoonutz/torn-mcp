@@ -38,3 +38,24 @@ export async function staleSessionResponse(request: Request): Promise<Response> 
     { status: 404, headers: { "content-type": "application/json" } },
   );
 }
+
+/**
+ * The Worker answers GET /mcp itself with 405, which the Streamable HTTP spec
+ * allows ("the server does not offer an SSE stream at this endpoint"), and the
+ * SDK client treats as expected. Forwarding GET let the transport open a
+ * standalone SSE stream that stays open for the whole client session, keeping
+ * the session DO awake and billed for Durable Object duration while idle. No
+ * tool sends server-initiated messages; progress and results ride the POST
+ * response, so nothing is lost. Returns null for every other method.
+ */
+export function standaloneSseRejection(request: Request): Response | null {
+  if (request.method !== "GET") return null;
+  return new Response(
+    JSON.stringify({
+      jsonrpc: "2.0",
+      error: { code: -32000, message: "Method not allowed: this server does not offer a standalone SSE stream" },
+      id: null,
+    }),
+    { status: 405, headers: { Allow: "POST, DELETE", "content-type": "application/json" } },
+  );
+}

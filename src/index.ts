@@ -29,12 +29,12 @@ import { RateLimiter, LIMIT, type RateCheck } from "./rateLimiter.js";
 import { dualResult, errorResult, type ToolResult } from "./mcpResult.js";
 import { registerAllTools } from "./tools.js";
 import { KEY_HEADER, MISSING_KEY_ERROR, keyFromHeaders } from "./auth.js";
-import { isStaleSessionRequest, staleSessionResponse } from "./session.js";
+import { isStaleSessionRequest, staleSessionResponse, standaloneSseRejection } from "./session.js";
 
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.11.0";
+const VERSION = "0.11.1";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -298,6 +298,11 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === "/mcp") {
+      // GET would open an idle SSE stream that keeps the session DO awake
+      // (billed duration) for the whole client session; answer it here.
+      const rejected = standaloneSseRejection(request);
+      if (rejected) return rejected;
+
       // Sticky-route each MCP session to its own Durable Object.
       const sessionId = request.headers.get("Mcp-Session-Id") ?? crypto.randomUUID();
       const stub = env.MCP_OBJECT.get(env.MCP_OBJECT.idFromName(sessionId));

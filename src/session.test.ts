@@ -1,6 +1,6 @@
 // @license MIT
 import { describe, it, expect } from "vitest";
-import { isStaleSessionRequest, staleSessionResponse } from "./session.js";
+import { isStaleSessionRequest, staleSessionResponse, standaloneSseRejection } from "./session.js";
 
 const req = (headers: Record<string, string> = {}, method = "POST") =>
   new Request("https://mcp-session/mcp", { method, headers });
@@ -40,5 +40,23 @@ describe("staleSessionResponse", () => {
     });
     await staleSessionResponse(request);
     expect(request.bodyUsed).toBe(true);
+  });
+});
+
+describe("standaloneSseRejection", () => {
+  it("answers GET with 405 and an Allow header, so no session DO wakes for an idle SSE stream", () => {
+    const res = standaloneSseRejection(req({ "Mcp-Session-Id": "abc", Accept: "text/event-stream" }, "GET"));
+    expect(res).not.toBeNull();
+    expect(res!.status).toBe(405);
+    expect(res!.headers.get("Allow")).toBe("POST, DELETE");
+  });
+
+  it("rejects GET even without a session id", () => {
+    expect(standaloneSseRejection(req({}, "GET"))?.status).toBe(405);
+  });
+
+  it("lets POST and DELETE through to the session DO", () => {
+    expect(standaloneSseRejection(req({ "Mcp-Session-Id": "abc" }, "POST"))).toBeNull();
+    expect(standaloneSseRejection(req({ "Mcp-Session-Id": "abc" }, "DELETE"))).toBeNull();
   });
 });
