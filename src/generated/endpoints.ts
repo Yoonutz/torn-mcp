@@ -3573,6 +3573,24 @@ export const ENDPOINTS = {
           "type": "integer"
         },
         {
+          "name": "sort",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "description": "Sorted by the greatest timestamps",
+          "enum": [
+            "DESC",
+            "ASC"
+          ]
+        },
+        {
+          "name": "cursor",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Opaque cursor from pagination links for searches without a name, in either sort direction. Offset is ignored for these searches."
+        },
+        {
           "name": "timestamp",
           "in": "query",
           "required": false,

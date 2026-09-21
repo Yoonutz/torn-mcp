@@ -10627,6 +10627,8 @@ export interface components {
         ApiTarget: number;
         /** @description Sorted by the greatest timestamps */
         ApiSort: "DESC" | "ASC";
+        /** @description Opaque cursor from pagination links for searches without a name, in either sort direction. Offset is ignored for these searches. */
+        ApiCursor: string;
         /** @description Sorted by the greatest timestamps */
         ApiSortDesc: "DESC" | "ASC";
         /** @description Sort rows from newest to oldest<br>Default ordering is ascending */
@@ -12859,6 +12861,10 @@ export interface operations {
                  */
                 filters?: components["parameters"]["ApiUserSearchFilter"];
                 offset?: components["parameters"]["ApiOffset"];
+                /** @description Sorted by the greatest timestamps */
+                sort?: components["parameters"]["ApiSort"];
+                /** @description Opaque cursor from pagination links for searches without a name, in either sort direction. Offset is ignored for these searches. */
+                cursor?: components["parameters"]["ApiCursor"];
                 /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
