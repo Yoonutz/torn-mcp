@@ -62,7 +62,7 @@ if (diff.hasChanges) {
   const prior = existsSync(changelogPath)
     ? readFileSync(changelogPath, "utf8").replace(header, "")
     : "";
-  const entry = `## ${date} — OpenAPI ${newCat.openapiVersion}\n\n${report}\n\n`;
+  const entry = `## ${date} - OpenAPI ${newCat.openapiVersion}\n\n${report}\n\n`;
   writeFileSync(changelogPath, header + entry + prior);
 
   // Commit message for the workflow (gitignored file).

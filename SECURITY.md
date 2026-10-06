@@ -46,7 +46,7 @@ Torn API keys are treated as secrets on every request:
   control: Cloudflare's own edge/analytics data, and the upstream leg, where the
   key is sent to `api.torn.com` as the `key` query parameter Torn documents.
 - **Egress-restricted (SSRF guard).** Outbound calls go only to the fixed
-  `api.torn.com` host, even when following Torn's own pagination links — the key
+  `api.torn.com` host, even when following Torn's own pagination links - the key
   can never be sent anywhere else.
 - **Read-only.** The Torn API v2 exposes only `GET` endpoints, so the server
   cannot modify your account or take in-game actions.
@@ -60,7 +60,7 @@ Use the lowest-scope Torn key that covers your needs.
   `wrangler secret put TORN_API_KEY`); never bake them into images or commit
   them. `.dev.vars` and `.env` are gitignored.
 - The optional admin/fallback key (`TORN_API_KEY`) makes header-less callers
-  single-tenant — set it only if you intend that.
+  single-tenant - set it only if you intend that.
 
 ## Dependencies
 
@@ -70,7 +70,7 @@ documented rather than force-upgraded when the upgrade would break the build.
 
 The deployed Worker's only runtime dependencies are `@modelcontextprotocol/sdk`
 and `zod`. Transitive advisories in dev/build tooling are pinned to patched
-versions via `overrides` in `package.json` — surgically, without downgrading the
+versions via `overrides` in `package.json` - surgically, without downgrading the
 direct dependency. Currently pinned: `ws` (via `wrangler`→`miniflare`), `js-yaml`
 (via `openapi-typescript`→`@redocly`), and `esbuild`.
 

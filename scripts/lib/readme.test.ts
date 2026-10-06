@@ -19,7 +19,8 @@ describe("renderToolTable", () => {
     expect(table).toMatch(/\| `torn_user` +\| 4 +\| `profile`, `bars`, `money`, `events` +\|/);
     expect(table).toMatch(/\| `torn_property` +\| 1 +\| `property` +\|/);
     expect(table.indexOf("torn_user")).toBeLessThan(table.indexOf("torn_property"));
-    expect(table).toMatch(/\| `torn_list_endpoints` \| — +\| discovery: lists every endpoint per tag \|/);
+    expect(table).toMatch(/\| `torn_list_endpoints` \| - +\| discovery: lists every endpoint per tag \|/);
+    expect(table).not.toContain("—");
   });
 
   it("pads columns Prettier-style so formatting the README is a no-op", () => {

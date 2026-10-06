@@ -1,0 +1,14 @@
+{
+  "rules": [
+    {
+      "name": "root-docs-no-em-dash",
+      "glob": "*.md",
+      "bannedPhrases": ["—"]
+    },
+    {
+      "name": "docs-no-em-dash",
+      "glob": "docs/**/*.md",
+      "bannedPhrases": ["—"]
+    }
+  ]
+}

@@ -23,7 +23,7 @@ export function renderToolTable(catalog) {
     const examples = r.names.slice(0, EXAMPLES).map((n) => `\`${n}\``).join(", ");
     cells.push([`\`torn_${r.tag}\``, String(r.names.length), examples]);
   }
-  cells.push(["`torn_list_endpoints`", "—", "discovery: lists every endpoint per tag"]);
+  cells.push(["`torn_list_endpoints`", "-", "discovery: lists every endpoint per tag"]);
   const widths = cells[0].map((_, i) => Math.max(...cells.map((row) => [...row[i]].length)));
   const pad = (s, w) => s + " ".repeat(w - [...s].length);
   const line = (row) => `| ${row.map((c, i) => pad(c, widths[i])).join(" | ")} |`;

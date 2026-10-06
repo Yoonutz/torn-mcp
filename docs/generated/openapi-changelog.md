@@ -1,9 +1,9 @@
 # Torn OpenAPI change log
 
-## 2026-09-21 — OpenAPI 6.13.6
+## 2026-09-21 - OpenAPI 6.13.6
 
 **OpenAPI version:** 6.13.5 → 6.13.6
-**Endpoints:** 187 → 187 catalog (from 234 → 234 raw operations) — +0 −0 ~1, 186 unchanged
+**Endpoints:** 187 → 187 catalog (from 234 → 234 raw operations) - +0 −0 ~1, 186 unchanged
 
 | Category | Endpoints | + Added | − Removed | ~ Changed |
 |----------|-----------|---------|-----------|-----------|
@@ -19,10 +19,10 @@
 | **Total** | **187** | **0** | **0** | **1** |
 **Changed (params/enums):** user/search
 
-## 2026-09-14 — OpenAPI 6.13.5
+## 2026-09-14 - OpenAPI 6.13.5
 
 **OpenAPI version:** 6.13.4 → 6.13.5
-**Endpoints:** 187 → 187 catalog (from 234 → 234 raw operations) — +0 −0 ~0, 187 unchanged
+**Endpoints:** 187 → 187 catalog (from 234 → 234 raw operations) - +0 −0 ~0, 187 unchanged
 
 | Category | Endpoints | + Added | − Removed | ~ Changed |
 |----------|-----------|---------|-----------|-----------|
@@ -37,10 +37,10 @@
 | key | 2 | 0 | 0 | 0 |
 | **Total** | **187** | **0** | **0** | **0** |
 
-## 2026-09-08 — OpenAPI 6.13.4
+## 2026-09-08 - OpenAPI 6.13.4
 
 **OpenAPI version:** 6.13.1 → 6.13.4
-**Endpoints:** 187 → 187 catalog (from 234 → 234 raw operations) — +0 −0 ~0, 187 unchanged
+**Endpoints:** 187 → 187 catalog (from 234 → 234 raw operations) - +0 −0 ~0, 187 unchanged
 
 | Category | Endpoints | + Added | − Removed | ~ Changed |
 |----------|-----------|---------|-----------|-----------|
@@ -55,10 +55,10 @@
 | key | 2 | 0 | 0 | 0 |
 | **Total** | **187** | **0** | **0** | **0** |
 
-## 2026-08-23 — OpenAPI 6.13.1
+## 2026-08-23 - OpenAPI 6.13.1
 
 **OpenAPI version:** 6.9.0 → 6.13.1
-**Endpoints:** 175 → 186 catalog (from 222 → 234 raw operations) — +11 −0 ~3, 172 unchanged
+**Endpoints:** 175 → 186 catalog (from 222 → 234 raw operations) - +11 −0 ~3, 172 unchanged
 
 | Category | Endpoints | + Added | − Removed | ~ Changed |
 |----------|-----------|---------|-----------|-----------|
@@ -76,10 +76,10 @@
 **Added:** faction/crimeexp, faction/inventory, torn/bank, torn/cards, torn/cityshops, torn/gyms, torn/itemstats, torn/pokertables, torn/rockpaperscissors, torn/stats, user/gym
 **Changed (params/enums):** faction/contributors, torn/itemdetails, user/log
 
-## 2026-08-17 — OpenAPI 6.9.0
+## 2026-08-17 - OpenAPI 6.9.0
 
 **OpenAPI version:** 6.6.1 → 6.9.0
-**Endpoints:** 166 → 175 catalog (from 211 → 222 raw operations) — +9 −0 ~1, 165 unchanged
+**Endpoints:** 166 → 175 catalog (from 211 → 222 raw operations) - +9 −0 ~1, 165 unchanged
 
 | Category | Endpoints | + Added | − Removed | ~ Changed |
 |----------|-----------|---------|-----------|-----------|
@@ -97,10 +97,10 @@
 **Added:** faction/dirtybombs, faction/warfarechains, faction/warfareraids, faction/warfareranked, faction/warfareterritory, torn/companies, torn/searchforcash, torn/shoplifting, user/search
 **Changed (params/enums):** user/medals
 
-## 2026-08-10 — OpenAPI 6.6.1
+## 2026-08-10 - OpenAPI 6.6.1
 
 **OpenAPI version:** 6.3.1 → 6.6.1
-**Endpoints:** 163 → 166 catalog (from 208 → 211 raw operations) — +3 −0 ~0, 163 unchanged
+**Endpoints:** 163 → 166 catalog (from 208 → 211 raw operations) - +3 −0 ~0, 163 unchanged
 
 | Category | Endpoints | + Added | − Removed | ~ Changed |
 |----------|-----------|---------|-----------|-----------|
@@ -117,10 +117,10 @@
 
 **Added:** market/pointsmarket, user/networth, user/perks
 
-## 2026-08-03 — OpenAPI 6.3.1
+## 2026-08-03 - OpenAPI 6.3.1
 
 **OpenAPI version:** 6.2.0 → 6.3.1
-**Endpoints:** 162 → 163 catalog (from 207 → 208 raw operations) — +1 −0 ~0, 162 unchanged
+**Endpoints:** 162 → 163 catalog (from 207 → 208 raw operations) - +1 −0 ~0, 162 unchanged
 
 | Category | Endpoints | + Added | − Removed | ~ Changed |
 |----------|-----------|---------|-----------|-----------|
@@ -137,10 +137,10 @@
 
 **Added:** user/snapshot
 
-## 2026-07-27 — OpenAPI 6.2.0
+## 2026-07-27 - OpenAPI 6.2.0
 
 **OpenAPI version:** 6.1.1 → 6.2.0
-**Endpoints:** 161 → 162 catalog (from 206 → 207 raw operations) — +1 −0 ~0, 161 unchanged
+**Endpoints:** 161 → 162 catalog (from 206 → 207 raw operations) - +1 −0 ~0, 161 unchanged
 
 | Category | Endpoints | + Added | − Removed | ~ Changed |
 |----------|-----------|---------|-----------|-----------|
@@ -157,10 +157,10 @@
 
 **Added:** torn/museum
 
-## 2026-07-20 — OpenAPI 6.1.1
+## 2026-07-20 - OpenAPI 6.1.1
 
 **OpenAPI version:** 6.0.3 → 6.1.1
-**Endpoints:** 160 → 161 catalog (from 205 → 206 raw operations) — +1 −0 ~0, 160 unchanged
+**Endpoints:** 160 → 161 catalog (from 205 → 206 raw operations) - +1 −0 ~0, 160 unchanged
 
 | Category | Endpoints | + Added | − Removed | ~ Changed |
 |----------|-----------|---------|-----------|-----------|
@@ -177,10 +177,10 @@
 
 **Added:** faction/snapshot
 
-## 2026-07-13 — OpenAPI 6.0.3
+## 2026-07-13 - OpenAPI 6.0.3
 
 **OpenAPI version:** 6.0.0 → 6.0.3
-**Endpoints:** 160 → 160 catalog (from 205 → 205 raw operations) — +0 −0 ~1, 159 unchanged
+**Endpoints:** 160 → 160 catalog (from 205 → 205 raw operations) - +0 −0 ~1, 159 unchanged
 
 | Category | Endpoints | + Added | − Removed | ~ Changed |
 |----------|-----------|---------|-----------|-----------|

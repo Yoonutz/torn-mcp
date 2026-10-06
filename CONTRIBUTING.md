@@ -4,7 +4,7 @@ A short reference for the tasks that come up most often when maintaining this re
 
 ## Generated files
 
-The following files are **auto-generated** — do not edit them by hand:
+The following files are **auto-generated** - do not edit them by hand:
 
 | File | Source of truth | Regenerate with |
 |------|----------------|-----------------|

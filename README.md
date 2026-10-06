@@ -4,12 +4,12 @@
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
 
-A remote [Model Context Protocol](https://modelcontextprotocol.io) server for the [Torn City](https://www.torn.com) API v2, running on **Cloudflare Workers**. Connect from VS Code (or any MCP client) anywhere — no local install. You supply your Torn API key via the `X-Torn-Api-Key` header; it is never stored, never shown to the model, and never read from the URL (see [Security & privacy](#security--privacy)).
+A remote [Model Context Protocol](https://modelcontextprotocol.io) server for the [Torn City](https://www.torn.com) API v2, running on **Cloudflare Workers**. Connect from VS Code (or any MCP client) anywhere - no local install. You supply your Torn API key via the `X-Torn-Api-Key` header; it is never stored, never shown to the model, and never read from the URL (see [Security & privacy](#security--privacy)).
 
-**Tools:** one grouped tool per Torn tag (`torn_user`, `torn_faction`, `torn_torn`, `torn_company`, `torn_market`, `torn_racing`, `torn_forum`, `torn_property`, `torn_key`) covering all 187 endpoints across 234 operations of the spec via an `endpoint` argument — plus **12 intelligence tools** that aggregate endpoints into structured summaries (`analyze_player`, `war_readiness_report`, `find_profitable_items`, …) and `torn_list_endpoints` for discovery.
+**Tools:** one grouped tool per Torn tag (`torn_user`, `torn_faction`, `torn_torn`, `torn_company`, `torn_market`, `torn_racing`, `torn_forum`, `torn_property`, `torn_key`) covering all 187 endpoints across 234 operations of the spec via an `endpoint` argument - plus **12 intelligence tools** that aggregate endpoints into structured summaries (`analyze_player`, `war_readiness_report`, `find_profitable_items`, …) and `torn_list_endpoints` for discovery.
 
 > [!NOTE]
-> Read-only. The Torn API v2 exposes only `GET` endpoints — this server can never modify your account or take in-game actions.
+> Read-only. The Torn API v2 exposes only `GET` endpoints - this server can never modify your account or take in-game actions.
 
 ## Install
 
@@ -25,9 +25,9 @@ https://torn-mcp.yoonutz.workers.dev/mcp
 [![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-Install-24bfa5?logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=torn&quality=insiders&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Ftorn-mcp.yoonutz.workers.dev%2Fmcp%22%2C%22headers%22%3A%7B%22X-Torn-Api-Key%22%3A%22YOUR_TORN_API_KEY%22%7D%7D)
 [![Install in Cursor](https://img.shields.io/badge/Cursor-Install-000000?logo=cursor&logoColor=white)](https://cursor.com/install-mcp?name=torn&config=eyJ1cmwiOiJodHRwczovL3Rvcm4tbWNwLnlvb251dHoud29ya2Vycy5kZXYvbWNwIiwiaGVhZGVycyI6eyJYLVRvcm4tQXBpLUtleSI6IllPVVJfVE9STl9BUElfS0VZIn19)
 
-Click a badge → the client opens with the server pre-filled. It installs with a `YOUR_TORN_API_KEY` placeholder — replace it with your real key ([get one](#get-a-torn-api-key)) in the client's MCP settings after install.
+Click a badge → the client opens with the server pre-filled. It installs with a `YOUR_TORN_API_KEY` placeholder - replace it with your real key ([get one](#get-a-torn-api-key)) in the client's MCP settings after install.
 
-**Setup guides** (these clients have no one-click protocol — badge links to their MCP docs; use the config blocks below):
+**Setup guides** (these clients have no one-click protocol - badge links to their MCP docs; use the config blocks below):
 
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Setup-D97757?logo=anthropic&logoColor=white)](https://docs.claude.com/en/docs/claude-code/mcp)
 [![Claude Desktop](https://img.shields.io/badge/Claude_Desktop-Setup-D97757?logo=anthropic&logoColor=white)](https://modelcontextprotocol.io/quickstart/user)
@@ -35,7 +35,7 @@ Click a badge → the client opens with the server pre-filled. It installs with 
 [![Visual Studio](https://img.shields.io/badge/Visual_Studio-Setup-5C2D91?logo=visualstudio&logoColor=white)](https://learn.microsoft.com/en-us/visualstudio/ide/mcp-servers)
 [![Continue](https://img.shields.io/badge/Continue-Setup-000000?logo=continue&logoColor=white)](https://docs.continue.dev/customize/deep-dives/mcp)
 
-Or set it up manually — pick your client below. Prefer to self-host? See [Deploy](#deploy).
+Or set it up manually - pick your client below. Prefer to self-host? See [Deploy](#deploy).
 
 <details>
 <summary><b>Claude Code</b> (CLI)</summary>
@@ -58,15 +58,15 @@ macOS / Linux (bash, zsh):
 code --add-mcp '{"name":"torn","type":"http","url":"https://torn-mcp.yoonutz.workers.dev/mcp","headers":{"X-Torn-Api-Key":"YOUR_TORN_API_KEY"}}'
 ```
 
-Windows PowerShell — escape the inner quotes with `\"` (the `code.cmd` shim strips plain quotes otherwise):
+Windows PowerShell - escape the inner quotes with `\"` (the `code.cmd` shim strips plain quotes otherwise):
 
 ```powershell
 code --add-mcp '{\"name\":\"torn\",\"type\":\"http\",\"url\":\"https://torn-mcp.yoonutz.workers.dev/mcp\",\"headers\":{\"X-Torn-Api-Key\":\"YOUR_TORN_API_KEY\"}}'
 ```
 
-Insiders: use `code-insiders`. Then open **Copilot Chat → Agent mode → 🛠️ tools** and enable `torn`. (If quoting still fights you, use the manual `mcp.json` below — no escaping needed.)
+Insiders: use `code-insiders`. Then open **Copilot Chat → Agent mode → 🛠️ tools** and enable `torn`. (If quoting still fights you, use the manual `mcp.json` below - no escaping needed.)
 
-Manual alternative — user `mcp.json` (Command Palette → _MCP: Open User Configuration_):
+Manual alternative - user `mcp.json` (Command Palette → _MCP: Open User Configuration_):
 
 ```json
 {
@@ -192,7 +192,7 @@ mcpServers:
 
 </details>
 
-> The **Claude Code** and **VS Code** CLI commands above are tested. The other clients use the same endpoint + `X-Torn-Api-Key` header (verified working), but their config key names and file paths can change between versions — check the client's own MCP docs if a connection fails.
+> The **Claude Code** and **VS Code** CLI commands above are tested. The other clients use the same endpoint + `X-Torn-Api-Key` header (verified working), but their config key names and file paths can change between versions - check the client's own MCP docs if a connection fails.
 
 > Security: putting the key inline lands it in config files / shell history. Where the client supports it (e.g. VS Code `${input:...}` prompts), prefer that over a plaintext key.
 
@@ -217,22 +217,22 @@ One grouped tool per Torn tag, each covering all of that tag's endpoints (table 
 | `torn_forum`          | 6         | `categories`, `posts`, `thread`, `threads`, `lookup`, `timestamp`                           |
 | `torn_property`       | 3         | `property`, `lookup`, `timestamp`                                                           |
 | `torn_key`            | 2         | `log`, `info`                                                                               |
-| `torn_list_endpoints` | —         | discovery: lists every endpoint per tag                                                     |
+| `torn_list_endpoints` | -         | discovery: lists every endpoint per tag                                                     |
 
 <!-- tools:end -->
 
 Each tool takes:
 
-- `endpoint` (required) — which data type to fetch (full list per tool, or call `torn_list_endpoints`).
-- `id` (optional) — entity id; used when the endpoint is entity-scoped or requires one. Item endpoints (`market/itemmarket`, `market/bazaar`, `torn/items`) also accept an item **name**; `ids` endpoints accept a comma-separated numeric list; `torn/itemdetails` and `torn/itemstats` take item **uids**, never names.
-- `params` (optional) — extra query options (`limit`, `from`, `to`, `sort`, `cat`, …). Only the params the called variant accepts are allowed; anything else is rejected with the accepted list, so a typo cannot be silently ignored by Torn.
+- `endpoint` (required) - which data type to fetch (full list per tool, or call `torn_list_endpoints`).
+- `id` (optional) - entity id; used when the endpoint is entity-scoped or requires one. Item endpoints (`market/itemmarket`, `market/bazaar`, `torn/items`) also accept an item **name**; `ids` endpoints accept a comma-separated numeric list; `torn/itemdetails` and `torn/itemstats` take item **uids**, never names.
+- `params` (optional) - extra query options (`limit`, `from`, `to`, `sort`, `cat`, …). Only the params the called variant accepts are allowed; anything else is rejected with the accepted list, so a typo cannot be silently ignored by Torn.
 
-The Torn key is **not** a tool parameter — it comes from the request header, so it never enters model context or client transcripts.
+The Torn key is **not** a tool parameter - it comes from the request header, so it never enters model context or client transcripts.
 
 ### Errors and non-JSON responses
 
 - Torn reports every error as **HTTP 200** with a JSON envelope `{ "error": { "code": N, "error": "..." } }`; the OpenAPI spec documents only the 200 success shape. The server detects the envelope on every endpoint and returns it as a tool error `Torn API error N: message`.
-- Three endpoints (`user/snapshot`, `faction/snapshot`, `company/snapshot`) answer **CSV**, not JSON (the spec documents `text/csv`). They are marked `[csv]` in the tool description and return `{ "csv": "<text>", "format": "text/csv" }` in the structured channel with the raw CSV as text — no pagination, no enrichment.
+- Three endpoints (`user/snapshot`, `faction/snapshot`, `company/snapshot`) answer **CSV**, not JSON (the spec documents `text/csv`). They are marked `[csv]` in the tool description and return `{ "csv": "<text>", "format": "text/csv" }` in the structured channel with the raw CSV as text - no pagination, no enrichment.
 - Any other non-JSON body is reported as `Torn API returned a non-JSON response.`
 
 ### Intelligence tools
@@ -254,24 +254,24 @@ Higher-level tools that aggregate multiple endpoints and return structured summa
 | `market_analysis`         | market/itemmarket ×N              | items ranked by spread                 |
 | `find_profitable_items`   | market/itemmarket + torn/items ×N | items ranked by margin                 |
 
-> War readiness is availability-based (okay/hospital/traveling, online, on-wall, in-OC) — per-member battlestats are not exposed by the Torn API.
+> War readiness is availability-based (okay/hospital/traveling, online, on-wall, in-OC) - per-member battlestats are not exposed by the Torn API.
 
 ## Security & privacy
 
-- Key supplied via the `X-Torn-Api-Key` header **only** — never a tool parameter, and never read from the URL. A `?key=` query parameter is ignored (the request fails with a "send the header" error), and the query string is not forwarded past the Worker's front door.
+- Key supplied via the `X-Torn-Api-Key` header **only** - never a tool parameter, and never read from the URL. A `?key=` query parameter is ignored (the request fails with a "send the header" error), and the query string is not forwarded past the Worker's front door.
 - Never stored, never returned in error messages.
-- **Logging, precisely:** this code writes no logs. Cloudflare Workers invocation logs (which would record `<Method> <URL>` per request) are switched off in `wrangler.toml` (`[observability.logs] invocation_logs = false`), so a request URL is not persisted even if a misconfigured client puts a key in it. What this repository cannot control: Cloudflare's own edge/analytics data, and the upstream leg — the key reaches `api.torn.com` as the `key` query parameter Torn documents, which is Torn's log surface, not ours.
+- **Logging, precisely:** this code writes no logs. Cloudflare Workers invocation logs (which would record `<Method> <URL>` per request) are switched off in `wrangler.toml` (`[observability.logs] invocation_logs = false`), so a request URL is not persisted even if a misconfigured client puts a key in it. What this repository cannot control: Cloudflare's own edge/analytics data, and the upstream leg - the key reaches `api.torn.com` as the `key` query parameter Torn documents, which is Torn's log surface, not ours.
 - Upstream calls are pinned to `https://api.torn.com` (SSRF guard) with `User-Agent: torn-mcp`.
-- Per-key rate limiting (~100 req/min, Torn's cap) via a Durable Object — returns a clear error instead of hammering Torn.
+- Per-key rate limiting (~100 req/min, Torn's cap) via a Durable Object - returns a clear error instead of hammering Torn.
 
 ### Dependencies
 
-The deployed Worker's runtime dependencies are `@modelcontextprotocol/sdk` and `zod`. Dev/build tooling advisories are pinned to patched versions via `overrides` in `package.json` (`esbuild`, `js-yaml`, `ws`); `npm audit` is part of the release check — see [SECURITY.md](SECURITY.md).
+The deployed Worker's runtime dependencies are `@modelcontextprotocol/sdk` and `zod`. Dev/build tooling advisories are pinned to patched versions via `overrides` in `package.json` (`esbuild`, `js-yaml`, `ws`); `npm audit` is part of the release check - see [SECURITY.md](SECURITY.md).
 
 ## Scope & roadmap
 
-Covered: all 9 Torn tags — every documented data endpoint (the counts in the table above are derived from the committed spec) as raw JSON, plus 12 intelligence tools and a discovery tool. The spec is re-synced from Torn weekly; see [docs/ROADMAP.md](docs/ROADMAP.md) for what shipped and what is proposed (MCP resources, prompts, richer per-endpoint output typing).
+Covered: all 9 Torn tags - every documented data endpoint (the counts in the table above are derived from the committed spec) as raw JSON, plus 12 intelligence tools and a discovery tool. The spec is re-synced from Torn weekly; see [docs/ROADMAP.md](docs/ROADMAP.md) for what shipped and what is proposed (MCP resources, prompts, richer per-endpoint output typing).
 
 ## License
 
-[MIT](LICENSE) — `// @license MIT` headers are included in all source files.
+[MIT](LICENSE) - `// @license MIT` headers are included in all source files.

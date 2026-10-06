@@ -4,6 +4,7 @@
     { "glob": "scripts/lib/returns-overrides.generated.json", "schema": ".claude/schemas/returns-overrides.schema.json" },
     { "glob": "openapi.json", "schema": ".claude/schemas/openapi.schema.json" },
     { "glob": "wrangler.toml", "schema": ".claude/schemas/wrangler.schema.json" },
-    { "glob": ".claude/allowed-paths.json", "schema": ".claude/schemas/allowed-paths.schema.json" }
+    { "glob": ".claude/allowed-paths.json", "schema": ".claude/schemas/allowed-paths.schema.json" },
+    { "glob": ".claude/content-rules.json", "schema": ".claude/schemas/content-rules.schema.json" }
   ]
 }

@@ -423,12 +423,12 @@ export function renderReport(diff) {
   if (diff.hasChanges) {
     L.push(
       `**Endpoints:** ${diff.oldCount} → ${diff.newCount} catalog ` +
-        `(from ${diff.rawOld} → ${diff.rawNew} raw operations) — ` +
+        `(from ${diff.rawOld} → ${diff.rawNew} raw operations) - ` +
         `+${diff.added.length} −${diff.removed.length} ~${diff.changed.length}, ${diff.unchanged} unchanged`,
     );
   } else {
     L.push(
-      `**Endpoints:** ${diff.newCount} catalog (from ${diff.rawNew} raw operations) — no changes`,
+      `**Endpoints:** ${diff.newCount} catalog (from ${diff.rawNew} raw operations) - no changes`,
     );
   }
 
