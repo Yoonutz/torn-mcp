@@ -1,0 +1,13 @@
+{
+  "note": "src/ and tests/ are the target layout. legacy lists what is allowed today; move code into src/ or tests/ and delete entries until legacy is empty. Folders not listed (build output, caches, vendored code) are flagged.",
+  "allowed": [
+    "src/",
+    "tests/"
+  ],
+  "legacy": [
+    ".github/",
+    "docs/",
+    "scripts/",
+    "*"
+  ]
+}
