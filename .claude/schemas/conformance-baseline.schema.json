@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Conformance baseline (conformance-baseline.json)",
+  "description": "Known Torn spec drift, keyed by \"<tag>/<endpoint>\", as written by `conformance.mjs --update-baseline` and read by reconcileBaseline. Each entry is the list of drift reasons accepted for that endpoint.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "array",
+    "minItems": 1,
+    "uniqueItems": true,
+    "items": { "type": "string", "minLength": 1 }
+  }
+}

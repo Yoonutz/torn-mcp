@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Generated returns overrides (scripts/lib/returns-overrides.generated.json)",
+  "description": "Live response shapes captured by the conformance run, keyed by \"<tag>/<endpoint>\", same shape as RETURNS_OVERRIDES in returns-overrides.mjs and read by buildCatalog(). type is what conformance.mjs derives: array, object, or a JavaScript typeof.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "required": ["note", "returns"],
+    "additionalProperties": false,
+    "properties": {
+      "note": { "type": "string", "minLength": 1 },
+      "returns": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": ["name", "type", "fields"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "type": { "enum": ["array", "object", "string", "number", "boolean"] },
+            "fields": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1 } }
+          }
+        }
+      }
+    }
+  }
+}

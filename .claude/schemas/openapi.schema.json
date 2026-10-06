@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Torn OpenAPI spec (openapi.json)",
+  "description": "Synced from Torn by the sync-openapi workflow. A light structural check only: an OpenAPI 3.1 document with info, paths and components, so a truncated or wrong file is caught before discovery and conformance read it.",
+  "type": "object",
+  "required": ["openapi", "info", "paths", "components"],
+  "properties": {
+    "openapi": { "type": "string", "pattern": "^3\\.1\\.\\d+$" },
+    "info": {
+      "type": "object",
+      "required": ["title", "version"],
+      "properties": { "title": { "type": "string" }, "version": { "type": "string" } }
+    },
+    "paths": { "type": "object", "additionalProperties": { "type": "object" } },
+    "components": { "type": "object" }
+  }
+}
