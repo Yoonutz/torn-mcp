@@ -1,6 +1,6 @@
 # Torn MCP - Roadmap
 
-Current version: **v0.11.1**. Roadmap reflects actual repo state - no drift.
+Current version: **v0.11.2**. Roadmap reflects actual repo state - no drift.
 
 | Phase                                   | Focus                                             | Effort   | Status     |
 | --------------------------------------- | ------------------------------------------------- | -------- | ---------- |
@@ -41,6 +41,7 @@ Tracks shipped fixes and open bugs. New bugs land as ⏳ Proposed; flip to ✅ w
 | CSV snapshot endpoints failed as "non-JSON"                                | ✅ Fixed | v0.11.0 | `[csv]` badge; raw CSV returned; Torn's 200-with-error envelope documented                                       |
 | Auto-derived discovery override contradicted the schema (user/competition) | ✅ Fixed | v0.11.0 | Overrides only for container-type mismatches on spec-defined keys; unions and foreign key sets never override    |
 | Idle clients kept session Durable Objects awake (free-tier duration cap hit) | ✅ Fixed | v0.11.1 | Worker answers `GET /mcp` with 405 + `Allow: POST, DELETE` instead of opening a standalone SSE stream per session |
+| claude.ai custom connectors could not send the key (custom header name `X-Torn-Api-Key` rejected at save) | ✅ Fixed | v0.11.2 | Worker also accepts the pre-approved `x-api-key` header and `Authorization: Bearer <key>`; README documents the connector setup |
 
 ## ✨ Features
 

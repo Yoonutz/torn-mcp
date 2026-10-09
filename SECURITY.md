@@ -32,7 +32,9 @@ reasonable window before publishing details.
 
 Torn API keys are treated as secrets on every request:
 
-- **Header only.** The key is read from the `X-Torn-Api-Key` request header. It
+- **Header only.** The key is read from the `X-Torn-Api-Key` request header, or
+  from the `X-Api-Key` / `Authorization: Bearer <key>` aliases for clients that
+  restrict header names. It
   is never a tool parameter, so it never enters the model's context or client
   transcripts. It is never read from the URL: a `?key=` query parameter is
   ignored and the query string is not forwarded past the Worker's front door.

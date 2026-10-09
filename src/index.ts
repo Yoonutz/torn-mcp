@@ -34,7 +34,7 @@ import { isStaleSessionRequest, staleSessionResponse, standaloneSseRejection } f
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.11.1";
+const VERSION = "0.11.2";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -315,6 +315,10 @@ export default {
       // past this point.
       const apiKey = keyFromHeaders(request.headers, env.TORN_API_KEY);
       if (apiKey) headers.set("X-Torn-Api-Key", apiKey);
+      // The aliases were folded into X-Torn-Api-Key above; do not carry the
+      // raw credential past the front door under a second name.
+      headers.delete("X-Api-Key");
+      headers.delete("Authorization");
 
       return stub.fetch(
         new Request("https://mcp-session/mcp", {

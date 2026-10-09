@@ -4,7 +4,7 @@
 [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
 
-A remote [Model Context Protocol](https://modelcontextprotocol.io) server for the [Torn City](https://www.torn.com) API v2, running on **Cloudflare Workers**. Connect from VS Code (or any MCP client) anywhere - no local install. You supply your Torn API key via the `X-Torn-Api-Key` header; it is never stored, never shown to the model, and never read from the URL (see [Security & privacy](#security--privacy)).
+A remote [Model Context Protocol](https://modelcontextprotocol.io) server for the [Torn City](https://www.torn.com) API v2, running on **Cloudflare Workers**. Connect from VS Code (or any MCP client) anywhere - no local install. You supply your Torn API key via the `X-Torn-Api-Key` header (`X-Api-Key` and `Authorization: Bearer <key>` are accepted too, for clients that restrict header names); it is never stored, never shown to the model, and never read from the URL (see [Security & privacy](#security--privacy)).
 
 **Tools:** one grouped tool per Torn tag (`torn_user`, `torn_faction`, `torn_torn`, `torn_company`, `torn_market`, `torn_racing`, `torn_forum`, `torn_property`, `torn_key`) covering all 187 endpoints across 234 operations of the spec via an `endpoint` argument - plus **12 intelligence tools** that aggregate endpoints into structured summaries (`analyze_player`, `war_readiness_report`, `find_profitable_items`, …) and `torn_list_endpoints` for discovery.
 
@@ -119,7 +119,20 @@ Edit `~/.codeium/windsurf/mcp_config.json`:
 </details>
 
 <details>
-<summary><b>Claude Desktop</b></summary>
+<summary><b>Claude.ai / Claude Desktop</b> (custom connector)</summary>
+
+**Customize → Connectors → Add custom connector**:
+
+- **MCP server URL:** `https://torn-mcp.yoonutz.workers.dev/mcp`
+- **Authentication:** _No sign-in_
+- **Request headers:** pick `x-api-key` from the list and paste your Torn API key as the value. Do not choose _Custom header_ with `X-Torn-Api-Key`: Anthropic only sends pre-approved header names, so the save is rejected. The server accepts `x-api-key` as an alias.
+
+The **Request headers** section is an Anthropic beta. If the dialog does not show it, your account does not have it yet; use the config-file route below or Claude Code instead.
+
+</details>
+
+<details>
+<summary><b>Claude Desktop</b> (config file)</summary>
 
 Settings → Developer → Edit Config (`claude_desktop_config.json`). Recent versions accept a remote URL directly:
 
@@ -258,7 +271,7 @@ Higher-level tools that aggregate multiple endpoints and return structured summa
 
 ## Security & privacy
 
-- Key supplied via the `X-Torn-Api-Key` header **only** - never a tool parameter, and never read from the URL. A `?key=` query parameter is ignored (the request fails with a "send the header" error), and the query string is not forwarded past the Worker's front door.
+- Key supplied via a request header **only** (`X-Torn-Api-Key`, or the `X-Api-Key` / `Authorization: Bearer` aliases) - never a tool parameter, and never read from the URL. A `?key=` query parameter is ignored (the request fails with a "send the header" error), and the query string is not forwarded past the Worker's front door.
 - Never stored, never returned in error messages.
 - **Logging, precisely:** this code writes no logs. Cloudflare Workers invocation logs (which would record `<Method> <URL>` per request) are switched off in `wrangler.toml` (`[observability.logs] invocation_logs = false`), so a request URL is not persisted even if a misconfigured client puts a key in it. What this repository cannot control: Cloudflare's own edge/analytics data, and the upstream leg - the key reaches `api.torn.com` as the `key` query parameter Torn documents, which is Torn's log surface, not ours.
 - Upstream calls are pinned to `https://api.torn.com` (SSRF guard) with `User-Agent: torn-mcp`.
