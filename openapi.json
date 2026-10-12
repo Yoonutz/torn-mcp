@@ -3,7 +3,7 @@
     "info": {
         "title": "Torn API",
         "description": "\n * The development of Torn's API v2 is still ongoing.\n * If selections remain unaltered, they will default to the API v1 version.\n * Unlike API v1, API v2 accepts both selections and IDs as path and query parameters.\n * If any discrepancies or errors are found, please submit a [bug report](https://www.torn.com/forums.php#/p=forums&f=19&b=0&a=0) on the Torn Forums.\n * In case you're using bots to check for changes on openapi.json file, make sure to specificy a custom user-agent header - CloudFlare sometimes prevents requests from default user-agents.",
-        "version": "6.13.6"
+        "version": "6.13.8"
     },
     "servers": [
         {
@@ -19555,6 +19555,25 @@
                 },
                 "type": "object"
             },
+            "ErrorNoCompetitionAvailable": {
+                "required": [
+                    "code",
+                    "error"
+                ],
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "format": "int32",
+                        "enum": [
+                            33
+                        ]
+                    },
+                    "error": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "ApiError": {
                 "oneOf": [
                     {
@@ -19655,6 +19674,9 @@
                     },
                     {
                         "$ref": "#/components/schemas/ErrorEndpointClosedUntilAttackingPeriod"
+                    },
+                    {
+                        "$ref": "#/components/schemas/ErrorNoCompetitionAvailable"
                     }
                 ]
             },
@@ -35562,7 +35584,7 @@
                 },
                 "type": "object"
             },
-            "TornEliminationTeamLeader": {
+            "TornEliminationTeamCaptain": {
                 "allOf": [
                     {
                         "$ref": "#/components/schemas/BasicUser"
@@ -35609,7 +35631,7 @@
                     "losses",
                     "eliminated",
                     "eliminated_timestamp",
-                    "leaders",
+                    "captains",
                     "attacking_summary"
                 ],
                 "properties": {
@@ -35667,7 +35689,7 @@
                             }
                         ]
                     },
-                    "leaders": {
+                    "captains": {
                         "required": [
                             "captain",
                             "vice_captains"
@@ -35676,7 +35698,7 @@
                             "captain": {
                                 "oneOf": [
                                     {
-                                        "$ref": "#/components/schemas/TornEliminationTeamLeader"
+                                        "$ref": "#/components/schemas/TornEliminationTeamCaptain"
                                     },
                                     {
                                         "type": "null"
@@ -35686,8 +35708,9 @@
                             "vice_captains": {
                                 "type": "array",
                                 "items": {
-                                    "$ref": "#/components/schemas/TornEliminationTeamLeader"
-                                }
+                                    "$ref": "#/components/schemas/TornEliminationTeamCaptain"
+                                },
+                                "maxItems": 5
                             }
                         },
                         "type": "object"
