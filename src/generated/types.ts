@@ -5558,7 +5558,15 @@ export interface components {
             code: 32;
             error: string;
         };
-        ApiError: components["schemas"]["ErrorUnknown"] | components["schemas"]["ErrorKeyEmpty"] | components["schemas"]["ErrorIncorrectKey"] | components["schemas"]["ErrorWrongType"] | components["schemas"]["ErrorWrongFields"] | components["schemas"]["ErrorTooManyRequests"] | components["schemas"]["ErrorIncorrectId"] | components["schemas"]["ErrorIncorrectIdEntityRelation"] | components["schemas"]["ErrorIpBlocked"] | components["schemas"]["ErrorApiDisabled"] | components["schemas"]["ErrorKeyOwnerInFederalJail"] | components["schemas"]["ErrorKeyChangeCooldown"] | components["schemas"]["ErrorKeyReadError"] | components["schemas"]["ErrorKeyTemporaryDisabled"] | components["schemas"]["ErrorDailyReadLimitReached"] | components["schemas"]["ErrorLogUnavailable"] | components["schemas"]["ErrorAccessLevelTooLow"] | components["schemas"]["ErrorBackendError"] | components["schemas"]["ErrorApiKeyPaused"] | components["schemas"]["ErrorMustMigrateToCrimesV2"] | components["schemas"]["ErrorRaceNotFinished"] | components["schemas"]["ErrorIncorrectCategory"] | components["schemas"]["ErrorOnlyAvailableInApiV1"] | components["schemas"]["ErrorOnlyAvailableInApiV2"] | components["schemas"]["ErrorClosedTemporarily"] | components["schemas"]["ErrorInvalidStatRequested"] | components["schemas"]["ErrorOnlyCategoryOrStatsAllowed"] | components["schemas"]["ErrorMustMigrateToOrganizedCrimesV2"] | components["schemas"]["ErrorIncorrectLogId"] | components["schemas"]["ErrorCategorySelectionUnavailableForInteractionLogs"] | components["schemas"]["ErrorFileDoesNotExist"] | components["schemas"]["ErrorCityStatsCronFailed"] | components["schemas"]["ErrorEndpointClosedUntilAttackingPeriod"];
+        ErrorNoCompetitionAvailable: {
+            /**
+             * Format: int32
+             * @enum {integer}
+             */
+            code: 33;
+            error: string;
+        };
+        ApiError: components["schemas"]["ErrorUnknown"] | components["schemas"]["ErrorKeyEmpty"] | components["schemas"]["ErrorIncorrectKey"] | components["schemas"]["ErrorWrongType"] | components["schemas"]["ErrorWrongFields"] | components["schemas"]["ErrorTooManyRequests"] | components["schemas"]["ErrorIncorrectId"] | components["schemas"]["ErrorIncorrectIdEntityRelation"] | components["schemas"]["ErrorIpBlocked"] | components["schemas"]["ErrorApiDisabled"] | components["schemas"]["ErrorKeyOwnerInFederalJail"] | components["schemas"]["ErrorKeyChangeCooldown"] | components["schemas"]["ErrorKeyReadError"] | components["schemas"]["ErrorKeyTemporaryDisabled"] | components["schemas"]["ErrorDailyReadLimitReached"] | components["schemas"]["ErrorLogUnavailable"] | components["schemas"]["ErrorAccessLevelTooLow"] | components["schemas"]["ErrorBackendError"] | components["schemas"]["ErrorApiKeyPaused"] | components["schemas"]["ErrorMustMigrateToCrimesV2"] | components["schemas"]["ErrorRaceNotFinished"] | components["schemas"]["ErrorIncorrectCategory"] | components["schemas"]["ErrorOnlyAvailableInApiV1"] | components["schemas"]["ErrorOnlyAvailableInApiV2"] | components["schemas"]["ErrorClosedTemporarily"] | components["schemas"]["ErrorInvalidStatRequested"] | components["schemas"]["ErrorOnlyCategoryOrStatsAllowed"] | components["schemas"]["ErrorMustMigrateToOrganizedCrimesV2"] | components["schemas"]["ErrorIncorrectLogId"] | components["schemas"]["ErrorCategorySelectionUnavailableForInteractionLogs"] | components["schemas"]["ErrorFileDoesNotExist"] | components["schemas"]["ErrorCityStatsCronFailed"] | components["schemas"]["ErrorEndpointClosedUntilAttackingPeriod"] | components["schemas"]["ErrorNoCompetitionAvailable"];
         UserGymResponse: {
             gym: {
                 id: components["schemas"]["GymId"];
@@ -9994,7 +10002,7 @@ export interface components {
         TornStockDetailedResponse: {
             stocks: components["schemas"]["TornStockDetailed"];
         };
-        TornEliminationTeamLeader: components["schemas"]["BasicUser"] & {
+        TornEliminationTeamCaptain: components["schemas"]["BasicUser"] & {
             active: boolean;
         };
         TornEliminationTeamAttacksSummary: {
@@ -10022,9 +10030,9 @@ export interface components {
             eliminated: boolean;
             attacking_summary: components["schemas"]["TornEliminationTeamAttacksSummary"][];
             eliminated_timestamp: number | null;
-            leaders: {
-                captain: components["schemas"]["TornEliminationTeamLeader"] | null;
-                vice_captains: components["schemas"]["TornEliminationTeamLeader"][];
+            captains: {
+                captain: components["schemas"]["TornEliminationTeamCaptain"] | null;
+                vice_captains: components["schemas"]["TornEliminationTeamCaptain"][];
             };
         };
         TornEliminationTeamsResponse: {
