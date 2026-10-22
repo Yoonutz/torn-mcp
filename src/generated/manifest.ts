@@ -3,8 +3,8 @@
 // Identifies the Torn OpenAPI spec this build was generated from.
 
 export const MANIFEST = {
-  openapiVersion: "6.13.6",
-  specHash: "f6c076e923032177016f6615b1a7d2b06c0db6ddfec222b731123ecb760c193e",
+  openapiVersion: "6.13.8",
+  specHash: "7c4930218f15066a7d44c3666c3212ebc2a3b777e40754493ca89d092aef76d6",
   tags: 9,
   endpoints: 187,
   rawOperations: 234,

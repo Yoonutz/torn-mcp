@@ -9009,7 +9009,7 @@ export const ENDPOINTS = {
             "eliminated",
             "attacking_summary",
             "eliminated_timestamp",
-            "leaders"
+            "captains"
           ]
         }
       ],
