@@ -277,6 +277,8 @@ Higher-level tools that aggregate multiple endpoints and return structured summa
 - Upstream calls are pinned to `https://api.torn.com` (SSRF guard) with `User-Agent: torn-mcp`.
 - Per-key rate limiting (~100 req/min, Torn's cap) via a Durable Object - returns a clear error instead of hammering Torn.
 
+Full policy for the hosted instance: [PRIVACY.md](PRIVACY.md). Support: [GitHub issues](https://github.com/Yoonutz/torn-mcp/issues).
+
 ### Dependencies
 
 The deployed Worker's runtime dependencies are `@modelcontextprotocol/sdk` and `zod`. Dev/build tooling advisories are pinned to patched versions via `overrides` in `package.json` (`esbuild`, `js-yaml`, `ws`); `npm audit` is part of the release check - see [SECURITY.md](SECURITY.md).
