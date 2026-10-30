@@ -10,7 +10,7 @@ import { registerAllTools, describeTag, MAX_DESCRIPTION_CHARS } from "./tools.js
 import { textResult } from "./mcpResult.js";
 import { ENDPOINTS, TAGS } from "./generated/endpoints.js";
 
-type Tool = { name: string; description?: string; inputSchema: any };
+type Tool = { name: string; title?: string; description?: string; inputSchema: any; annotations?: any };
 
 let tools: Tool[] = [];
 
@@ -35,6 +35,20 @@ describe("registered tool set (as seen by a client)", () => {
     expect(names).toContain("analyze_player");
     expect(names).toContain("find_profitable_items");
     expect(tools).toHaveLength(22);
+  });
+
+  it("declares a title and read-only annotations on every tool", () => {
+    for (const t of tools) {
+      expect(t.title, `${t.name} has no title`).toBeTruthy();
+      expect(t.annotations, `${t.name} has no annotations`).toMatchObject({
+        title: t.title,
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+      });
+      // Only the catalog tool stays inside the server; the rest call the Torn API.
+      expect(t.annotations.openWorldHint).toBe(t.name !== "torn_list_endpoints");
+    }
   });
 
   it("keeps every serialized description within the client budget", () => {
@@ -74,9 +88,18 @@ describe("registered tool set (as seen by a client)", () => {
 describe("describeTag", () => {
   it("flags endpoints whose id variant means something else, with a legend", () => {
     const desc = describeTag("faction");
-    expect(desc).toMatch(/^- basic: Get your faction's basic details \[\+id\]/m);
+    expect(desc).toMatch(/^- basic: Faction's basic details \[\+id\]/m);
     expect(desc).toMatch(/^- crimes: /m);
     expect(desc).not.toMatch(/^- crimes: [^\n]*\[\+id\]/m); // no id variant at all
     expect(desc).toMatch(/\[\+id\] = pass 'id' to target a specific faction entity/);
+  });
+
+  it("names common enums once in the legend instead of on every line", () => {
+    const desc = describeTag("faction");
+    expect(desc).toMatch(/^- chains: [^\n]*· filter sort(?!=)/m);
+    expect(desc).not.toMatch(/^- [^\n]*sort=DESC\|ASC/m);
+    expect(desc).toMatch(/query options \([^)]*sort=DESC\|ASC/);
+    expect(desc).toMatch(/^- attacks: [^\n]*\[limited\]$/m);
+    expect(desc).toMatch(/\[minimal\]\/\[limited\]\/\[full\] = API key access level/);
   });
 });
