@@ -30,17 +30,28 @@ import { dualResult, errorResult, type ToolResult } from "./mcpResult.js";
 import { registerAllTools } from "./tools.js";
 import { KEY_HEADER, MISSING_KEY_ERROR, keyFromHeaders } from "./auth.js";
 import { isStaleSessionRequest, staleSessionResponse, standaloneSseRejection } from "./session.js";
+import {
+  TOKEN_PREFIX,
+  handleOAuth,
+  keyFromAccessToken,
+  unauthorized,
+  validateTornKey,
+  type OAuthDeps,
+} from "./oauth.js";
+import { OAuthRecord, durableTokenStore } from "./oauthStore.js";
 
-export { RateLimiter };
+export { RateLimiter, OAuthRecord };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.11.4";
+const VERSION = "0.12.0";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 interface Env {
   MCP_OBJECT: DurableObjectNamespace;
   RATE_LIMITER: DurableObjectNamespace;
+  /** OAuth token records (see oauth.ts / oauthStore.ts). */
+  OAUTH_STORE: DurableObjectNamespace<OAuthRecord>;
   /** Optional fallback key, used only when the request omits the header. */
   TORN_API_KEY?: string;
 }
@@ -296,12 +307,32 @@ export class TornMCP extends DurableObject<Env> {
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    const oauthDeps: OAuthDeps = {
+      store: durableTokenStore(env.OAUTH_STORE),
+      validateKey: validateTornKey,
+    };
+
+    const oauth = await handleOAuth(request, oauthDeps);
+    if (oauth) return oauth;
 
     if (url.pathname === "/mcp") {
       // GET would open an idle SSE stream that keeps the session DO awake
       // (billed duration) for the whole client session; answer it here.
       const rejected = standaloneSseRejection(request);
       if (rejected) return rejected;
+
+      // An OAuth access token stands in for the key; anything else is the
+      // key itself (headers, see auth.ts). No credential at all gets a 401
+      // that points the client at the OAuth sign-in.
+      const bearer = /^Bearer\s+(\S+)\s*$/i.exec(request.headers.get("authorization") ?? "")?.[1];
+      let apiKey: string;
+      if (bearer?.startsWith(TOKEN_PREFIX)) {
+        apiKey = (await keyFromAccessToken(oauthDeps, bearer)) ?? "";
+        if (!apiKey) return unauthorized(url.origin, "invalid_token");
+      } else {
+        apiKey = keyFromHeaders(request.headers, env.TORN_API_KEY);
+        if (!apiKey) return unauthorized(url.origin);
+      }
 
       // Sticky-route each MCP session to its own Durable Object.
       const sessionId = request.headers.get("Mcp-Session-Id") ?? crypto.randomUUID();
@@ -313,8 +344,7 @@ export default {
       // downstream tool invocation reads the same header; the query string is
       // deliberately NOT forwarded, so nothing placed there can be used or seen
       // past this point.
-      const apiKey = keyFromHeaders(request.headers, env.TORN_API_KEY);
-      if (apiKey) headers.set("X-Torn-Api-Key", apiKey);
+      headers.set("X-Torn-Api-Key", apiKey);
       // The aliases were folded into X-Torn-Api-Key above; do not carry the
       // raw credential past the front door under a second name.
       headers.delete("X-Api-Key");

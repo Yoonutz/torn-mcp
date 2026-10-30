@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last updated: 2026-10-30_
+_Last updated: 2026-10-30 (OAuth sign-in added)_
 
 Torn MCP is a free, open-source [Model Context Protocol](https://modelcontextprotocol.io) server for the
 [Torn City](https://www.torn.com) API v2. The hosted instance runs at
@@ -12,10 +12,18 @@ Nothing. There are no accounts, no sign-up, no analytics, no cookies and no data
 
 ## Your Torn API key
 
-- You send your key in a request header (`X-Torn-Api-Key`, `X-Api-Key` or `Authorization: Bearer`).
-- It is used only to forward your request to `https://api.torn.com` and lives only for that one request.
-- It is never stored, never logged by this server, never returned in a response or error, and never shown to
-  the AI model (it is not a tool parameter).
+You give the server your key in one of two ways:
+
+- **Request header** (`X-Torn-Api-Key`, `X-Api-Key` or `Authorization: Bearer`): the key is used only to forward
+  that request to `https://api.torn.com` and is never stored.
+- **OAuth sign-in** (used by Claude's connector directory): you paste the key once on the server's sign-in page.
+  It is checked against Torn, then stored **only encrypted** (AES-GCM) under a key derived from the token issued
+  to your client. The server keeps no key of its own that can decrypt it, so the stored data is useless without
+  your token. Access tokens last 24 hours, refresh tokens 180 days; expired records are deleted automatically.
+  Disconnecting the connector and deleting the key in Torn ends access for good.
+
+Either way, the key is never logged by this server, never returned in a response or error, and never shown to
+the AI model (it is not a tool parameter).
 - A SHA-256 hash of the key names an in-memory rate-limit counter (about 100 requests per minute, Torn's own
   limit). The counter holds only a request count, is never written to disk, and resets when idle.
 

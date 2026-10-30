@@ -1,6 +1,6 @@
 # Torn MCP - Roadmap
 
-Current version: **v0.11.4**. Roadmap reflects actual repo state - no drift.
+Current version: **v0.12.0**. Roadmap reflects actual repo state - no drift.
 
 | Phase                                   | Focus                                             | Effort   | Status     |
 | --------------------------------------- | ------------------------------------------------- | -------- | ---------- |
@@ -44,6 +44,7 @@ Tracks shipped fixes and open bugs. New bugs land as ⏳ Proposed; flip to ✅ w
 | claude.ai custom connectors could not send the key (custom header name `X-Torn-Api-Key` rejected at save) | ✅ Fixed | v0.11.2 | Worker also accepts the pre-approved `x-api-key` header and `Authorization: Bearer <key>`; README documents the connector setup |
 | Connector directory review: tools had no annotations; `torn_user` description cut at ~4000 chars | ✅ Fixed | v0.11.3 | Every tool declares a title + `readOnlyHint`/`destructiveHint: false`/`idempotentHint`/`openWorldHint`; grouped descriptions ≤4000 chars (shared enums and key levels in a legend) |
 | Directory policy: tool descriptions must not name other tools | ✅ Fixed | v0.11.4 | Grouped tool legends no longer point to `torn_list_endpoints`; a test fails if any description names another tool |
+| Connector directory: clients without custom headers had no way to send a key | ✅ Fixed | v0.12.0 | OAuth 2.1 (DCR + PKCE) sign-in page where the user pastes their Torn key; key stored only encrypted under the token; keyless `/mcp` now answers 401 with OAuth metadata |
 
 ## ✨ Features
 

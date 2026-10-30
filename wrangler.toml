@@ -7,6 +7,7 @@ compatibility_flags = ["nodejs_compat"]
 # Durable Object bindings.
 #  - MCP_OBJECT: required by the McpAgent (one DO per MCP session).
 #  - RATE_LIMITER: per-API-key request counter (see src/rateLimiter.ts).
+#  - OAUTH_STORE: one DO per OAuth token record (see src/oauthStore.ts).
 [[durable_objects.bindings]]
 name = "MCP_OBJECT"
 class_name = "TornMCP"
@@ -15,10 +16,18 @@ class_name = "TornMCP"
 name = "RATE_LIMITER"
 class_name = "RateLimiter"
 
+[[durable_objects.bindings]]
+name = "OAUTH_STORE"
+class_name = "OAuthRecord"
+
 [[migrations]]
 tag = "v1"
 # Free plan requires all Durable Objects to be SQLite-backed.
 new_sqlite_classes = ["TornMCP", "RateLimiter"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["OAuthRecord"]
 
 # Optional server-level fallback Torn API key, used only when a request
 # omits the X-Torn-Api-Key header. Set with:
