@@ -1,6 +1,6 @@
 # Torn MCP - Roadmap
 
-Current version: **v0.12.1**. Roadmap reflects actual repo state - no drift.
+Current version: **v0.12.2**. Roadmap reflects actual repo state - no drift.
 
 | Phase                                   | Focus                                             | Effort   | Status     |
 | --------------------------------------- | ------------------------------------------------- | -------- | ---------- |

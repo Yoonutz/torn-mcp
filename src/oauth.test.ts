@@ -161,6 +161,8 @@ describe("authorize + token flow", () => {
     );
     expect(page.status).toBe(200);
     expect(await page.text()).toContain('name="api_key"');
+    // The POST answers with a 302 to the client; form-action must allow it.
+    expect(page.headers.get("content-security-policy")).toContain("form-action 'self' https://claude.ai;");
 
     const code = await codeFrom(await authorize(clientId));
     const tok = (await (await exchange(clientId, code)).json()) as any;

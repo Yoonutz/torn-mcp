@@ -278,38 +278,59 @@ function authorizePage(fields: Record<string, string>, clientName: string, error
   const hidden = AUTH_FIELDS.filter((f) => fields[f])
     .map((f) => `<input type="hidden" name="${f}" value="${escapeHtml(fields[f] ?? "")}">`)
     .join("");
-  const host = escapeHtml(new URL(fields.redirect_uri!).host);
+  const redirect = new URL(fields.redirect_uri!);
+  const host = escapeHtml(redirect.host);
+  const redirectOrigin = redirect.origin;
+  // Torn's own dark UI: title-bar gradient, #333 panel, Arial 12px, Torn buttons
+  // and inputs (values from Torn's CSS variables, as in torn-scripts occ-kit).
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Connect Torn MCP</title>
 <style>
-:root{color-scheme:light dark;--bg:#f4f4f4;--card:#fff;--fg:#222;--muted:#666;--line:#ccc;--accent:#5a7d2a;--err:#b3261e}
-@media (prefers-color-scheme:dark){:root{--bg:#191919;--card:#262626;--fg:#e8e8e8;--muted:#aaa;--line:#444;--accent:#8fb85a;--err:#ff8a80}}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif;display:flex;justify-content:center;padding:16px}
-main{background:var(--card);max-width:440px;width:100%;border:1px solid var(--line);border-radius:10px;padding:24px;margin-top:6vh}
-h1{font-size:20px;margin:0 0 8px}p{margin:8px 0;color:var(--muted)}label{display:block;margin:16px 0 6px;font-weight:600}
-input[type=password]{width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font:inherit}
-button{margin-top:16px;width:100%;padding:10px;border:0;border-radius:6px;background:var(--accent);color:#fff;font:inherit;font-weight:600;cursor:pointer}
-.err{color:var(--err)}a{color:var(--accent)}ul{color:var(--muted);padding-left:18px}
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#191919;color:#ddd;font:12px/1.4 Arial,Helvetica,sans-serif;display:flex;justify-content:center;align-items:flex-start;padding:12vh 16px 16px}
+main{width:100%;max-width:400px;background:#333;border-radius:5px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.35)}
+.bar{height:30px;display:flex;align-items:center;padding:0 10px;background:linear-gradient(180deg,#555 0%,#333 100%);color:#fff;text-shadow:0 0 2px #000;font:bold 12px/1 Arial,Helvetica,sans-serif;border-bottom:1px solid #222}
+.body{padding:10px;border-top:1px solid #474747}
+p{margin:0 0 8px}
+b{color:#fff}
+.muted{color:#999;font-size:11.5px;line-height:1.45}
+label{display:block;margin:10px 0 0;color:#fff;font-weight:bold}
+input[type=password]{display:block;width:100%;height:30px;padding:0 9px;margin:7px 0 2px;border:1px solid #444;border-radius:5px;background:linear-gradient(0deg,#111 0%,#000 100%);color:#fff;font:12px/1 Arial,Helvetica,sans-serif;outline:none;appearance:none;-webkit-appearance:none}
+input[type=password]:hover{border-color:#666}
+input[type=password]:focus{border-color:#1864AB80;box-shadow:0 0 2px #1C7ED6A6}
+button{margin-top:10px;height:28px;padding:0 14px;border-radius:5px;border:1px solid #111;background:linear-gradient(180deg,#111 0%,#555 25%,#333 60%,#333 78%,#111 100%);color:#eee;text-shadow:0 0 5px #000;font:bold 12px/1 Arial,Helvetica,sans-serif;text-transform:uppercase;cursor:pointer;appearance:none;-webkit-appearance:none}
+button:hover{background:linear-gradient(180deg,#333 0%,#777 25%,#333 59%,#666 78%,#333 100%);color:#fff}
+button:active{background:linear-gradient(180deg,#000 0%,#333 100%)}
+button:disabled{opacity:.6;cursor:default}
+.err{margin:0 0 8px;padding:7px 9px;border-radius:5px;background:rgba(228,74,27,.15);box-shadow:inset 3px 0 0 #E54C19;color:#ddd}
+ul{margin:10px 0 0;padding:8px 0 0 16px;border-top:1px solid #222;box-shadow:inset 0 1px 0 #474747}
+li{margin:3px 0}
+li::marker{color:#999}
+a{color:#74c0fc;text-decoration:none}a:hover{color:#a5d8ff}
 </style></head><body><main>
-<h1>Connect Torn MCP</h1>
-<p><strong>${escapeHtml(clientName)}</strong> wants read-only access to your Torn data. You'll go back to <strong>${host}</strong>.</p>
+<div class="bar">Connect Torn MCP</div>
+<div class="body">
+<p><b>${escapeHtml(clientName)}</b> wants read-only access to your Torn data. You'll go back to <b>${host}</b>.</p>
 ${error ? `<p class="err">${escapeHtml(error)}</p>` : ""}
-<form method="post" action="/authorize">${hidden}
+<form method="post" action="/authorize" id="f">${hidden}
 <label for="k">Torn API key</label>
-<input id="k" name="api_key" type="password" autocomplete="off" required minlength="16" maxlength="16" pattern="[A-Za-z0-9]{16}">
-<button type="submit">Connect</button></form>
-<ul>
+<input id="k" name="api_key" type="password" autocomplete="off" required minlength="16" maxlength="16" pattern="[A-Za-z0-9]{16}" title="16 letters and numbers">
+<button type="submit" id="go">Connect</button></form>
+<ul class="muted">
 <li>Make one at <a href="https://www.torn.com/preferences.php#tab=api" target="_blank" rel="noopener">Torn &gt; Preferences &gt; API Keys</a>. Limited Access covers almost everything.</li>
 <li>Read-only: the Torn API can't change your account.</li>
 <li>Your key is stored only encrypted, unlockable only with the token your client gets. <a href="https://github.com/Yoonutz/torn-mcp/blob/main/PRIVACY.md" target="_blank" rel="noopener">Privacy</a></li>
-</ul></main></body></html>`;
+</ul></div></main></body></html>`;
   return new Response(html, {
     status: error ? 400 : 200,
     headers: {
       "content-type": "text/html; charset=utf-8",
       "cache-control": "no-store",
-      "content-security-policy": "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'",
+      // form-action also governs the 302 that follows the POST, so the client's
+      // redirect origin must be allowed or the browser silently drops it.
+      "content-security-policy": `default-src 'none'; style-src 'unsafe-inline'; form-action 'self' ${redirectOrigin}; frame-ancestors 'none'`,
       "x-frame-options": "DENY",
       "referrer-policy": "no-referrer",
     },
