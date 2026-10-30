@@ -308,6 +308,7 @@ button:disabled{opacity:.6;cursor:default}
 ul{margin:10px 0 0;padding:8px 0 0 16px;border-top:1px solid #222;box-shadow:inset 0 1px 0 #474747}
 li{margin:3px 0}
 li::marker{color:#999}
+.by{margin:8px 0 0;text-align:right}
 a{color:#74c0fc;text-decoration:none}a:hover{color:#a5d8ff}
 </style></head><body><main>
 <div class="bar">Connect Torn MCP</div>
@@ -322,7 +323,9 @@ ${error ? `<p class="err">${escapeHtml(error)}</p>` : ""}
 <li>Make one at <a href="https://www.torn.com/preferences.php#tab=api" target="_blank" rel="noopener">Torn &gt; Preferences &gt; API Keys</a>. Limited Access covers almost everything.</li>
 <li>Read-only: the Torn API can't change your account.</li>
 <li>Your key is stored only encrypted, unlockable only with the token your client gets. <a href="https://github.com/Yoonutz/torn-mcp/blob/main/PRIVACY.md" target="_blank" rel="noopener">Privacy</a></li>
-</ul></div></main></body></html>`;
+</ul>
+<p class="muted by">Made by <a href="https://www.torn.com/profiles.php?XID=2805199" target="_blank" rel="noopener">KamiRen [2805199]</a></p>
+</div></main></body></html>`;
   return new Response(html, {
     status: error ? 400 : 200,
     headers: {

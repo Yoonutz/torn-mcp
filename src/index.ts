@@ -43,7 +43,7 @@ import { OAuthRecord, durableTokenStore } from "./oauthStore.js";
 export { RateLimiter, OAuthRecord };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.12.2";
+const VERSION = "0.12.3";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
