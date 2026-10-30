@@ -43,7 +43,7 @@ import { OAuthRecord, durableTokenStore } from "./oauthStore.js";
 export { RateLimiter, OAuthRecord };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.12.0";
+const VERSION = "0.12.1";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -316,11 +316,6 @@ export default {
     if (oauth) return oauth;
 
     if (url.pathname === "/mcp") {
-      // GET would open an idle SSE stream that keeps the session DO awake
-      // (billed duration) for the whole client session; answer it here.
-      const rejected = standaloneSseRejection(request);
-      if (rejected) return rejected;
-
       // An OAuth access token stands in for the key; anything else is the
       // key itself (headers, see auth.ts). No credential at all gets a 401
       // that points the client at the OAuth sign-in.
@@ -333,6 +328,12 @@ export default {
         apiKey = keyFromHeaders(request.headers, env.TORN_API_KEY);
         if (!apiKey) return unauthorized(url.origin);
       }
+
+      // GET would open an idle SSE stream that keeps the session DO awake
+      // (billed duration) for the whole client session; answer it here. Auth
+      // runs first so an unauthenticated probe of any method gets the 401.
+      const rejected = standaloneSseRejection(request);
+      if (rejected) return rejected;
 
       // Sticky-route each MCP session to its own Durable Object.
       const sessionId = request.headers.get("Mcp-Session-Id") ?? crypto.randomUUID();
