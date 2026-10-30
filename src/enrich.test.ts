@@ -220,3 +220,15 @@ describe("annotate", () => {
     expect(out.money._computed.total_cash).toBe(350); // 100+200+50, no faction/city_bank/company
   });
 });
+
+describe("mergePages - nested lists", () => {
+  it("keeps every page of a list nested inside an object (itemmarket.listings)", () => {
+    const merged = mergePages([
+      { itemmarket: { item: { id: 206 }, listings: [{ price: 912000 }], cache_timestamp: 1 } },
+      { itemmarket: { item: { id: 206 }, listings: [{ price: 1300000 }], cache_timestamp: 2 } },
+    ]) as any;
+    expect(merged.itemmarket.listings.map((l: any) => l.price)).toEqual([912000, 1300000]);
+    expect(merged.itemmarket.item.id).toBe(206);
+    expect(merged.itemmarket.cache_timestamp).toBe(2);
+  });
+});

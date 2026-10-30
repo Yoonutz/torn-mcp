@@ -29,8 +29,28 @@ function unwrapData(page: Json): { dataKey: string | null; value: Json } {
   return { dataKey: null, value: undefined };
 }
 
+function isPlainObject(v: Json): v is Record<string, Json> {
+  return !!v && typeof v === "object" && !Array.isArray(v);
+}
+
 /**
- * Merge paginated payloads: concat array fields, shallow-merge object maps. Keeps
+ * Merge one page's object into the running result: arrays concat at any depth
+ * (so nested lists like itemmarket.listings keep every page), nested objects
+ * merge recursively, scalars take the later page's value.
+ */
+function mergeObject(into: Record<string, Json>, from: Record<string, Json>): Record<string, Json> {
+  for (const [k, v] of Object.entries(from)) {
+    const cur = into[k];
+    if (Array.isArray(v) && Array.isArray(cur)) into[k] = cur.concat(v);
+    else if (isPlainObject(v) && isPlainObject(cur)) into[k] = mergeObject(cur, v);
+    else into[k] = v;
+  }
+  return into;
+}
+
+/**
+ * Merge paginated payloads: concat array fields, merge object maps (nested arrays
+ * concatenated too, see mergeObject). Keeps
  * the LAST page's `_metadata` (reflects where the walk stopped) and records the
  * page count. Ports Sol `_mergePages`.
  */
@@ -44,7 +64,7 @@ export function mergePages(pages: Json[]): Json {
       if (Array.isArray(value)) {
         out[key] = (Array.isArray(out[key]) ? (out[key] as Json[]) : []).concat(value);
       } else if (value && typeof value === "object") {
-        out[key] = Object.assign(out[key] ?? {}, value);
+        out[key] = mergeObject(isPlainObject(out[key] as Json) ? (out[key] as Record<string, Json>) : {}, value as Record<string, Json>);
       } else if (!(key in out)) {
         out[key] = value;
       }
