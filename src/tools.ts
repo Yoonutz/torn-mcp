@@ -75,7 +75,8 @@ export function describeTag(tag: TornTag): string {
     const idNote = def.requiresId ? ` (requires ${def.idParam?.name ?? "id"})` : "";
     // When the id variant means something else ("your faction" vs "a faction"),
     // flag it: the model picks between them by passing an id. The exact id
-    // summary and the id variant's own params live in torn_list_endpoints.
+    // summary and the id variant's own params live in the discovery catalog.
+    // Descriptions never name another tool (connector directory policy).
     const idMeaning = def.idSummary ? " [+id]" : "";
     // Return keys are omitted here (they doubled the size of the largest tools)
     // and stay in the discovery catalog.
@@ -97,8 +98,8 @@ export function describeTag(tag: TornTag): string {
     lines.join("\n") +
     `\n[+id] = pass 'id' to target a specific ${tag} entity instead of your own. ` +
     (usesKeyLevel ? `[minimal]/[limited]/[full] = API key access level needed. ` : "") +
-    `Use 'params' for query options${enumLegend ? ` (${enumLegend})` : ""}; elided enum values (+N more), each endpoint's ` +
-    `accepted params and its response fields are in torn_list_endpoints.`
+    `Use 'params' for query options${enumLegend ? ` (${enumLegend})` : ""}. ` +
+    `(+N more) = further accepted values not listed here.`
   );
 }
 

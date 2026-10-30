@@ -51,6 +51,16 @@ describe("registered tool set (as seen by a client)", () => {
     }
   });
 
+  it("never names another tool in a description (directory policy)", () => {
+    const names = tools.map((t) => t.name);
+    for (const t of tools) {
+      for (const other of names) {
+        if (other === t.name) continue;
+        expect(t.description ?? "", `${t.name} mentions ${other}`).not.toContain(other);
+      }
+    }
+  });
+
   it("keeps every serialized description within the client budget", () => {
     for (const t of tools) {
       expect(
@@ -81,7 +91,7 @@ describe("registered tool set (as seen by a client)", () => {
     const torn = tools.find((t) => t.name === "torn_torn")!.description ?? "";
     expect(torn).toMatch(/hof: .*requires cat=level\|busts\|rank\|/);
     expect(torn).toMatch(/\+\d+ more/); // hof has 14 values; the tail is elided
-    expect(torn).toMatch(/torn_list_endpoints/);
+    expect(torn).toMatch(/\(\+N more\) = further accepted values/);
   });
 });
 
