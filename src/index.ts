@@ -34,7 +34,7 @@ import { isStaleSessionRequest, staleSessionResponse, standaloneSseRejection } f
 export { RateLimiter };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.11.2";
+const VERSION = "0.11.3";
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
