@@ -624,6 +624,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/user/halloween": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get your Halloween treats information
+         * @description Requires minimal access key. <br>Returns your current and cumulative treats and the IDs of basket upgrades you have unlocked.
+         */
+        get: operations["getMyHalloween"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/user/hof": {
         parameters: {
             query?: never;
@@ -733,7 +753,7 @@ export interface paths {
         };
         /**
          * Get your inventory
-         * @description <b>Cached selection (1 hour per category).</b><br><br>Requires minimal access key. <br>
+         * @description <b>Cached selection (15 minutes per category).</b><br><br>Requires minimal access key. <br>
          */
         get: operations["getMyInventory"];
         put?: never;
@@ -1599,6 +1619,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/user/travelinventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get your travel inventory capacity
+         * @description Requires limited access key. <br>
+         */
+        get: operations["getMyTravelInventory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/user/virus": {
         parameters: {
             query?: never;
@@ -2112,7 +2152,7 @@ export interface paths {
         };
         /**
          * Get your faction's inventory items.
-         * @description <b>Cached selection (1 hour, all items cached at once).</b><br><br>Requires limited access key. <br>
+         * @description <b>Cached selection (5 minutes, all items cached at once).</b><br><br>Requires limited access key. <br>
          */
         get: operations["getMyFactionInventory"];
         put?: never;
@@ -4105,6 +4145,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/torn/halloween": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Halloween basket upgrades
+         * @description Requires minimal access key. <br>Returns the list of available Halloween basket upgrades with their benefits, treats cost and unlock requirement.
+         */
+        get: operations["getTornHalloween"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/torn/honors": {
         parameters: {
             query?: never;
@@ -4792,7 +4852,7 @@ export interface components {
          */
         TornOrganizedCrimePositionIdDeprecated: "P1" | "P2" | "P3" | "P4" | "P5" | "P6";
         /** @enum {string} */
-        FactionTerritoryWarResultEnum: "success_assault" | "fail_assault" | "end_with_nap" | "end_with_destroy_attack" | "end_with_destroy_defense" | "end_with_peace_treaty";
+        FactionTerritoryWarResultEnum: "success_assault" | "fail_assault" | "end_with_nap" | "end_with_destroy_attack" | "end_with_destroy_defense" | "end_with_peace_treaty" | "end_with_dirty_bomb";
         /** @enum {string} */
         FactionAttackResult: "None" | "Attacked" | "Mugged" | "Hospitalized" | "Arrested" | "Looted" | "Lost" | "Stalemate" | "Assist" | "Escape" | "Timeout" | "Special" | "Bounty" | "Interrupted";
         /** @enum {string} */
@@ -4806,7 +4866,7 @@ export interface components {
         /** @enum {string} */
         UserListEnum: "Friends" | "Enemies" | "Targets";
         /** @enum {string} */
-        JobPositionCasinoEnum: "Gaming Consultant" | "Marketing Manager" | "Revenue Manager" | "Casino Manager" | "Casino President";
+        JobPositionCasinoEnum: "Gaming Consultant" | "Marketing Manager" | "Revenue Manager" | "Casino Manager" | "Casino President" | "Dealer";
         /** @enum {string} */
         AttackFinishingHitEffect: "proficience" | "stricken" | "revitalize" | "warlord" | "plunder" | "irradiate";
         /** @enum {string} */
@@ -4923,6 +4983,8 @@ export interface components {
         TornCrimeId: number;
         /** Format: int32 */
         TornSubCrimeId: number;
+        /** Format: int32 */
+        HalloweenBasketUpgradeId: number;
         /** Format: int32 */
         ChainId: number;
         /** Format: int32 */
@@ -5690,6 +5752,34 @@ export interface components {
         UserInventoryResponse: {
             inventory: components["schemas"]["UserInventory"];
             _metadata: components["schemas"]["RequestMetadataWithLinksAndTotal"];
+        };
+        UserTravelInventoryItem: {
+            id: components["schemas"]["ItemId"];
+            uid: components["schemas"]["ItemUid"] | null;
+            is_equipped: boolean;
+            name: string;
+            type: string;
+            is_faction_owned: boolean;
+            /** @description True for items added while player was in Torn. */
+            is_permanent: boolean;
+        };
+        UserTravelInventorySlot: {
+            /** Format: int64 */
+            id: number;
+            item: components["schemas"]["UserTravelInventoryItem"] | null;
+        };
+        UserTravelInventoryCapacity: {
+            /** Format: int32 */
+            base: number;
+            /** Format: int32 */
+            special: number;
+        };
+        UserTravelInventory: {
+            capacity: components["schemas"]["UserTravelInventoryCapacity"];
+            inventory: components["schemas"]["UserTravelInventorySlot"][];
+        };
+        UserTravelInventoryResponse: {
+            travelinventory: components["schemas"]["UserTravelInventory"];
         };
         UserTradeResponse: {
             trade: components["schemas"]["UserTradeDetailed"];
@@ -6867,7 +6957,7 @@ export interface components {
             list: components["schemas"]["UserList"][];
             _metadata: components["schemas"]["RequestMetadataWithLinks"];
         };
-        UserSelectionName: ("ammo" | "attacks" | "attacksfull" | "bars" | "basic" | "battlestats" | "bounties" | "calendar" | "casino" | "competition" | "cooldowns" | "crimes" | "discord" | "enlistedcars" | "equipment" | "events" | "faction" | "factionbalance" | "forumfeed" | "forumfriends" | "forumposts" | "forumsubscribedthreads" | "forumthreads" | "gym" | "hof" | "honors" | "icons" | "inventory" | "itemmarket" | "itemmod" | "job" | "jobpoints" | "jobranks" | "list" | "log" | "lookup" | "medals" | "merits" | "messages" | "missions" | "money" | "networth" | "newevents" | "newmessages" | "notifications" | "organizedcrime" | "personalstats" | "profile" | "properties" | "property" | "races" | "racingrecords" | "refills" | "reports" | "revives" | "revivesfull" | "skills" | "snapshot" | "stocks" | "trades" | "trade" | "travel" | "timestamp" | "weaponexp" | "workstats" | "bazaar" | "criminalrecord" | "display" | "education" | "perks") | string;
+        UserSelectionName: ("ammo" | "attacks" | "attacksfull" | "bars" | "basic" | "battlestats" | "bounties" | "calendar" | "casino" | "competition" | "cooldowns" | "crimes" | "discord" | "enlistedcars" | "equipment" | "events" | "faction" | "factionbalance" | "forumfeed" | "forumfriends" | "forumposts" | "forumsubscribedthreads" | "forumthreads" | "gym" | "halloween" | "hof" | "honors" | "icons" | "inventory" | "itemmarket" | "itemmod" | "job" | "jobpoints" | "jobranks" | "list" | "log" | "lookup" | "medals" | "merits" | "messages" | "missions" | "money" | "networth" | "newevents" | "newmessages" | "notifications" | "organizedcrime" | "personalstats" | "profile" | "properties" | "property" | "races" | "racingrecords" | "refills" | "reports" | "revives" | "revivesfull" | "skills" | "snapshot" | "stocks" | "trades" | "trade" | "travel" | "travelinventory" | "timestamp" | "weaponexp" | "workstats" | "bazaar" | "criminalrecord" | "display" | "education" | "perks") | string;
         UserLookupResponse: {
             selections: components["schemas"]["UserSelectionName"][];
         };
@@ -6905,6 +6995,23 @@ export interface components {
         };
         UserMeritsResponse: {
             merits: components["schemas"]["UserMerits"];
+        };
+        UserHalloween: {
+            treats: {
+                /** Format: int32 */
+                total: number;
+                /** Format: int32 */
+                current: number;
+            };
+            basket_upgrades: components["schemas"]["UserHalloweenBasketUpgrade"][];
+        };
+        UserHalloweenBasketUpgrade: {
+            id: components["schemas"]["HalloweenBasketUpgradeId"];
+            /** Format: int32 */
+            timestamp: number;
+        };
+        UserHalloweenResponse: {
+            halloween: components["schemas"]["UserHalloween"];
         };
         PersonalStatsOther: {
             other: {
@@ -9611,6 +9718,10 @@ export interface components {
                     points_market: number;
                     /** Format: int64 */
                     points_used: number;
+                    /** Format: int64 */
+                    points_bought: number;
+                    /** Format: int64 */
+                    points_average_cost: number;
                 };
                 attacking: {
                     /** Format: int64 */
@@ -9635,6 +9746,12 @@ export interface components {
                     money_mugged: number;
                     /** Format: int64 */
                     respect_gained: number;
+                    /** Format: int64 */
+                    wars_ranked: number;
+                    /** Format: int64 */
+                    wars_territory: number;
+                    /** Format: int64 */
+                    wars_raid: number;
                 };
                 jobs: {
                     /** Format: int64 */
@@ -9725,6 +9842,8 @@ export interface components {
                     china: number;
                     /** Format: int64 */
                     cayman_islands: number;
+                    /** Format: int64 */
+                    canada: number;
                 };
                 bounties: {
                     /** Format: int64 */
@@ -9736,21 +9855,67 @@ export interface components {
                     /** Format: int64 */
                     total: number;
                     /** Format: int64 */
+                    today: number;
+                    /** Format: int64 */
                     jail_sentences: number;
                 };
                 communication: {
                     /** Format: int64 */
+                    messages: number;
+                    /** Format: int64 */
                     total_messages: number;
+                    /**
+                     * Format: int64
+                     * @deprecated
+                     * @description Replaced with 'mails_friends' field. Will be removed on 1st of January 2027.
+                     */
+                    friends?: number;
                     /** Format: int64 */
-                    friends: number;
+                    mails_friends: number;
+                    /**
+                     * Format: int64
+                     * @deprecated
+                     * @description Replaced with 'mails_coworkers' field. Will be removed on 1st of January 2027.
+                     */
+                    coworkers?: number;
                     /** Format: int64 */
-                    coworkers: number;
+                    mails_coworkers: number;
+                    /**
+                     * Format: int64
+                     * @deprecated
+                     * @description Replaced with 'mails_spouses' field. Will be removed on 1st of January 2027.
+                     */
+                    spouses?: number;
                     /** Format: int64 */
-                    spouses: number;
+                    mails_spouses: number;
+                    /** Format: int64 */
+                    mails_faction: number;
+                    /** Format: int64 */
+                    mails_total: number;
+                    /** Format: int64 */
+                    chats: number;
+                    /** Format: int64 */
+                    articles: number;
+                    /** Format: int64 */
+                    article_views: number;
+                    /** Format: int64 */
+                    article_reads: number;
                     /** Format: int64 */
                     classified_ads_placed: number;
                     /** Format: int64 */
                     personals_placed: number;
+                    /** Format: int64 */
+                    events: number;
+                    /** Format: int64 */
+                    total_events: number;
+                    /** Format: int64 */
+                    forum_posts: number;
+                    /** Format: int64 */
+                    forum_threads: number;
+                    /** Format: int64 */
+                    forum_likes: number;
+                    /** Format: int64 */
+                    forum_dislikes: number;
                 };
                 other: {
                     /** Format: int64 */
@@ -9765,6 +9930,10 @@ export interface components {
                     company_trains: number;
                     /** Format: int64 */
                     stat_enhancers_used: number;
+                    /** Format: int64 */
+                    gym_trains: number;
+                    /** Format: int64 */
+                    users_daily: number;
                 };
             };
         };
@@ -10541,9 +10710,25 @@ export interface components {
         TornFactionTreeResponse: {
             factionTree: components["schemas"]["TornFactionTree"][];
         };
-        TornSelectionName: ("attacklog" | "bank" | "bounties" | "calendar" | "cards" | "cityshops" | "companies" | "crimes" | "education" | "elimination" | "eliminationteam" | "factionhof" | "factiontree" | "gyms" | "hof" | "honors" | "itemammo" | "itemdetails" | "itemmods" | "itemstats" | "items" | "logcategories" | "logtypes" | "lookup" | "medals" | "merits" | "museum" | "organizedcrimes" | "pokertables" | "properties" | "rockpaperscissors" | "searchforcash" | "shoplifting" | "stats" | "stocks" | "subcrimes" | "territory" | "timestamp" | "competition" | "organisedcrimes") | string;
+        TornSelectionName: ("attacklog" | "bank" | "bounties" | "calendar" | "cards" | "cityshops" | "companies" | "crimes" | "education" | "elimination" | "eliminationteam" | "factionhof" | "factiontree" | "gyms" | "halloween" | "hof" | "honors" | "itemammo" | "itemdetails" | "itemmods" | "itemstats" | "items" | "logcategories" | "logtypes" | "lookup" | "medals" | "merits" | "museum" | "organizedcrimes" | "pokertables" | "properties" | "rockpaperscissors" | "searchforcash" | "shoplifting" | "stats" | "stocks" | "subcrimes" | "territory" | "timestamp" | "competition" | "organisedcrimes") | string;
         TornLookupResponse: {
             selections: components["schemas"]["TornSelectionName"][];
+        };
+        TornHalloweenUpgrade: {
+            id: components["schemas"]["HalloweenBasketUpgradeId"];
+            name: string;
+            description: string;
+            flavor: string;
+            /** Format: int32 */
+            cost: number;
+            /** Format: int32 */
+            requirement: number;
+        };
+        TornHalloween: {
+            basket_upgrades: components["schemas"]["TornHalloweenUpgrade"][];
+        };
+        TornHalloweenResponse: {
+            halloween: components["schemas"]["TornHalloween"];
         };
     };
     responses: never;
@@ -11584,6 +11769,33 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserGymResponse"];
+                };
+            };
+        };
+    };
+    getMyHalloween: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Minimal).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyMinimal"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserHalloweenResponse"];
                 };
             };
         };
@@ -13044,6 +13256,33 @@ export interface operations {
             };
         };
     };
+    getMyTravelInventory: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Limited).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyLimited"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserTravelInventoryResponse"];
+                };
+            };
+        };
+    };
     getMyVirusCodingInformation: {
         parameters: {
             query?: {
@@ -13223,7 +13462,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserCrimesResponse"] | components["schemas"]["UserWeaponExpResponse"] | components["schemas"]["UserAmmoResponse"] | components["schemas"]["UserDiscordResponse"] | components["schemas"]["UserRacesResponse"] | components["schemas"]["UserEnlistedCarsResponse"] | components["schemas"]["UserForumPostsResponse"] | components["schemas"]["UserForumThreadsResponse"] | components["schemas"]["UserForumSubscribedThreadsResponse"] | components["schemas"]["UserForumFeedResponse"] | components["schemas"]["UserForumFriendsResponse"] | components["schemas"]["UserPropertyResponse"] | components["schemas"]["ReportsResponse"] | components["schemas"]["UserHofResponse"] | components["schemas"]["UserCalendarResponse"] | components["schemas"]["UserRacingRecordsResponse"] | components["schemas"]["UserEducationResponse"] | components["schemas"]["UserStocksResponse"] | components["schemas"]["UserBountiesResponse"] | components["schemas"]["UserJobRanksResponse"] | components["schemas"]["UserPropertiesResponse"] | components["schemas"]["UserFactionBalanceResponse"] | components["schemas"]["UserBasicResponse"] | components["schemas"]["RevivesResponse"] | components["schemas"]["UserHonorsResponse"] | components["schemas"]["UserMedalsResponse"] | components["schemas"]["UserMeritsResponse"] | components["schemas"]["RevivesFullResponse"] | components["schemas"]["UserProfileResponse"] | components["schemas"]["UserJobResponse"] | components["schemas"]["UserFactionResponse"] | components["schemas"]["UserCompetitionResponse"] | components["schemas"]["UserIconsResponse"] | components["schemas"]["UserItemMarketResponse"] | components["schemas"]["UserListResponse"] | components["schemas"]["UserEquipmentResponse"] | components["schemas"]["UserMissionsResponse"] | components["schemas"]["UserPersonalStatsResponse"] | components["schemas"]["UserOrganizedCrimeResponse"] | components["schemas"]["UserItemModsResponse"] | components["schemas"]["AttacksResponse"] | components["schemas"]["UserBarsResponse"] | components["schemas"]["UserCooldownsResponse"] | components["schemas"]["UserNotificationsResponse"] | components["schemas"]["UserPerksResponse"] | components["schemas"]["UserRefillsResponse"] | components["schemas"]["UserTravelResponse"] | components["schemas"]["UserVirusResponse"] | components["schemas"]["AttacksFullResponse"] | components["schemas"]["UserCasinoResponse"] | components["schemas"]["UserNetworthResponse"] | components["schemas"]["UserMoneyResponse"] | components["schemas"]["UserJobPointsResponse"] | components["schemas"]["UserWorkStatsResponse"] | components["schemas"]["UserSkillsResponse"] | components["schemas"]["UserBattleStatsResponse"] | components["schemas"]["UserGymResponse"] | components["schemas"]["UserTradeResponse"] | components["schemas"]["UserTradesResponse"] | components["schemas"]["UserNewEventsResponse"] | components["schemas"]["UserEventsResponse"] | components["schemas"]["UserMessagesResponse"] | components["schemas"]["UserNewMessagesResponse"] | components["schemas"]["UserLookupResponse"] | components["schemas"]["UserInventoryResponse"] | components["schemas"]["TimestampResponse"];
+                    "application/json": components["schemas"]["UserCrimesResponse"] | components["schemas"]["UserWeaponExpResponse"] | components["schemas"]["UserAmmoResponse"] | components["schemas"]["UserDiscordResponse"] | components["schemas"]["UserRacesResponse"] | components["schemas"]["UserEnlistedCarsResponse"] | components["schemas"]["UserForumPostsResponse"] | components["schemas"]["UserForumThreadsResponse"] | components["schemas"]["UserForumSubscribedThreadsResponse"] | components["schemas"]["UserForumFeedResponse"] | components["schemas"]["UserForumFriendsResponse"] | components["schemas"]["UserPropertyResponse"] | components["schemas"]["ReportsResponse"] | components["schemas"]["UserHofResponse"] | components["schemas"]["UserCalendarResponse"] | components["schemas"]["UserRacingRecordsResponse"] | components["schemas"]["UserEducationResponse"] | components["schemas"]["UserStocksResponse"] | components["schemas"]["UserBountiesResponse"] | components["schemas"]["UserJobRanksResponse"] | components["schemas"]["UserPropertiesResponse"] | components["schemas"]["UserFactionBalanceResponse"] | components["schemas"]["UserBasicResponse"] | components["schemas"]["RevivesResponse"] | components["schemas"]["UserHonorsResponse"] | components["schemas"]["UserMedalsResponse"] | components["schemas"]["UserMeritsResponse"] | components["schemas"]["RevivesFullResponse"] | components["schemas"]["UserProfileResponse"] | components["schemas"]["UserJobResponse"] | components["schemas"]["UserFactionResponse"] | components["schemas"]["UserCompetitionResponse"] | components["schemas"]["UserIconsResponse"] | components["schemas"]["UserItemMarketResponse"] | components["schemas"]["UserListResponse"] | components["schemas"]["UserEquipmentResponse"] | components["schemas"]["UserMissionsResponse"] | components["schemas"]["UserPersonalStatsResponse"] | components["schemas"]["UserOrganizedCrimeResponse"] | components["schemas"]["UserItemModsResponse"] | components["schemas"]["AttacksResponse"] | components["schemas"]["UserBarsResponse"] | components["schemas"]["UserCooldownsResponse"] | components["schemas"]["UserNotificationsResponse"] | components["schemas"]["UserPerksResponse"] | components["schemas"]["UserRefillsResponse"] | components["schemas"]["UserTravelResponse"] | components["schemas"]["UserTravelInventoryResponse"] | components["schemas"]["UserVirusResponse"] | components["schemas"]["AttacksFullResponse"] | components["schemas"]["UserCasinoResponse"] | components["schemas"]["UserHalloweenResponse"] | components["schemas"]["UserNetworthResponse"] | components["schemas"]["UserMoneyResponse"] | components["schemas"]["UserJobPointsResponse"] | components["schemas"]["UserWorkStatsResponse"] | components["schemas"]["UserSkillsResponse"] | components["schemas"]["UserBattleStatsResponse"] | components["schemas"]["UserGymResponse"] | components["schemas"]["UserTradeResponse"] | components["schemas"]["UserTradesResponse"] | components["schemas"]["UserNewEventsResponse"] | components["schemas"]["UserEventsResponse"] | components["schemas"]["UserMessagesResponse"] | components["schemas"]["UserNewMessagesResponse"] | components["schemas"]["UserLookupResponse"] | components["schemas"]["UserInventoryResponse"] | components["schemas"]["TimestampResponse"];
                 };
             };
         };
@@ -16949,6 +17188,33 @@ export interface operations {
             };
         };
     };
+    getTornHalloween: {
+        parameters: {
+            query?: {
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Minimal).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyMinimal"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornHalloweenResponse"];
+                };
+            };
+        };
+    };
     getTornHonors: {
         parameters: {
             query?: {
@@ -17814,7 +18080,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TornSubcrimesResponse"] | components["schemas"]["TornCrimesResponse"] | components["schemas"]["TornCalendarResponse"] | components["schemas"]["TornHofResponse"] | components["schemas"]["TornFactionHofResponse"] | components["schemas"]["TornLogTypesResponse"] | components["schemas"]["TornCardsResponse"] | components["schemas"]["TornItemsResponse"] | components["schemas"]["TornRockPaperScissorsResponse"] | components["schemas"]["TornCityStatsResponse"] | components["schemas"]["TornLogCategoriesResponse"] | components["schemas"]["TornEducationResponse"] | components["schemas"]["TornMeritsResponse"] | components["schemas"]["TornOrganizedCrimeResponse"] | components["schemas"]["TornItemStatsResponse"] | components["schemas"]["TornHonorsResponse"] | components["schemas"]["TornItemDetailsResponse"] | components["schemas"]["TornEliminationTeamsResponse"] | components["schemas"]["TornCityShopsResponse"] | components["schemas"]["TornEliminationTeamPlayersResponse"] | components["schemas"]["TornMedalsResponse"] | components["schemas"]["TornBankResponse"] | components["schemas"]["TornBountiesResponse"] | components["schemas"]["TornGymsResponse"] | components["schemas"]["TornPokerTablesResponse"] | components["schemas"]["TornItemAmmoResponse"] | components["schemas"]["TornProperties"] | components["schemas"]["TornFactionTreeResponse"] | components["schemas"]["AttackLogResponse"] | components["schemas"]["TornMuseumResponse"] | components["schemas"]["TornStockDetailedResponse"] | components["schemas"]["TornStocksResponse"] | components["schemas"]["TornTerritoriesResponse"] | components["schemas"]["TornTerritoriesNoLinksResponse"] | components["schemas"]["TornItemModsResponse"] | components["schemas"]["TornLookupResponse"] | components["schemas"]["TimestampResponse"];
+                    "application/json": components["schemas"]["TornSubcrimesResponse"] | components["schemas"]["TornCrimesResponse"] | components["schemas"]["TornCalendarResponse"] | components["schemas"]["TornHofResponse"] | components["schemas"]["TornFactionHofResponse"] | components["schemas"]["TornLogTypesResponse"] | components["schemas"]["TornCardsResponse"] | components["schemas"]["TornItemsResponse"] | components["schemas"]["TornRockPaperScissorsResponse"] | components["schemas"]["TornCityStatsResponse"] | components["schemas"]["TornLogCategoriesResponse"] | components["schemas"]["TornEducationResponse"] | components["schemas"]["TornMeritsResponse"] | components["schemas"]["TornOrganizedCrimeResponse"] | components["schemas"]["TornItemStatsResponse"] | components["schemas"]["TornHonorsResponse"] | components["schemas"]["TornItemDetailsResponse"] | components["schemas"]["TornEliminationTeamsResponse"] | components["schemas"]["TornCityShopsResponse"] | components["schemas"]["TornEliminationTeamPlayersResponse"] | components["schemas"]["TornMedalsResponse"] | components["schemas"]["TornBankResponse"] | components["schemas"]["TornHalloweenResponse"] | components["schemas"]["TornBountiesResponse"] | components["schemas"]["TornGymsResponse"] | components["schemas"]["TornPokerTablesResponse"] | components["schemas"]["TornItemAmmoResponse"] | components["schemas"]["TornProperties"] | components["schemas"]["TornFactionTreeResponse"] | components["schemas"]["AttackLogResponse"] | components["schemas"]["TornMuseumResponse"] | components["schemas"]["TornStockDetailedResponse"] | components["schemas"]["TornStocksResponse"] | components["schemas"]["TornTerritoriesResponse"] | components["schemas"]["TornTerritoriesNoLinksResponse"] | components["schemas"]["TornItemModsResponse"] | components["schemas"]["TornLookupResponse"] | components["schemas"]["TimestampResponse"];
                 };
             };
         };

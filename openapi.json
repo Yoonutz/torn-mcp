@@ -3,7 +3,7 @@
     "info": {
         "title": "Torn API",
         "description": "\n * The development of Torn's API v2 is still ongoing.\n * If selections remain unaltered, they will default to the API v1 version.\n * Unlike API v1, API v2 accepts both selections and IDs as path and query parameters.\n * If any discrepancies or errors are found, please submit a [bug report](https://www.torn.com/forums.php#/p=forums&f=19&b=0&a=0) on the Torn Forums.\n * In case you're using bots to check for changes on openapi.json file, make sure to specificy a custom user-agent header - CloudFlare sometimes prevents requests from default user-agents.",
-        "version": "6.13.8"
+        "version": "6.15.0"
     },
     "servers": [
         {
@@ -1395,6 +1395,45 @@
                 "x-stability": "Stable"
             }
         },
+        "/user/halloween": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get your Halloween treats information",
+                "description": "Requires minimal access key. <br>Returns your current and cumulative treats and the IDs of basket upgrades you have unlocked.",
+                "operationId": "getMyHalloween",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyMinimal"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserHalloweenResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Untable"
+            }
+        },
         "/user/hof": {
             "get": {
                 "tags": [
@@ -1614,7 +1653,7 @@
                     "User"
                 ],
                 "summary": "Get your inventory",
-                "description": "<b>Cached selection (1 hour per category).</b><br><br>Requires minimal access key. <br>",
+                "description": "<b>Cached selection (15 minutes per category).</b><br><br>Requires minimal access key. <br>",
                 "operationId": "getMyInventory",
                 "parameters": [
                     {
@@ -2384,7 +2423,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/user/newmessages": {
@@ -3651,6 +3690,45 @@
                 "x-stability": "Stable"
             }
         },
+        "/user/travelinventory": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get your travel inventory capacity",
+                "description": "Requires limited access key. <br>",
+                "operationId": "getMyTravelInventory",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyLimited"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserTravelInventoryResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
         "/user/virus": {
             "get": {
                 "tags": [
@@ -4127,6 +4205,9 @@
                                             "$ref": "#/components/schemas/UserTravelResponse"
                                         },
                                         {
+                                            "$ref": "#/components/schemas/UserTravelInventoryResponse"
+                                        },
+                                        {
                                             "$ref": "#/components/schemas/UserVirusResponse"
                                         },
                                         {
@@ -4134,6 +4215,9 @@
                                         },
                                         {
                                             "$ref": "#/components/schemas/UserCasinoResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/UserHalloweenResponse"
                                         },
                                         {
                                             "$ref": "#/components/schemas/UserNetworthResponse"
@@ -5136,7 +5220,7 @@
                     "Faction"
                 ],
                 "summary": "Get your faction's inventory items.",
-                "description": "<b>Cached selection (1 hour, all items cached at once).</b><br><br>Requires limited access key. <br> ",
+                "description": "<b>Cached selection (5 minutes, all items cached at once).</b><br><br>Requires limited access key. <br> ",
                 "operationId": "getMyFactionInventory",
                 "parameters": [
                     {
@@ -5181,7 +5265,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/faction/members": {
@@ -6004,7 +6088,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/faction/stats": {
@@ -8815,7 +8899,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/market/{propertyTypeId}/rentals": {
@@ -9883,7 +9967,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/bounties": {
@@ -10006,7 +10090,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/cityshops": {
@@ -10045,7 +10129,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/{shopId}/cityshops": {
@@ -10093,7 +10177,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/companies": {
@@ -10132,7 +10216,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/{typeId}/companies": {
@@ -10180,7 +10264,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/crimes": {
@@ -10483,7 +10567,46 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
+            }
+        },
+        "/torn/halloween": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get Halloween basket upgrades",
+                "description": "Requires minimal access key. <br>Returns the list of available Halloween basket upgrades with their benefits, treats cost and unlock requirement.",
+                "operationId": "getTornHalloween",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyMinimal"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornHalloweenResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Stable"
             }
         },
         "/torn/honors": {
@@ -10822,7 +10945,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/items": {
@@ -11303,7 +11426,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/properties": {
@@ -11381,7 +11504,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/searchforcash": {
@@ -11420,7 +11543,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/shoplifting": {
@@ -11459,7 +11582,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/stats": {
@@ -11498,7 +11621,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/stocks": {
@@ -11981,6 +12104,9 @@
                                         },
                                         {
                                             "$ref": "#/components/schemas/TornBankResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TornHalloweenResponse"
                                         },
                                         {
                                             "$ref": "#/components/schemas/TornBountiesResponse"
@@ -16729,7 +16855,8 @@
                     "end_with_nap",
                     "end_with_destroy_attack",
                     "end_with_destroy_defense",
-                    "end_with_peace_treaty"
+                    "end_with_peace_treaty",
+                    "end_with_dirty_bomb"
                 ]
             },
             "FactionAttackResult": {
@@ -16882,7 +17009,8 @@
                     "Marketing Manager",
                     "Revenue Manager",
                     "Casino Manager",
-                    "Casino President"
+                    "Casino President",
+                    "Dealer"
                 ]
             },
             "AttackFinishingHitEffect": {
@@ -17236,6 +17364,10 @@
                 "format": "int32"
             },
             "TornSubCrimeId": {
+                "type": "integer",
+                "format": "int32"
+            },
+            "HalloweenBasketUpgradeId": {
                 "type": "integer",
                 "format": "int32"
             },
@@ -20132,6 +20264,118 @@
                     },
                     "_metadata": {
                         "$ref": "#/components/schemas/RequestMetadataWithLinksAndTotal"
+                    }
+                },
+                "type": "object"
+            },
+            "UserTravelInventoryItem": {
+                "required": [
+                    "id",
+                    "uid",
+                    "is_equipped",
+                    "name",
+                    "type",
+                    "is_faction_owned",
+                    "is_permanent"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/ItemId"
+                    },
+                    "uid": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ItemUid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "is_equipped": {
+                        "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "is_faction_owned": {
+                        "type": "boolean"
+                    },
+                    "is_permanent": {
+                        "description": "True for items added while player was in Torn.",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "UserTravelInventorySlot": {
+                "required": [
+                    "id",
+                    "item"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "item": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserTravelInventoryItem"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "UserTravelInventoryCapacity": {
+                "required": [
+                    "base",
+                    "special"
+                ],
+                "properties": {
+                    "base": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "special": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "type": "object"
+            },
+            "UserTravelInventory": {
+                "required": [
+                    "capacity",
+                    "inventory"
+                ],
+                "properties": {
+                    "capacity": {
+                        "$ref": "#/components/schemas/UserTravelInventoryCapacity"
+                    },
+                    "inventory": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserTravelInventorySlot"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "UserTravelInventoryResponse": {
+                "required": [
+                    "travelinventory"
+                ],
+                "properties": {
+                    "travelinventory": {
+                        "$ref": "#/components/schemas/UserTravelInventory"
                     }
                 },
                 "type": "object"
@@ -24403,6 +24647,7 @@
                             "forumsubscribedthreads",
                             "forumthreads",
                             "gym",
+                            "halloween",
                             "hof",
                             "honors",
                             "icons",
@@ -24441,6 +24686,7 @@
                             "trades",
                             "trade",
                             "travel",
+                            "travelinventory",
                             "timestamp",
                             "weaponexp",
                             "workstats",
@@ -24587,6 +24833,65 @@
                 "properties": {
                     "merits": {
                         "$ref": "#/components/schemas/UserMerits"
+                    }
+                },
+                "type": "object"
+            },
+            "UserHalloween": {
+                "required": [
+                    "treats",
+                    "basket_upgrades"
+                ],
+                "properties": {
+                    "treats": {
+                        "required": [
+                            "total",
+                            "current"
+                        ],
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "format": "int32"
+                            },
+                            "current": {
+                                "type": "integer",
+                                "format": "int32"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "basket_upgrades": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserHalloweenBasketUpgrade"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "UserHalloweenBasketUpgrade": {
+                "required": [
+                    "id",
+                    "timestamp"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/HalloweenBasketUpgradeId"
+                    },
+                    "timestamp": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "type": "object"
+            },
+            "UserHalloweenResponse": {
+                "required": [
+                    "halloween"
+                ],
+                "properties": {
+                    "halloween": {
+                        "$ref": "#/components/schemas/UserHalloween"
                     }
                 },
                 "type": "object"
@@ -34292,6 +34597,8 @@
                             },
                             "currency": {
                                 "required": [
+                                    "points_bought",
+                                    "points_average_cost",
                                     "money_on_hand",
                                     "money_on_hand_average",
                                     "money_in_bank",
@@ -34333,12 +34640,23 @@
                                     "points_used": {
                                         "type": "integer",
                                         "format": "int64"
+                                    },
+                                    "points_bought": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "points_average_cost": {
+                                        "type": "integer",
+                                        "format": "int64"
                                     }
                                 },
                                 "type": "object"
                             },
                             "attacking": {
                                 "required": [
+                                    "wars_ranked",
+                                    "wars_territory",
+                                    "wars_raid",
                                     "attacks_won",
                                     "attacks_lost",
                                     "attacks_stalemated",
@@ -34393,6 +34711,18 @@
                                         "format": "int64"
                                     },
                                     "respect_gained": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "wars_ranked": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "wars_territory": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "wars_raid": {
                                         "type": "integer",
                                         "format": "int64"
                                     }
@@ -34569,6 +34899,7 @@
                             },
                             "traveling": {
                                 "required": [
+                                    "canada",
                                     "items_bought_abroad",
                                     "total_trips",
                                     "argentina",
@@ -34630,6 +34961,10 @@
                                     "cayman_islands": {
                                         "type": "integer",
                                         "format": "int64"
+                                    },
+                                    "canada": {
+                                        "type": "integer",
+                                        "format": "int64"
                                     }
                                 },
                                 "type": "object"
@@ -34654,10 +34989,15 @@
                             "crimes": {
                                 "required": [
                                     "total",
+                                    "today",
                                     "jail_sentences"
                                 ],
                                 "properties": {
                                     "total": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "today": {
                                         "type": "integer",
                                         "format": "int64"
                                     },
@@ -34670,27 +35010,86 @@
                             },
                             "communication": {
                                 "required": [
+                                    "messages",
+                                    "mails_friends",
+                                    "mails_coworkers",
+                                    "mails_spouses",
+                                    "mails_faction",
+                                    "mails_total",
+                                    "chats",
+                                    "articles",
+                                    "article_views",
+                                    "article_reads",
+                                    "events",
+                                    "total_events",
+                                    "forum_posts",
+                                    "forum_threads",
+                                    "forum_likes",
+                                    "forum_dislikes",
                                     "total_messages",
-                                    "friends",
-                                    "coworkers",
-                                    "spouses",
                                     "classified_ads_placed",
                                     "personals_placed"
                                 ],
                                 "properties": {
+                                    "messages": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
                                     "total_messages": {
                                         "type": "integer",
                                         "format": "int64"
                                     },
                                     "friends": {
+                                        "description": "Replaced with 'mails_friends' field. Will be removed on 1st of January 2027.",
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "deprecated": true
+                                    },
+                                    "mails_friends": {
                                         "type": "integer",
                                         "format": "int64"
                                     },
                                     "coworkers": {
+                                        "description": "Replaced with 'mails_coworkers' field. Will be removed on 1st of January 2027.",
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "deprecated": true
+                                    },
+                                    "mails_coworkers": {
                                         "type": "integer",
                                         "format": "int64"
                                     },
                                     "spouses": {
+                                        "description": "Replaced with 'mails_spouses' field. Will be removed on 1st of January 2027.",
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "deprecated": true
+                                    },
+                                    "mails_spouses": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "mails_faction": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "mails_total": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "chats": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "articles": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "article_views": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "article_reads": {
                                         "type": "integer",
                                         "format": "int64"
                                     },
@@ -34701,12 +35100,38 @@
                                     "personals_placed": {
                                         "type": "integer",
                                         "format": "int64"
+                                    },
+                                    "events": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "total_events": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "forum_posts": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "forum_threads": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "forum_likes": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "forum_dislikes": {
+                                        "type": "integer",
+                                        "format": "int64"
                                     }
                                 },
                                 "type": "object"
                             },
                             "other": {
                                 "required": [
+                                    "users_daily",
+                                    "gym_trains",
                                     "logins",
                                     "years_played",
                                     "merits_bought",
@@ -34736,6 +35161,14 @@
                                         "format": "int64"
                                     },
                                     "stat_enhancers_used": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "gym_trains": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "users_daily": {
                                         "type": "integer",
                                         "format": "int64"
                                     }
@@ -37786,6 +38219,7 @@
                             "factionhof",
                             "factiontree",
                             "gyms",
+                            "halloween",
                             "hof",
                             "honors",
                             "itemammo",
@@ -37829,6 +38263,65 @@
                         "items": {
                             "$ref": "#/components/schemas/TornSelectionName"
                         }
+                    }
+                },
+                "type": "object"
+            },
+            "TornHalloweenUpgrade": {
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "flavor",
+                    "cost",
+                    "requirement",
+                    "type"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/HalloweenBasketUpgradeId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "flavor": {
+                        "type": "string"
+                    },
+                    "cost": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "requirement": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "type": "object"
+            },
+            "TornHalloween": {
+                "required": [
+                    "basket_upgrades"
+                ],
+                "properties": {
+                    "basket_upgrades": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornHalloweenUpgrade"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornHalloweenResponse": {
+                "required": [
+                    "halloween"
+                ],
+                "properties": {
+                    "halloween": {
+                        "$ref": "#/components/schemas/TornHalloween"
                     }
                 },
                 "type": "object"

@@ -6,7 +6,7 @@
 
 A remote [Model Context Protocol](https://modelcontextprotocol.io) server for the [Torn City](https://www.torn.com) API v2, running on **Cloudflare Workers**. Connect from VS Code (or any MCP client) anywhere - no local install. You supply your Torn API key via the `X-Torn-Api-Key` header (`X-Api-Key` and `Authorization: Bearer <key>` are accepted too, for clients that restrict header names); it is never stored, never shown to the model, and never read from the URL (see [Security & privacy](#security--privacy)). Clients that can't set headers (Claude's connector directory) sign in with OAuth instead: you paste the key once on the server's sign-in page.
 
-**Tools:** one grouped tool per Torn tag (`torn_user`, `torn_faction`, `torn_torn`, `torn_company`, `torn_market`, `torn_racing`, `torn_forum`, `torn_property`, `torn_key`) covering all 187 endpoints across 234 operations of the spec via an `endpoint` argument - plus **12 intelligence tools** that aggregate endpoints into structured summaries (`analyze_player`, `war_readiness_report`, `find_profitable_items`, …) and `torn_list_endpoints` for discovery.
+**Tools:** one grouped tool per Torn tag (`torn_user`, `torn_faction`, `torn_torn`, `torn_company`, `torn_market`, `torn_racing`, `torn_forum`, `torn_property`, `torn_key`) covering all 190 endpoints across 237 operations of the spec via an `endpoint` argument - plus **12 intelligence tools** that aggregate endpoints into structured summaries (`analyze_player`, `war_readiness_report`, `find_profitable_items`, …) and `torn_list_endpoints` for discovery.
 
 > [!NOTE]
 > Read-only. The Torn API v2 exposes only `GET` endpoints - this server can never modify your account or take in-game actions.
@@ -221,9 +221,9 @@ One grouped tool per Torn tag, each covering all of that tag's endpoints (table 
 
 | Tool                  | Endpoints | Example `endpoint` values                                                                   |
 | --------------------- | --------- | ------------------------------------------------------------------------------------------- |
-| `torn_user`           | 69        | `ammo`, `attacks`, `attacksfull`, `bars`, `basic`, `battlestats`                            |
+| `torn_user`           | 71        | `ammo`, `attacks`, `attacksfull`, `bars`, `basic`, `battlestats`                            |
 | `torn_faction`        | 42        | `applications`, `attacks`, `attacksfull`, `balance`, `basic`, `chain`                       |
-| `torn_torn`           | 38        | `attacklog`, `bank`, `bounties`, `calendar`, `cards`, `cityshops`                           |
+| `torn_torn`           | 39        | `attacklog`, `bank`, `bounties`, `calendar`, `cards`, `cityshops`                           |
 | `torn_company`        | 10        | `applications`, `employees`, `news`, `companies`, `profile`, `search`                       |
 | `torn_market`         | 9         | `auctionhouselisting`, `auctionhouse`, `bazaar`, `itemmarket`, `properties`, `pointsmarket` |
 | `torn_racing`         | 8         | `cars`, `carupgrades`, `races`, `race`, `records`, `tracks`                                 |
