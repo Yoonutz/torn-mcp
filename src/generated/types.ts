@@ -913,7 +913,7 @@ export interface paths {
         };
         /**
          * Get your logs
-         * @description Requires full access key. <br> It's possible to pass a list of log ids or a log category id.<br>This selection is standalone and cannot be used together with other selections.
+         * @description Requires full access key. <br> It's possible to pass a list of log ids or a log category id.<br>This selection is standalone and cannot be used together with other selections.<br><br>Pagination: `from` and `to` are inclusive bounds at one-second resolution. Log timestamps are nanosecond-precise, so to page without gaps or repeats use the `nanostamp` cursor (returned as `_metadata.nanostamp`, sent without `to`); the `prev` link does this automatically.
          */
         get: operations["getMyLogs"];
         put?: never;
@@ -5017,7 +5017,7 @@ export interface components {
         };
         RequestMetadataWithLinksAndNanostamp: {
             links: components["schemas"]["RequestLinks"];
-            /** @description Use to bypass system limitation when 100 or more logs were inserted within the same second. */
+            /** @description Nanosecond paging cursor. Send it back (without `to`) as the next request's `nanostamp` to continue from the exact position; also bypasses the limitation when 100 or more logs share the same second. */
             nanostamp?: string;
         };
         /**
@@ -5047,9 +5047,6 @@ export interface components {
         HonorRarityEnum: "Extremely Rare" | "Very Rare" | "Rare" | "Limited" | "Uncommon" | "Common" | "Very Common" | "Unknown" | "Unknown Rarity";
         /** @enum {string} */
         AwardCrimesVersionEnum: "v1" | "v2";
-        CompanySearchParameter: ("recruiting" | "notRecruiting") | string;
-        UserSearchParameter: ("married" | "notMarried" | "traveling" | "notTraveling" | "inFaction" | "notInFaction" | "inCompany" | "notInCompany" | "inHospital" | "notInHospital" | "inJail" | "notInJail" | "inFederalJail" | "notInFederalJail" | "male" | "female" | "enby" | "lastActionNow" | "lastActionRecent" | "lastActionHourAgo" | "lastActionDayAgo" | "lastActionWeekAgo" | "lastActionMonthAgo" | "lastActionYearAgo") | string;
-        Parameters: ("destroyed" | "notDestroyed" | "recruiting" | "notRecruiting") | string;
         /** @enum {string} */
         TornShopliftingStatusTitleEnum: "One camera" | "Two cameras" | "Three cameras" | "Four cameras" | "Checkpoint" | "One guard" | "Two guards";
         /** @enum {string} */
@@ -5325,6 +5322,8 @@ export interface components {
                     id: components["schemas"]["ItemId"];
                     name: string;
                     /** Format: int32 */
+                    stock: number;
+                    /** Format: int32 */
                     price: number;
                     /** Format: int32 */
                     value: number;
@@ -5334,6 +5333,7 @@ export interface components {
                 trip_duration: number;
                 /** Format: int32 */
                 hourly_profit: number;
+                restock_timestamp: number | null;
             }[];
         };
         ReportAnonymousBounties: {
@@ -10431,8 +10431,12 @@ export interface components {
             start: number;
             /** Format: int32 */
             end: number;
+            /** Format: int32 */
+            earliest_start: number;
+            /** Format: int32 */
+            latest_end: number;
             /** @description This value is false if the event uses personal calendar time. */
-            fixed_start_time?: boolean;
+            fixed_start_time: boolean;
         };
         TornCalendarResponse: {
             calendar: {
@@ -10534,29 +10538,32 @@ export interface components {
             /** Format: int32 */
             damage: number;
         };
+        AttackLogItem: {
+            id: components["schemas"]["ItemId"];
+            name: string;
+        };
+        AttackLogAttacker: {
+            id: components["schemas"]["UserId"];
+            name: string;
+            /** @description This value is null if there was no item being used in this turn or during this effect. */
+            item: components["schemas"]["AttackLogItem"] | null;
+        };
+        AttackLogDefender: {
+            id: components["schemas"]["UserId"];
+            name: string;
+        };
         AttackLog: {
             text: string;
             /** Format: int32 */
             timestamp: number;
             action: components["schemas"]["AttackActionEnum"];
             icon: string;
-            attacker: {
-                id: components["schemas"]["UserId"];
-                name: string;
-                item: {
-                    id?: components["schemas"]["ItemId"];
-                    name?: string;
-                } | null;
-            } | null;
-            defender: {
-                id: components["schemas"]["UserId"];
-                name: string;
-            } | null;
-            /** @description This field only exists if the attacker is stealthed and they used a temporary item. */
-            attacker_item?: {
-                id: components["schemas"]["ItemId"];
-                name: string;
-            };
+            /** @description This value is null in stealthed attacks. */
+            attacker: components["schemas"]["AttackLogAttacker"] | null;
+            /** @description This value is null in stealthed attacks. */
+            defender: components["schemas"]["AttackLogDefender"] | null;
+            /** @description This field only exists if the attacker is stealthed and they used a temporary item. It is null if the item could not be resolved. */
+            attacker_item?: components["schemas"]["AttackLogItem"] | null;
         };
         AttackLogResponse: {
             attacklog: {
@@ -10777,7 +10784,7 @@ export interface components {
         ApiTimestamp: number | string;
         /** @description Timestamp to get the data in specific point in time */
         ApiTimestampSpecificPointInTime: number | string;
-        /** @description Timestamp in nanoseconds to bypass system limitation when more than 100 logs were returned in the same second. */
+        /** @description Nanosecond cursor for user/log pagination, returned as `_metadata.nanostamp`. Pass it back (without `to`) to continue from the exact position with no skipped or repeated logs; it also bypasses the limitation when more than 100 logs share the same second. */
         ApiNanostamp: string;
         /**
          * @description It's possible to use this query parameter to only get incoming or outgoing attacks / revives. If not specified, this selection will return both incoming and outgoing attacks / revives.
@@ -10830,6 +10837,10 @@ export interface components {
         ApiTo: number;
         /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
         ApiFrom: number;
+        /** @description Timestamp that sets the lower limit for the data returned. Data returned will be from and including this time */
+        ApiFromLog: number;
+        /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
+        ApiToLog: number;
         ApiOffset: number;
         ApiOffsetNoDefault: number;
         /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
@@ -12184,12 +12195,12 @@ export interface operations {
                 target?: components["schemas"]["UserId"];
                 limit?: components["parameters"]["ApiLimit100Default20"];
                 /** @description Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time */
-                to?: components["parameters"]["ApiTo"];
-                /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
-                from?: components["parameters"]["ApiFrom"];
+                to?: components["parameters"]["ApiToLog"];
+                /** @description Timestamp that sets the lower limit for the data returned. Data returned will be from and including this time */
+                from?: components["parameters"]["ApiFromLog"];
                 /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
-                /** @description Timestamp in nanoseconds to bypass system limitation when more than 100 logs were returned in the same second. */
+                /** @description Nanosecond cursor for user/log pagination, returned as `_metadata.nanostamp`. Pass it back (without `to`) to continue from the exact position with no skipped or repeated logs; it also bypasses the limitation when more than 100 logs share the same second. */
                 nanostamp?: components["parameters"]["ApiNanostamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
                 comment?: components["parameters"]["ApiComment"];

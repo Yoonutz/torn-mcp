@@ -1765,7 +1765,7 @@ export const ENDPOINTS = {
     "log": {
       "requiresId": false,
       "summary": "Get your logs",
-      "description": "Requires full access key. <br> It's possible to pass a list of log ids or a log category id.<br>This selection is standalone and cannot be used together with other selections.",
+      "description": "Requires full access key. <br> It's possible to pass a list of log ids or a log category id.<br>This selection is standalone and cannot be used together with other selections.<br><br>Pagination: `from` and `to` are inclusive bounds at one-second resolution. Log timestamps are nanosecond-precise, so to page without gaps or repeats use the `nanostamp` cursor (returned as `_metadata.nanostamp`, sent without `to`); the `prev` link does this automatically.",
       "keyLevel": "full",
       "stability": "Stable",
       "query": [
@@ -1808,7 +1808,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer",
-          "description": "Timestamp that sets the lower limit for the data returned. Data returned will be after this time"
+          "description": "Timestamp that sets the lower limit for the data returned. Data returned will be from and including this time"
         },
         {
           "name": "timestamp",
@@ -1822,7 +1822,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "string",
-          "description": "Timestamp in nanoseconds to bypass system limitation when more than 100 logs were returned in the same second."
+          "description": "Nanosecond cursor for user/log pagination, returned as `_metadata.nanostamp`. Pass it back (without `to`) to continue from the exact position with no skipped or repeated logs; it also bypasses the limitation when more than 100 logs share the same second."
         },
         {
           "name": "comment",
