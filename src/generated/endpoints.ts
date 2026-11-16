@@ -1243,7 +1243,8 @@ export const ENDPOINTS = {
           "type": "object",
           "fields": [
             "id",
-            "name"
+            "name",
+            "unlocked_gyms"
           ]
         }
       ],
@@ -2986,7 +2987,7 @@ export const ENDPOINTS = {
     "properties": {
       "requiresId": false,
       "summary": "Get your own properties",
-      "description": "Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys.",
+      "description": "Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys. <br>Responses are cached for an hour unless requesting your own or your spouse's properties with a Limited or higher access key.",
       "keyLevel": "public",
       "stability": "Stable",
       "query": [
@@ -4886,6 +4887,54 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/faction/dirtybombs"
+    },
+    "headlines": {
+      "requiresId": false,
+      "summary": "Get your faction's news ticker headlines",
+      "description": "Requires minimal access key with faction API access permissions. <br>Returns the headlines currently shown in your faction's news ticker. 'importance' is 'urgent' for headlines marked as urgent.",
+      "keyLevel": "minimal",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "striptags",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "description": "Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user').",
+          "enum": [
+            "true",
+            "false"
+          ]
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "headlines",
+          "type": "array",
+          "fields": [
+            "id",
+            "headline",
+            "link",
+            "type",
+            "importance"
+          ]
+        }
+      ],
+      "path": "/faction/headlines"
     },
     "hof": {
       "requiresId": false,
@@ -7547,7 +7596,7 @@ export const ENDPOINTS = {
     "info": {
       "requiresId": false,
       "summary": "Get current key info",
-      "description": "Available for any key. <br>",
+      "description": "Available for any key. <br>'sensitive_data' is true when the key returns the same data as a Limited Access key (e.g. battle stats, revive setting, property and company finances): Limited Access, Full Access and custom keys created with 'Include sensitive data' enabled. Custom keys created before this option existed keep the permissions they had, report false and have 'legacy_permissions' set to true.",
       "keyLevel": "public",
       "stability": "Stable",
       "query": [
@@ -8248,7 +8297,7 @@ export const ENDPOINTS = {
     "races": {
       "requiresId": false,
       "summary": "Get races",
-      "description": "Requires public access key. <br>Returns a list of races, ordered by race start timestamp.",
+      "description": "Requires public access key. <br>Returns a list of races, ordered by race start timestamp. <br>The 'available' category returns races which have not started yet and can still be joined; 'from' and 'to' are ignored for this category.",
       "keyLevel": "public",
       "stability": "Stable",
       "query": [
@@ -8291,7 +8340,8 @@ export const ENDPOINTS = {
           "description": "Category of races returned",
           "enum": [
             "official",
-            "custom"
+            "custom",
+            "available"
           ]
         },
         {
@@ -9306,6 +9356,54 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/torn/halloween"
+    },
+    "headlines": {
+      "requiresId": false,
+      "summary": "Get news ticker headlines",
+      "description": "Requires public access key. <br>Returns the headlines currently shown in the news ticker. 'importance' is 'urgent' for headlines marked as announcements.",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "striptags",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "description": "Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user').",
+          "enum": [
+            "true",
+            "false"
+          ]
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "headlines",
+          "type": "array",
+          "fields": [
+            "id",
+            "headline",
+            "link",
+            "type",
+            "importance"
+          ]
+        }
+      ],
+      "path": "/torn/headlines"
     },
     "honors": {
       "requiresId": false,

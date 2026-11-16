@@ -1285,7 +1285,7 @@ export interface paths {
         };
         /**
          * Get your own properties
-         * @description Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys.
+         * @description Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys. <br>Responses are cached for an hour unless requesting your own or your spouse's properties with a Limited or higher access key.
          */
         get: operations["getMyProperties"];
         put?: never;
@@ -1305,7 +1305,7 @@ export interface paths {
         };
         /**
          * Get specific user's properties
-         * @description Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys for yourself or your spouse.
+         * @description Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys for yourself or your spouse. <br>Responses are cached for an hour unless requesting your own or your spouse's properties with a Limited or higher access key.
          */
         get: operations["getUserProperties"];
         put?: never;
@@ -2095,6 +2095,26 @@ export interface paths {
          * @description Requires public access key. <br>
          */
         get: operations["getWarfareDirtyBombs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/faction/headlines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get your faction's news ticker headlines
+         * @description Requires minimal access key with faction API access permissions. <br>Returns the headlines currently shown in your faction's news ticker. 'importance' is 'urgent' for headlines marked as urgent.
+         */
+        get: operations["getMyFactionHeadlines"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3297,7 +3317,7 @@ export interface paths {
         };
         /**
          * Get current key info
-         * @description Available for any key. <br>
+         * @description Available for any key. <br>'sensitive_data' is true when the key returns the same data as a Limited Access key (e.g. battle stats, revive setting, property and company finances): Limited Access, Full Access and custom keys created with 'Include sensitive data' enabled. Custom keys created before this option existed keep the permissions they had, report false and have 'legacy_permissions' set to true.
          */
         get: operations["getKeyInfo"];
         put?: never;
@@ -3614,7 +3634,7 @@ export interface paths {
         };
         /**
          * Get races
-         * @description Requires public access key. <br>Returns a list of races, ordered by race start timestamp.
+         * @description Requires public access key. <br>Returns a list of races, ordered by race start timestamp. <br>The 'available' category returns races which have not started yet and can still be joined; 'from' and 'to' are ignored for this category.
          */
         get: operations["getRacingRaces"];
         put?: never;
@@ -4157,6 +4177,26 @@ export interface paths {
          * @description Requires minimal access key. <br>Returns the list of available Halloween basket upgrades with their benefits, treats cost and unlock requirement.
          */
         get: operations["getTornHalloween"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/torn/headlines": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get news ticker headlines
+         * @description Requires public access key. <br>Returns the headlines currently shown in the news ticker. 'importance' is 'urgent' for headlines marked as announcements.
+         */
+        get: operations["getTornHeadlines"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4821,6 +4861,8 @@ export interface components {
         FactionBranchStateEnum: "war" | "peace";
         /** @enum {string} */
         RacingRaceTypeEnum: "official" | "custom";
+        /** @enum {string} */
+        RacingRacesCategoryEnum: "official" | "custom" | "available";
         /** @enum {string} */
         MarketSpecializedBazaarCategoryEnum: "Alcohol" | "Artifact" | "Booster" | "Candy" | "Car" | "Clothing" | "Collectible" | "Defensive" | "Drug" | "Energy Drink" | "Enhancer" | "Flower" | "Jewelry" | "Material" | "Medical" | "Melee" | "Other" | "Plushie" | "Primary" | "Secondary" | "Special" | "Supply Pack" | "Temporary" | "Tool";
         /** @enum {string} */
@@ -5633,7 +5675,13 @@ export interface components {
             gym: {
                 id: components["schemas"]["GymId"];
                 name: string;
+                unlocked_gyms: components["schemas"]["UserUnlockedGym"][];
             };
+        };
+        UserUnlockedGym: {
+            id: components["schemas"]["GymId"];
+            name: string;
+            available: boolean;
         };
         UserSearch: {
             id: components["schemas"]["UserId"];
@@ -8451,6 +8499,9 @@ export interface components {
             /** Format: int32 */
             timestamp: number;
         };
+        FactionHeadlinesResponse: {
+            headlines: components["schemas"]["TornHeadline"][];
+        };
         NewsResponse: {
             news: components["schemas"]["News"][];
             _metadata: components["schemas"]["RequestMetadataWithLinks"];
@@ -8764,7 +8815,7 @@ export interface components {
         FactionBalanceResponse: {
             balance: components["schemas"]["FactionBalance"];
         };
-        FactionSelectionName: ("applications" | "attacks" | "attacksfull" | "balance" | "basic" | "chain" | "chainreport" | "chains" | "contributors" | "crime" | "crimes" | "crimeexp" | "dirtbombs" | "hof" | "lookup" | "members" | "news" | "positions" | "rackets" | "raidreport" | "raids" | "rankedwars" | "rankedwarreport" | "reports" | "revives" | "revivesfull" | "search" | "stats" | "territory" | "territoryownership" | "territorywarreport" | "territorywars" | "timestamp" | "upgrades" | "warfarechains" | "warfareraids" | "warfareranked" | "warfareterritory" | "wars") | string;
+        FactionSelectionName: ("applications" | "attacks" | "attacksfull" | "balance" | "basic" | "chain" | "chainreport" | "chains" | "contributors" | "crime" | "crimes" | "crimeexp" | "dirtbombs" | "headlines" | "hof" | "lookup" | "members" | "news" | "positions" | "rackets" | "raidreport" | "raids" | "rankedwars" | "rankedwarreport" | "reports" | "revives" | "revivesfull" | "search" | "stats" | "territory" | "territoryownership" | "territorywarreport" | "territorywars" | "timestamp" | "upgrades" | "warfarechains" | "warfareraids" | "warfareranked" | "warfareterritory" | "wars") | string;
         FactionLookupResponse: {
             selections: components["schemas"]["FactionSelectionName"][];
         };
@@ -9248,6 +9299,8 @@ export interface components {
                     /** Format: int32 */
                     level: number;
                     type: components["schemas"]["ApiKeyAccessTypeEnum"];
+                    sensitive_data: boolean;
+                    legacy_permissions: boolean;
                     faction: boolean;
                     company: boolean;
                     log: {
@@ -10717,7 +10770,7 @@ export interface components {
         TornFactionTreeResponse: {
             factionTree: components["schemas"]["TornFactionTree"][];
         };
-        TornSelectionName: ("attacklog" | "bank" | "bounties" | "calendar" | "cards" | "cityshops" | "companies" | "crimes" | "education" | "elimination" | "eliminationteam" | "factionhof" | "factiontree" | "gyms" | "halloween" | "hof" | "honors" | "itemammo" | "itemdetails" | "itemmods" | "itemstats" | "items" | "logcategories" | "logtypes" | "lookup" | "medals" | "merits" | "museum" | "organizedcrimes" | "pokertables" | "properties" | "rockpaperscissors" | "searchforcash" | "shoplifting" | "stats" | "stocks" | "subcrimes" | "territory" | "timestamp" | "competition" | "organisedcrimes") | string;
+        TornSelectionName: ("attacklog" | "bank" | "bounties" | "calendar" | "cards" | "cityshops" | "companies" | "crimes" | "education" | "elimination" | "eliminationteam" | "factionhof" | "factiontree" | "gyms" | "halloween" | "headlines" | "hof" | "honors" | "itemammo" | "itemdetails" | "itemmods" | "itemstats" | "items" | "logcategories" | "logtypes" | "lookup" | "medals" | "merits" | "museum" | "organizedcrimes" | "pokertables" | "properties" | "rockpaperscissors" | "searchforcash" | "shoplifting" | "stats" | "stocks" | "subcrimes" | "territory" | "timestamp" | "competition" | "organisedcrimes") | string;
         TornLookupResponse: {
             selections: components["schemas"]["TornSelectionName"][];
         };
@@ -10736,6 +10789,17 @@ export interface components {
         };
         TornHalloweenResponse: {
             halloween: components["schemas"]["TornHalloween"];
+        };
+        TornHeadline: {
+            id: number | null;
+            headline: string;
+            link: string | null;
+            type: string;
+            /** @enum {string} */
+            importance: "normal" | "urgent";
+        };
+        TornHeadlinesResponse: {
+            headlines: components["schemas"]["TornHeadline"][];
         };
     };
     responses: never;
@@ -14008,6 +14072,35 @@ export interface operations {
             };
         };
     };
+    getMyFactionHeadlines: {
+        parameters: {
+            query?: {
+                /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
+                striptags?: components["parameters"]["ApiStripTagsFalse"];
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Minimal).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyMinimal"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FactionHeadlinesResponse"];
+                };
+            };
+        };
+    };
     getMyFactionHoF: {
         parameters: {
             query?: {
@@ -15203,7 +15296,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["FactionHofResponse"] | components["schemas"]["FactionMembersResponse"] | components["schemas"]["FactionBasicResponse"] | components["schemas"]["FactionWarsResponse"] | components["schemas"]["NewsResponse"] | components["schemas"]["RevivesResponse"] | components["schemas"]["FactionTerritoryWarsHistoryResponse"] | components["schemas"]["AttacksResponse"] | components["schemas"]["FactionBalanceResponse"] | components["schemas"]["FactionRaidWarReportResponse"] | components["schemas"]["FactionTerritoriesOwnershipResponse"] | components["schemas"]["FactionPositionsResponse"] | components["schemas"]["RevivesFullResponse"] | components["schemas"]["AttacksFullResponse"] | components["schemas"]["FactionApplicationsResponse"] | components["schemas"]["FactionOngoingChainResponse"] | components["schemas"]["FactionChainsResponse"] | components["schemas"]["FactionChainReportResponse"] | components["schemas"]["FactionCrimesResponse"] | components["schemas"]["FactionCrimeResponse"] | components["schemas"]["FactionRaidsResponse"] | components["schemas"]["FactionWarfareResponse"] | components["schemas"]["FactionRankedWarReportResponse"] | components["schemas"]["FactionTerritoryWarReportResponse"] | components["schemas"]["FactionTerritoriesResponse"] | components["schemas"]["FactionUpgradesResponse"] | components["schemas"]["FactionStatsResponse"] | components["schemas"]["FactionContributorsResponse"] | components["schemas"]["FactionInventoryResponse"] | components["schemas"]["FactionCrimeExpResponse"] | components["schemas"]["FactionRacketsResponse"] | components["schemas"]["FactionRankedWarResponse"] | components["schemas"]["FactionLookupResponse"] | components["schemas"]["FactionWarfareDirtyBombsResponse"] | components["schemas"]["FactionWarfareChainsResponse"] | components["schemas"]["FactionWarfareTerritoryWarsResponse"] | components["schemas"]["FactionWarfareRaidsResponse"] | components["schemas"]["FactionWarfareRankedResponse"] | components["schemas"]["TimestampResponse"];
+                    "application/json": components["schemas"]["FactionHofResponse"] | components["schemas"]["FactionMembersResponse"] | components["schemas"]["FactionBasicResponse"] | components["schemas"]["FactionWarsResponse"] | components["schemas"]["NewsResponse"] | components["schemas"]["FactionHeadlinesResponse"] | components["schemas"]["RevivesResponse"] | components["schemas"]["FactionTerritoryWarsHistoryResponse"] | components["schemas"]["AttacksResponse"] | components["schemas"]["FactionBalanceResponse"] | components["schemas"]["FactionRaidWarReportResponse"] | components["schemas"]["FactionTerritoriesOwnershipResponse"] | components["schemas"]["FactionPositionsResponse"] | components["schemas"]["RevivesFullResponse"] | components["schemas"]["AttacksFullResponse"] | components["schemas"]["FactionApplicationsResponse"] | components["schemas"]["FactionOngoingChainResponse"] | components["schemas"]["FactionChainsResponse"] | components["schemas"]["FactionChainReportResponse"] | components["schemas"]["FactionCrimesResponse"] | components["schemas"]["FactionCrimeResponse"] | components["schemas"]["FactionRaidsResponse"] | components["schemas"]["FactionWarfareResponse"] | components["schemas"]["FactionRankedWarReportResponse"] | components["schemas"]["FactionTerritoryWarReportResponse"] | components["schemas"]["FactionTerritoriesResponse"] | components["schemas"]["FactionUpgradesResponse"] | components["schemas"]["FactionStatsResponse"] | components["schemas"]["FactionContributorsResponse"] | components["schemas"]["FactionInventoryResponse"] | components["schemas"]["FactionCrimeExpResponse"] | components["schemas"]["FactionRacketsResponse"] | components["schemas"]["FactionRankedWarResponse"] | components["schemas"]["FactionLookupResponse"] | components["schemas"]["FactionWarfareDirtyBombsResponse"] | components["schemas"]["FactionWarfareChainsResponse"] | components["schemas"]["FactionWarfareTerritoryWarsResponse"] | components["schemas"]["FactionWarfareRaidsResponse"] | components["schemas"]["FactionWarfareRankedResponse"] | components["schemas"]["TimestampResponse"];
                 };
             };
         };
@@ -16419,7 +16512,7 @@ export interface operations {
                 /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Category of races returned */
-                cat?: components["schemas"]["RacingRaceTypeEnum"];
+                cat?: components["schemas"]["RacingRacesCategoryEnum"];
                 /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
                 /** @description Comment for your tool/service/bot/website to be visible in the logs. */
@@ -16602,7 +16695,7 @@ export interface operations {
                 /** @description Timestamp that sets the lower limit for the data returned. Data returned will be after this time */
                 from?: components["parameters"]["ApiFrom"];
                 /** @description Selection category */
-                cat?: components["schemas"]["RacingRaceTypeEnum"] | components["schemas"]["RaceClassEnum"];
+                cat?: components["schemas"]["RacingRacesCategoryEnum"] | components["schemas"]["RaceClassEnum"];
                 offset?: components["parameters"]["ApiOffsetNoDefault"];
                 /** @description Timestamp to bypass cache */
                 timestamp?: components["parameters"]["ApiTimestamp"];
@@ -17222,6 +17315,35 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TornHalloweenResponse"];
+                };
+            };
+        };
+    };
+    getTornHeadlines: {
+        parameters: {
+            query?: {
+                /** @description Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user'). */
+                striptags?: components["parameters"]["ApiStripTagsFalse"];
+                /** @description Timestamp to bypass cache */
+                timestamp?: components["parameters"]["ApiTimestamp"];
+                /** @description Comment for your tool/service/bot/website to be visible in the logs. */
+                comment?: components["parameters"]["ApiComment"];
+                /** @description API key (Public).<br>It's not required to use this parameter when passing the API key via the Authorization header. */
+                key?: components["parameters"]["ApiKeyPublic"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful operation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TornHeadlinesResponse"];
                 };
             };
         };
@@ -18091,7 +18213,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TornSubcrimesResponse"] | components["schemas"]["TornCrimesResponse"] | components["schemas"]["TornCalendarResponse"] | components["schemas"]["TornHofResponse"] | components["schemas"]["TornFactionHofResponse"] | components["schemas"]["TornLogTypesResponse"] | components["schemas"]["TornCardsResponse"] | components["schemas"]["TornItemsResponse"] | components["schemas"]["TornRockPaperScissorsResponse"] | components["schemas"]["TornCityStatsResponse"] | components["schemas"]["TornLogCategoriesResponse"] | components["schemas"]["TornEducationResponse"] | components["schemas"]["TornMeritsResponse"] | components["schemas"]["TornOrganizedCrimeResponse"] | components["schemas"]["TornItemStatsResponse"] | components["schemas"]["TornHonorsResponse"] | components["schemas"]["TornItemDetailsResponse"] | components["schemas"]["TornEliminationTeamsResponse"] | components["schemas"]["TornCityShopsResponse"] | components["schemas"]["TornEliminationTeamPlayersResponse"] | components["schemas"]["TornMedalsResponse"] | components["schemas"]["TornBankResponse"] | components["schemas"]["TornHalloweenResponse"] | components["schemas"]["TornBountiesResponse"] | components["schemas"]["TornGymsResponse"] | components["schemas"]["TornPokerTablesResponse"] | components["schemas"]["TornItemAmmoResponse"] | components["schemas"]["TornProperties"] | components["schemas"]["TornFactionTreeResponse"] | components["schemas"]["AttackLogResponse"] | components["schemas"]["TornMuseumResponse"] | components["schemas"]["TornStockDetailedResponse"] | components["schemas"]["TornStocksResponse"] | components["schemas"]["TornTerritoriesResponse"] | components["schemas"]["TornTerritoriesNoLinksResponse"] | components["schemas"]["TornItemModsResponse"] | components["schemas"]["TornLookupResponse"] | components["schemas"]["TimestampResponse"];
+                    "application/json": components["schemas"]["TornSubcrimesResponse"] | components["schemas"]["TornCrimesResponse"] | components["schemas"]["TornCalendarResponse"] | components["schemas"]["TornHofResponse"] | components["schemas"]["TornFactionHofResponse"] | components["schemas"]["TornLogTypesResponse"] | components["schemas"]["TornCardsResponse"] | components["schemas"]["TornItemsResponse"] | components["schemas"]["TornRockPaperScissorsResponse"] | components["schemas"]["TornCityStatsResponse"] | components["schemas"]["TornLogCategoriesResponse"] | components["schemas"]["TornEducationResponse"] | components["schemas"]["TornMeritsResponse"] | components["schemas"]["TornOrganizedCrimeResponse"] | components["schemas"]["TornItemStatsResponse"] | components["schemas"]["TornHonorsResponse"] | components["schemas"]["TornItemDetailsResponse"] | components["schemas"]["TornEliminationTeamsResponse"] | components["schemas"]["TornCityShopsResponse"] | components["schemas"]["TornEliminationTeamPlayersResponse"] | components["schemas"]["TornMedalsResponse"] | components["schemas"]["TornBankResponse"] | components["schemas"]["TornHalloweenResponse"] | components["schemas"]["TornHeadlinesResponse"] | components["schemas"]["TornBountiesResponse"] | components["schemas"]["TornGymsResponse"] | components["schemas"]["TornPokerTablesResponse"] | components["schemas"]["TornItemAmmoResponse"] | components["schemas"]["TornProperties"] | components["schemas"]["TornFactionTreeResponse"] | components["schemas"]["AttackLogResponse"] | components["schemas"]["TornMuseumResponse"] | components["schemas"]["TornStockDetailedResponse"] | components["schemas"]["TornStocksResponse"] | components["schemas"]["TornTerritoriesResponse"] | components["schemas"]["TornTerritoriesNoLinksResponse"] | components["schemas"]["TornItemModsResponse"] | components["schemas"]["TornLookupResponse"] | components["schemas"]["TimestampResponse"];
                 };
             };
         };
