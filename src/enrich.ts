@@ -38,12 +38,12 @@ function isPlainObject(v: Json): v is Record<string, Json> {
  * (so nested lists like itemmarket.listings keep every page), nested objects
  * merge recursively, scalars take the later page's value.
  */
-/** Keys that would reach Object.prototype if a page carried them (JSON.parse keeps "__proto__"). */
-const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
 function mergeObject(into: Record<string, Json>, from: Record<string, Json>): Record<string, Json> {
   for (const [k, v] of Object.entries(from)) {
-    if (UNSAFE_KEYS.has(k)) continue;
+    // Keys that would reach Object.prototype (JSON.parse keeps "__proto__"). Plain
+    // comparisons, so CodeQL's js/prototype-pollution-utility sees the guard.
+    if (k === "__proto__" || k === "constructor" || k === "prototype") continue;
     const cur = into[k];
     if (Array.isArray(v) && Array.isArray(cur)) into[k] = cur.concat(v);
     else if (isPlainObject(v) && isPlainObject(cur)) into[k] = mergeObject(cur, v);
@@ -63,7 +63,7 @@ export function mergePages(pages: Json[]): Json {
   for (const page of pages) {
     if (!page || typeof page !== "object") continue;
     for (const key of Object.keys(page)) {
-      if (key === "_metadata" || UNSAFE_KEYS.has(key)) continue;
+      if (key === "_metadata" || key === "__proto__" || key === "constructor" || key === "prototype") continue;
       const value = (page as Record<string, Json>)[key];
       if (Array.isArray(value)) {
         out[key] = (Array.isArray(out[key]) ? (out[key] as Json[]) : []).concat(value);

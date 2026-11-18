@@ -1,6 +1,6 @@
 # Torn MCP - Roadmap
 
-Current version: **v0.12.7**. Roadmap reflects actual repo state - no drift.
+Current version: **v0.12.8**. Roadmap reflects actual repo state - no drift.
 
 | Phase                                   | Focus                                             | Effort   | Status     |
 | --------------------------------------- | ------------------------------------------------- | -------- | ---------- |
@@ -66,7 +66,7 @@ Tracks shipped fixes and open bugs. New bugs land as ⏳ Proposed; flip to ✅ w
 | Conformance skip notes were cryptic for HTTP errors and non-JSON bodies | ✅ Fixed | v0.12.6 | `lib/conformance-http.mjs` reports `HTTP 502`, `non-JSON response`, timeouts; keys scrubbed from errors; calls carry `comment=torn-mcp-conformance` |
 | `zod` < 4.6.6 (high, memory exhaustion on large constrained collections) | ✅ Fixed | v0.12.6 | Upgraded to zod 4.6.7; `z.record` now names its key type |
 | `body-parser` 2.3.0 (high) and `ip-address` 10.7.2 (moderate), via the MCP SDK | ✅ Fixed | v0.12.6 | Lockfile bump to 2.4.0 and 10.7.6 |
-| CodeQL `js/prototype-pollution-utility`: page merge copied `__proto__` / `constructor` / `prototype` keys, so a crafted payload could change `Object.prototype` | ✅ Fixed | v0.12.7 | `mergePages` and `mergeObject` skip those keys; tests prove `({}).polluted` stays undefined |
+| CodeQL `js/prototype-pollution-utility`: page merge copied `__proto__` / `constructor` / `prototype` keys, so a crafted payload could change `Object.prototype` | ✅ Fixed | v0.12.7, v0.12.8 | `mergePages` and `mergeObject` skip those keys (v0.12.8: plain `===` checks so CodeQL sees the guard); tests prove `({}).polluted` stays undefined |
 | `picomatch` <= 4.0.7 (high, dev only via vitest) | ⏳ Proposed | - | No patched release exists yet; bump when one ships |
 
 ## ✨ Features

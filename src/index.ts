@@ -45,7 +45,7 @@ import { OAuthRecord, durableTokenStore } from "./oauthStore.js";
 export { RateLimiter, OAuthRecord };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.12.7";
+const VERSION = "0.12.8";
 
 /** Attempts per Torn URL (first try + retries on transient errors). */
 const ATTEMPTS = 3;
