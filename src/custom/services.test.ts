@@ -5,6 +5,10 @@ import {
   comparePlayers,
   factionMemberActivity,
   findProfitableItems,
+  itemMarketAnalysis,
+  summarizeCompany,
+  summarizeFaction,
+  territorySummary,
   warReadinessReport,
   type TornCall,
 } from "./services.js";
@@ -138,5 +142,53 @@ describe("findProfitableItems", () => {
     // item 1: margin 900; item 2: margin 100 → item 1 first
     expect(r.items[0]?.id).toBe(1);
     expect(r.items[0]?.margin).toBe(900);
+  });
+});
+
+describe("secondary call failures are reported, not hidden", () => {
+  const boom = (ok: Record<string, any>): TornCall => async (tag, endpoint) => {
+    const key = `${tag}/${endpoint}`;
+    if (key in ok) return ok[key];
+    throw new Error(`Torn API error 16: Access level too low (${key})`);
+  };
+
+  it("summarizeFaction names the failed members call", async () => {
+    const out = await summarizeFaction(boom({ "faction/basic": { basic: { id: 9 } } }));
+    expect(out.member_count).toBe(0);
+    expect(out.members_error).toMatch(/faction\/members/);
+  });
+
+  it("summarizeCompany names the failed employees call", async () => {
+    const out = await summarizeCompany(boom({ "company/profile": { profile: { id: 3 } } }));
+    expect(out.employees_error).toMatch(/company\/employees/);
+  });
+
+  it("territorySummary names each failed call", async () => {
+    const out = await territorySummary(boom({}));
+    expect(out.faction_territory_error).toMatch(/faction\/territory/);
+    expect(out.global_territory_error).toMatch(/torn\/territory/);
+  });
+
+  it("itemMarketAnalysis names the failed item lookup", async () => {
+    const out = await itemMarketAnalysis(
+      boom({ "market/itemmarket": { itemmarket: { item: { id: 206 }, listings: [] } } }),
+      "206",
+    );
+    expect(out.market_value_error).toMatch(/torn\/items/);
+  });
+
+  it("findProfitableItems names the failed item lookup per row", async () => {
+    const out = await findProfitableItems(
+      boom({ "market/itemmarket": { itemmarket: { item: { id: 206 }, listings: [{ price: 5, amount: 1 }] } } }),
+      ["206"],
+    );
+    expect(out.items[0]!.reference_value_error).toMatch(/torn\/items/);
+  });
+
+  it("adds no error field when every call succeeds", async () => {
+    const out = await summarizeFaction(
+      boom({ "faction/basic": { basic: { id: 9 } }, "faction/members": { members: [] } }),
+    );
+    expect(out).not.toHaveProperty("members_error");
   });
 });

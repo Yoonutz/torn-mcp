@@ -4,6 +4,7 @@ import {
   ACCESS_TTL_S,
   TOKEN_PREFIX,
   decodeClientId,
+  encodeClientId,
   handleOAuth,
   keyFromAccessToken,
   pkceMatches,
@@ -117,6 +118,8 @@ describe("OAuth metadata", () => {
     const as = (await (await call("/.well-known/oauth-authorization-server")).json()) as any;
     expect(as.registration_endpoint).toBe(`${ORIGIN}/register`);
     expect(as.code_challenge_methods_supported).toEqual(["S256"]);
+    expect(as.revocation_endpoint).toBe(`${ORIGIN}/revoke`);
+    expect(as.revocation_endpoint_auth_methods_supported).toEqual(["none"]);
   });
 
   it("answers a 401 that points at the metadata", () => {
@@ -190,6 +193,26 @@ describe("authorize + token flow", () => {
     expect(res.headers.get("location")).toBeNull();
   });
 
+  it("refuses a hand-made client_id whose redirect URI registration would reject", async () => {
+    // client_id is stateless, so anyone can encode one without calling /register.
+    // The redirect rules must hold on /authorize too, not only at registration.
+    for (const uri of ["http://evil.example/cb", "https://ok.example/cb#frag", "not a url"]) {
+      const clientId = encodeClientId({ redirect_uris: [uri] });
+      expect(decodeClientId(clientId)).toBeNull();
+      const res = await call(
+        `/authorize?${new URLSearchParams({
+          response_type: "code",
+          client_id: clientId,
+          redirect_uri: uri,
+          code_challenge: await challengeFor(VERIFIER),
+          code_challenge_method: "S256",
+        })}`,
+      );
+      expect(res.status).toBe(400);
+      expect(res.headers.get("location")).toBeNull();
+    }
+  });
+
   it("rejects a wrong PKCE verifier and a reused code", async () => {
     const clientId = await register();
     const code = await codeFrom(await authorize(clientId));
@@ -220,6 +243,49 @@ describe("authorize + token flow", () => {
   it("rejects forged or malformed tokens", async () => {
     expect(await keyFromAccessToken(deps, `${TOKEN_PREFIX}${"a".repeat(22)}.${"b".repeat(43)}`)).toBeNull();
     expect(await keyFromAccessToken(deps, "not-a-token")).toBeNull();
+  });
+});
+
+describe("token revocation (RFC 7009)", () => {
+  async function tokens() {
+    const clientId = await register();
+    return (await (await exchange(clientId, await codeFrom(await authorize(clientId)))).json()) as any;
+  }
+  const revoke = (fields: Record<string, string>) => call("/revoke", form(fields));
+
+  it("revokes an access token and deletes its stored key", async () => {
+    const tok = await tokens();
+    const before = store.map.size;
+    const res = await revoke({ token: tok.access_token, token_type_hint: "access_token" });
+    expect(res.status).toBe(200);
+    expect(await keyFromAccessToken(deps, tok.access_token)).toBeNull();
+    expect(store.map.size).toBe(before - 1);
+  });
+
+  it("revoking a refresh token also kills the access token issued with it", async () => {
+    const tok = await tokens();
+    expect((await revoke({ token: tok.refresh_token })).status).toBe(200);
+    expect(await keyFromAccessToken(deps, tok.access_token)).toBeNull();
+    const refreshed = await call("/token", form({ grant_type: "refresh_token", refresh_token: tok.refresh_token }));
+    expect(refreshed.status).toBe(400);
+    expect(store.map.size).toBe(0);
+  });
+
+  it("answers 200 for an unknown or malformed token, per the RFC", async () => {
+    expect((await revoke({ token: `${TOKEN_PREFIX}${"a".repeat(22)}.${"b".repeat(43)}` })).status).toBe(200);
+    expect((await revoke({ token: "junk" })).status).toBe(200);
+  });
+
+  it("does not delete a record when the secret half of the token is wrong", async () => {
+    const tok = await tokens();
+    const [id] = tok.access_token.slice(TOKEN_PREFIX.length).split(".");
+    await revoke({ token: `${TOKEN_PREFIX}${id}.${"x".repeat(43)}` });
+    expect(await keyFromAccessToken(deps, tok.access_token)).toBe(KEY);
+  });
+
+  it("needs a token and POST", async () => {
+    expect((await revoke({})).status).toBe(400);
+    expect((await call("/revoke")).status).toBe(405);
   });
 });
 

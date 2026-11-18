@@ -141,11 +141,11 @@ function memberActivity(members: any[]) {
 }
 
 export async function summarizeFaction(call: TornCall, id?: string) {
-  const [basicRes, membersRes] = await Promise.all([
+  const [basicRes, membersCall] = await Promise.all([
     call("faction", "basic", id) as Promise<S["FactionBasicResponse"]>,
-    call("faction", "members", id).catch(() => null) as Promise<S["FactionMembersResponse"] | null>,
+    optional(call("faction", "members", id) as Promise<S["FactionMembersResponse"]>),
   ]);
-  const members = membersRes?.members ?? [];
+  const members = membersCall.data?.members ?? [];
   const byPosition: Record<string, number> = {};
   for (const m of members) {
     const pos = m?.position ?? "Unknown";
@@ -156,6 +156,7 @@ export async function summarizeFaction(call: TornCall, id?: string) {
     member_count: members.length,
     members_by_position: byPosition,
     members_by_activity: memberActivity(members),
+    ...(membersCall.error ? { members_error: membersCall.error } : {}),
   };
 }
 
@@ -227,16 +228,18 @@ export async function warReadinessReport(call: TornCall, id?: string) {
 }
 
 export async function territorySummary(call: TornCall, id?: string) {
-  const [factionRes, globalRes] = await Promise.all([
-    call("faction", "territory", id).catch(() => null) as Promise<S["FactionTerritoriesResponse"] | null>,
-    call("torn", "territory").catch(() => null) as Promise<S["TornTerritoriesResponse"] | null>,
+  const [factionCall, globalCall] = await Promise.all([
+    optional(call("faction", "territory", id) as Promise<S["FactionTerritoriesResponse"]>),
+    optional(call("torn", "territory") as Promise<S["TornTerritoriesResponse"]>),
   ]);
-  const factionTerr = factionRes?.territory;
-  const globalTerr = globalRes?.territory;
+  const factionTerr = factionCall.data?.territory;
+  const globalTerr = globalCall.data?.territory;
   return {
     faction_territory_count: Array.isArray(factionTerr) ? factionTerr.length : undefined,
     faction_territory: factionTerr ?? null,
     global_territory_sample: Array.isArray(globalTerr) ? globalTerr.slice(0, 10) : globalTerr ?? null,
+    ...(factionCall.error ? { faction_territory_error: factionCall.error } : {}),
+    ...(globalCall.error ? { global_territory_error: globalCall.error } : {}),
   };
 }
 
@@ -269,24 +272,26 @@ export async function crimeAnalysis(call: TornCall, id?: string) {
 // ── Company ─────────────────────────────────────────────────────────
 
 export async function summarizeCompany(call: TornCall, id?: string) {
-  const [profileRes, employeesRes] = await Promise.all([
+  const [profileRes, employeesCall] = await Promise.all([
     call("company", "profile", id) as Promise<S["CompanyProfileResponseMixed"]>,
-    call("company", "employees", id).catch(() => null) as Promise<S["CompanyEmployeesResponse"] | null>,
+    optional(call("company", "employees", id) as Promise<S["CompanyEmployeesResponse"]>),
   ]);
-  const employees = employeesRes?.employees ?? [];
+  const employees = employeesCall.data?.employees ?? [];
   return {
     company: (profileRes as any)?.profile ?? null,
     employee_count: employees.length,
+    ...(employeesCall.error ? { employees_error: employeesCall.error } : {}),
   };
 }
 
 // ── Market ──────────────────────────────────────────────────────────
 
 export async function itemMarketAnalysis(call: TornCall, id: string) {
-  const [marketRes, tornRes] = await Promise.all([
+  const [marketRes, tornCall] = await Promise.all([
     call("market", "itemmarket", id) as Promise<S["MarketItemMarketResponse"]>,
-    call("torn", "items", id).catch(() => null) as Promise<S["TornItemsResponse"] | null>,
+    optional(call("torn", "items", id) as Promise<S["TornItemsResponse"]>),
   ]);
+  const tornRes = tornCall.data;
   const im = marketRes?.itemmarket;
   const listings = im?.listings ?? [];
   const prices = listings
@@ -305,6 +310,7 @@ export async function itemMarketAnalysis(call: TornCall, id: string) {
       highest: prices.length ? Math.max(...prices) : undefined,
       depth: depth(listings),
     },
+    ...(tornCall.error ? { market_value_error: tornCall.error } : {}),
   };
 }
 
@@ -335,10 +341,11 @@ export async function marketAnalysis(call: TornCall, itemIds: string[]) {
 export async function findProfitableItems(call: TornCall, itemIds: string[]) {
   const rows = await Promise.all(
     itemIds.map(async (id) => {
-      const [marketRes, tornRes] = await Promise.all([
+      const [marketRes, tornCall] = await Promise.all([
         call("market", "itemmarket", id) as Promise<S["MarketItemMarketResponse"]>,
-        call("torn", "items", id).catch(() => null) as Promise<S["TornItemsResponse"] | null>,
+        optional(call("torn", "items", id) as Promise<S["TornItemsResponse"]>),
       ]);
+      const tornRes = tornCall.data;
       const im = marketRes?.itemmarket;
       const listings = im?.listings ?? [];
       const lowest = lowestPrice(listings);
@@ -358,6 +365,7 @@ export async function findProfitableItems(call: TornCall, itemIds: string[]) {
           typeof margin === "number" && typeof lowest === "number" && lowest > 0
             ? Math.round((100 * margin) / lowest)
             : undefined,
+        ...(tornCall.error ? { reference_value_error: tornCall.error } : {}),
       };
     }),
   );

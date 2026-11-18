@@ -1,6 +1,6 @@
 {
   "name": "torn-mcp",
-  "version": "0.12.4",
+  "version": "0.12.5",
   "description": "Remote MCP server for the Torn City API v2, on Cloudflare Workers",
   "license": "MIT",
   "type": "module",
@@ -28,7 +28,7 @@
     "openapi-typescript": "^7.13.0",
     "typescript": "^5.5.4",
     "vitest": "^5.0.5",
-    "wrangler": "^4.149.0"
+    "wrangler": "^4.156.0"
   },
   "overrides": {
     "esbuild": "^0.28.2",

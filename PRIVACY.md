@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last updated: 2026-10-30 (OAuth sign-in added)_
+_Last updated: 2026-11-18 (token revocation, API log comment)_
 
 Torn MCP is a free, open-source [Model Context Protocol](https://modelcontextprotocol.io) server for the
 [Torn City](https://www.torn.com) API v2. The hosted instance runs at
@@ -20,7 +20,10 @@ You give the server your key in one of two ways:
   It is checked against Torn, then stored **only encrypted** (AES-GCM) under a key derived from the token issued
   to your client. The server keeps no key of its own that can decrypt it, so the stored data is useless without
   your token. Access tokens last 24 hours, refresh tokens 180 days; expired records are deleted automatically.
-  Disconnecting the connector and deleting the key in Torn ends access for good.
+  A client that revokes its token (RFC 7009) deletes the stored key at once. Disconnecting the connector and
+  deleting the key in Torn ends access for good.
+- Every request to Torn carries `comment=torn-mcp`, so you can see in your Torn API log which calls came from
+  this server.
 
 Either way, the key is never logged by this server, never returned in a response or error, and never shown to
 the AI model (it is not a tool parameter).

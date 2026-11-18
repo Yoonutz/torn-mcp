@@ -41,10 +41,12 @@ Torn API keys are treated as secrets on every request:
 - **Header keys are never stored.** A key sent in a header lives only for the
   duration of one request; it is not persisted in any Durable Object or storage.
 - **OAuth keys are stored only encrypted.** For clients that sign in with OAuth
-  (`/authorize`, `/token`, `/register`; see `src/oauth.ts`), the pasted key is
+  (`/authorize`, `/token`, `/register`, `/revoke`; see `src/oauth.ts`), the pasted key is
   AES-GCM-encrypted under a key derived from the secret half of the issued token.
   The server holds no decryption key; each record is its own Durable Object that
-  deletes itself at expiry. Codes are single use and PKCE (S256) is required.
+  deletes itself at expiry, or at once when the client revokes the token
+  (RFC 7009). Codes are single use and PKCE (S256) is required. A `client_id` is
+  checked against the registration rules on every `/authorize`, not only at `/register`.
 - **Not logged by this server, and not logged by Cloudflare invocation logs.**
   The code writes no logs and never echoes the key in errors or responses.
   Cloudflare Workers invocation logs, which record `<Method> <URL>` per request

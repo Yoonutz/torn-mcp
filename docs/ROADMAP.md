@@ -1,6 +1,6 @@
 # Torn MCP - Roadmap
 
-Current version: **v0.12.4**. Roadmap reflects actual repo state - no drift.
+Current version: **v0.12.5**. Roadmap reflects actual repo state - no drift.
 
 | Phase                                   | Focus                                             | Effort   | Status     |
 | --------------------------------------- | ------------------------------------------------- | -------- | ---------- |
@@ -46,6 +46,17 @@ Tracks shipped fixes and open bugs. New bugs land as ⏳ Proposed; flip to ✅ w
 | Directory policy: tool descriptions must not name other tools | ✅ Fixed | v0.11.4 | Grouped tool legends no longer point to `torn_list_endpoints`; a test fails if any description names another tool |
 | Connector directory: clients without custom headers had no way to send a key | ✅ Fixed | v0.12.0 | OAuth 2.1 (DCR + PKCE) sign-in page where the user pastes their Torn key; key stored only encrypted under the token; keyless `/mcp` now answers 401 with OAuth metadata |
 | Item market tools saw only the last page of listings (wrong lowest price) | ✅ Fixed | v0.12.4 | Page merge now concatenates lists nested inside objects (`itemmarket.listings`) |
+| Hand-made OAuth `client_id` skipped the redirect rules (`http://` hosts accepted, bad URL gave 500) | ✅ Fixed | v0.12.5 | `decodeClientId` re-applies the registration checks, so `/authorize` answers 400 |
+| Torn error 17 (backend error) never retried: it comes as HTTP 200 | ✅ Fixed | v0.12.5 | Retried like HTTP 5xx; error 5 (too many requests) is not retried, it would only spend more of the minute budget |
+| Torn errors gave no fix hint | ✅ Fixed | v0.12.5 | Codes 2, 5, 8, 9, 13, 14, 16, 18 add what to do (e.g. 16: make a Limited or Full key) |
+| A hung Torn call held the session with no timeout | ✅ Fixed | v0.12.5 | 10 s per attempt, then retried; the final error says Torn did not answer |
+| Page cap hit silently; early stops always blamed "subrequest limit" | ✅ Fixed | v0.12.5 | `_pages_partial` names the real reason (page cap or the Torn error) |
+| Empty time window re-fetch walked up to 40 more pages | ✅ Fixed | v0.12.5 | The "most recent instead" fallback fetches one page |
+| `ids` / `item_ids` lists had no maximum | ✅ Fixed | v0.12.5 | At most 10 ids per call (`MAX_IDS`) |
+| Summary tools hid failed sub-calls (`.catch(() => null)`) | ✅ Fixed | v0.12.5 | `members_error`, `employees_error`, `*_territory_error`, `market_value_error`, `reference_value_error` |
+| Calls not identifiable in the player's Torn API log | ✅ Fixed | v0.12.5 | Every call sends Torn's `comment=torn-mcp` |
+| `index.ts` fetch path had no tests | ✅ Fixed | v0.12.5 | `src/index.test.ts` runs the Durable Object in Node via a `cloudflare:workers` stub |
+| Open Dependabot bumps (#44, #46, #47, #49, #50) | ✅ Fixed | v0.12.5 | fast-uri 3.1.9, qs 6.17.1, undici 7.30.1 + wrangler 4.156.0, @hono/node-server 2.1.8, hono 4.13.18 folded into one lockfile change |
 
 ## ✨ Features
 
@@ -54,6 +65,8 @@ Tracks shipped features and future ideas. Ideas land as ⏳ Proposed; flip to �
 | Feature                                      | Status     | Version | Notes                                                                                                                           |
 | -------------------------------------------- | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | Reality-derived response shapes in discovery | ✅ Shipped | v0.10.0 | Conformance auto-derives structural-drift shapes into discovery; manual overrides stay the curated authority for nested renames |
+| OAuth token revocation (RFC 7009) | ✅ Shipped | v0.12.5 | `/revoke` deletes the token record (needs the token's secret half); a revoked refresh token also ends its access token |
+| Multi-selection batching (`/user?selections=a,b`) | ✅ Shipped | v0.12.5 | `torn_selections`: up to 10 selections of one tag in one Torn call; names checked against the catalog first |
 
 ## ✅ Phase 1 - Core server & tools
 
