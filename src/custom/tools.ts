@@ -32,6 +32,12 @@ async function run(fn: () => Promise<unknown>): Promise<ToolResult> {
   }
 }
 
+/**
+ * Most ids one list-taking tool accepts. Each id costs 1-2 Torn calls (plus
+ * pages) out of the key's ~100/min budget, so an unbounded list could spend it all.
+ */
+export const MAX_IDS = 10;
+
 const ID = z.string().describe("Optional id; omit to use the caller's own data.");
 
 export function registerCustomTools(
@@ -72,7 +78,7 @@ export function registerCustomTools(
       description:
         "Compare 2+ players side by side (level, status, activity, life) with the " +
         "level gap to the strongest. Fetches user/profile for each id.",
-      inputSchema: { ids: z.array(z.string()).min(2).describe("Player ids to compare (>=2).") },
+      inputSchema: { ids: z.array(z.string()).min(2).max(MAX_IDS).describe(`Player ids to compare (2-${MAX_IDS}).`) },
       annotations: readOnly("Compare Players"),
     },
     async ({ ids }, extra) => run(() => comparePlayers(makeCall(extra), ids)),
@@ -180,7 +186,7 @@ export function registerCustomTools(
       description:
         "Compare several items by spread (average price minus lowest listing), " +
         "ranked. Fetches market/itemmarket per item.",
-      inputSchema: { item_ids: z.array(z.string()).min(1).describe("Item ids to analyze.") },
+      inputSchema: { item_ids: z.array(z.string()).min(1).max(MAX_IDS).describe(`Item ids to analyze (1-${MAX_IDS}).`) },
       annotations: readOnly("Market Spread Analysis"),
     },
     async ({ item_ids }, extra) => run(() => marketAnalysis(makeCall(extra), item_ids)),
@@ -193,7 +199,7 @@ export function registerCustomTools(
       description:
         "Rank items by margin (reference market value minus lowest listing). " +
         "Aggregates market/itemmarket and torn/items per item.",
-      inputSchema: { item_ids: z.array(z.string()).min(1).describe("Item ids to scan.") },
+      inputSchema: { item_ids: z.array(z.string()).min(1).max(MAX_IDS).describe(`Item ids to scan (1-${MAX_IDS}).`) },
       annotations: readOnly("Find Profitable Items"),
     },
     async ({ item_ids }, extra) => run(() => findProfitableItems(makeCall(extra), item_ids)),

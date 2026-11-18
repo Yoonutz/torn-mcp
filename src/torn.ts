@@ -276,6 +276,9 @@ export function humanizeTimestamps(value: unknown): unknown {
   return value;
 }
 
+/** Value of Torn's `comment` query param on every call (shown in the player's API log). */
+export const API_COMMENT = "torn-mcp";
+
 /** Build the full Torn request URL from a resolved path, query params, and key. */
 export function buildUrl(
   path: string,
@@ -286,6 +289,9 @@ export function buildUrl(
   for (const [k, v] of Object.entries(params ?? {})) {
     url.searchParams.set(k, String(v));
   }
+  // Torn's documented `comment` param: the player sees it in their API log, so
+  // calls made through this server are easy to tell apart from other tools.
+  if (!url.searchParams.has("comment")) url.searchParams.set("comment", API_COMMENT);
   url.searchParams.set("key", key);
   return url.toString();
 }
@@ -299,6 +305,34 @@ export function ensureKey(url: string, key: string): string {
   const u = new URL(url);
   u.searchParams.set("key", key);
   return u.toString();
+}
+
+/**
+ * What the user can do about a Torn error, by code. Codes and meanings from the
+ * `Error*` schemas in openapi.json; only codes with a clear user action get one.
+ */
+export const ERROR_HINTS: Record<number, string> = {
+  2: "Check the key: it is wrong or was deleted in Torn > Preferences > API Keys",
+  5: "Torn got too many calls for this key in the last minute; wait up to 60 seconds",
+  8: "Torn has blocked this IP for a short time; wait a few minutes",
+  9: "The Torn API is disabled for now; try again later",
+  13: "Torn has temporarily disabled this key; check it in Torn > Preferences > API Keys",
+  14: "This key hit Torn's daily read limit; try again tomorrow",
+  16: "This key's access level is too low for this data; make a Limited or Full key",
+  18: "The key owner paused this key in Torn > Preferences > API Keys",
+};
+
+/** Torn error codes worth one retry: transient on Torn's side. */
+export const RETRYABLE_TORN_CODES = new Set([17]);
+
+/** Torn error code from an error envelope body, or null. */
+export function tornErrorCode(text: string): number | null {
+  try {
+    const code = (JSON.parse(text) as { error?: { code?: unknown } })?.error?.code;
+    return typeof code === "number" ? code : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -323,7 +357,8 @@ export function parseTornError(jsonText: string): string | null {
     const err = (parsed as { error: { code?: number; error?: string } }).error;
     const code = err.code ?? "?";
     const msg = err.error ?? "unknown error";
-    return `Torn API error ${code}: ${msg}`;
+    const hint = typeof err.code === "number" ? ERROR_HINTS[err.code] : undefined;
+    return `Torn API error ${code}: ${msg}${hint ? `. ${hint}` : ""}`;
   }
   return null;
 }

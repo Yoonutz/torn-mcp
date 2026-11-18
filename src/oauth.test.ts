@@ -4,6 +4,7 @@ import {
   ACCESS_TTL_S,
   TOKEN_PREFIX,
   decodeClientId,
+  encodeClientId,
   handleOAuth,
   keyFromAccessToken,
   pkceMatches,
@@ -188,6 +189,26 @@ describe("authorize + token flow", () => {
     const res = await call(`/authorize?client_id=${clientId}&redirect_uri=https://evil.example/cb`);
     expect(res.status).toBe(400);
     expect(res.headers.get("location")).toBeNull();
+  });
+
+  it("refuses a hand-made client_id whose redirect URI registration would reject", async () => {
+    // client_id is stateless, so anyone can encode one without calling /register.
+    // The redirect rules must hold on /authorize too, not only at registration.
+    for (const uri of ["http://evil.example/cb", "https://ok.example/cb#frag", "not a url"]) {
+      const clientId = encodeClientId({ redirect_uris: [uri] });
+      expect(decodeClientId(clientId)).toBeNull();
+      const res = await call(
+        `/authorize?${new URLSearchParams({
+          response_type: "code",
+          client_id: clientId,
+          redirect_uri: uri,
+          code_challenge: await challengeFor(VERIFIER),
+          code_challenge_method: "S256",
+        })}`,
+      );
+      expect(res.status).toBe(400);
+      expect(res.headers.get("location")).toBeNull();
+    }
   });
 
   it("rejects a wrong PKCE verifier and a reused code", async () => {

@@ -46,8 +46,14 @@ describe("resolveEndpointPath", () => {
 describe("buildUrl", () => {
   it("builds a fixed-host url with key", () => {
     expect(buildUrl("/torn/timestamp", undefined, "SECRET")).toBe(
-      "https://api.torn.com/v2/torn/timestamp?key=SECRET",
+      "https://api.torn.com/v2/torn/timestamp?comment=torn-mcp&key=SECRET",
     );
+  });
+  it("tags calls with comment=torn-mcp so they show in the player's Torn API log", () => {
+    expect(new URL(buildUrl("/user/log", undefined, "K")).searchParams.get("comment")).toBe("torn-mcp");
+  });
+  it("keeps a caller-supplied comment", () => {
+    expect(new URL(buildUrl("/user/log", { comment: "mine" }, "K")).searchParams.get("comment")).toBe("mine");
   });
   it("appends extra params", () => {
     const url = new URL(buildUrl("/user/log", { limit: 5, cat: "x" }, "K"));
@@ -320,7 +326,20 @@ describe("parseTornError", () => {
   it("detects the Torn error envelope", () => {
     expect(
       parseTornError(JSON.stringify({ error: { code: 2, error: "Incorrect key" } })),
-    ).toBe("Torn API error 2: Incorrect key");
+    ).toMatch(/^Torn API error 2: Incorrect key/);
+  });
+  it("adds a fix hint for errors the user can act on", () => {
+    const err = (code: number, msg: string) => parseTornError(JSON.stringify({ error: { code, error: msg } }));
+    expect(err(2, "Incorrect key")).toMatch(/check the key/i);
+    expect(err(16, "Access level of this key is not high enough")).toMatch(/Limited or Full/);
+    expect(err(5, "Too many requests")).toMatch(/wait/i);
+    expect(err(13, "Key temporarily disabled")).toMatch(/inactiv|disabled/i);
+    expect(err(18, "API key paused")).toMatch(/paused/i);
+  });
+  it("adds no hint for codes without one", () => {
+    expect(parseTornError(JSON.stringify({ error: { code: 6, error: "Incorrect ID" } }))).toBe(
+      "Torn API error 6: Incorrect ID",
+    );
   });
   it("returns null for normal payloads", () => {
     expect(parseTornError(JSON.stringify({ timestamp: 123 }))).toBeNull();

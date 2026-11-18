@@ -147,26 +147,30 @@ export async function followPages(
   firstPage: Json,
   fetchUrl: PageFetcher,
   max: number,
-): Promise<{ merged: Json; partial: boolean }> {
+): Promise<{ merged: Json; partial: boolean; stopReason?: string }> {
   const pages: Json[] = [firstPage];
-  let partial = false;
+  let stopReason: string | undefined;
   const firstLinks = firstPage?._metadata?.links ?? {};
   const direction: "next" | "prev" | null =
     firstLinks.next ? "next" : firstLinks.prev ? "prev" : null;
 
   let current = firstPage;
-  while (direction && pages.length < max) {
+  while (direction) {
     const url = current?._metadata?.links?.[direction];
     if (!url) break;
+    if (pages.length >= max) {
+      stopReason = `page cap reached (${max} pages)`;
+      break;
+    }
     try {
       current = await fetchUrl(url);
-    } catch {
-      partial = true;
+    } catch (e) {
+      stopReason = e instanceof Error ? e.message : "a page request failed";
       break;
     }
     pages.push(current);
   }
-  return { merged: mergePages(pages), partial };
+  return { merged: mergePages(pages), partial: stopReason !== undefined, ...(stopReason ? { stopReason } : {}) };
 }
 
 const TIME_FIELDS = ["timestamp", "time", "started", "ended", "created", "executed", "date"];

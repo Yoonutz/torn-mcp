@@ -191,7 +191,13 @@ export function decodeClientId(clientId: string): ClientInfo | null {
   if (!clientId.startsWith("c_") || clientId.length > 4096) return null;
   try {
     const info = JSON.parse(new TextDecoder().decode(fromB64url(clientId.slice(2)))) as ClientInfo;
-    if (!Array.isArray(info.redirect_uris) || !info.redirect_uris.every((u) => typeof u === "string")) {
+    // The client_id is self-describing, so anyone can hand-craft one without
+    // /register. Re-apply the registration rules here or they are bypassed.
+    if (
+      !Array.isArray(info.redirect_uris) ||
+      info.redirect_uris.length === 0 ||
+      !info.redirect_uris.every((u) => typeof u === "string" && validRedirect(u))
+    ) {
       return null;
     }
     return info;

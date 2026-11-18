@@ -9,6 +9,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { registerAllTools, describeTag, MAX_DESCRIPTION_CHARS } from "./tools.js";
 import { textResult } from "./mcpResult.js";
 import { ENDPOINTS, TAGS } from "./generated/endpoints.js";
+import { MAX_IDS } from "./custom/tools.js";
 
 type Tool = { name: string; title?: string; description?: string; inputSchema: any; annotations?: any };
 
@@ -67,6 +68,19 @@ describe("registered tool set (as seen by a client)", () => {
         (t.description ?? "").length,
         `${t.name} description is ${(t.description ?? "").length} chars`,
       ).toBeLessThanOrEqual(MAX_DESCRIPTION_CHARS);
+    }
+  });
+
+  it("caps id lists so one call cannot fan out without limit", () => {
+    const cases: [string, string][] = [
+      ["compare_players", "ids"],
+      ["market_analysis", "item_ids"],
+      ["find_profitable_items", "item_ids"],
+    ];
+    expect(MAX_IDS).toBeGreaterThan(1);
+    for (const [tool, field] of cases) {
+      const schema = tools.find((t) => t.name === tool)!.inputSchema.properties[field];
+      expect(schema.maxItems, `${tool}.${field} has no maxItems`).toBe(MAX_IDS);
     }
   });
 

@@ -110,8 +110,19 @@ describe("followPages", () => {
       _metadata: { links: { prev: "more" } },
     });
     const first = ever(1);
-    const { merged } = await followPages(first, async () => ever(9), 2);
+    const { merged, partial, stopReason } = await followPages(first, async () => ever(9), 2);
     expect(merged._pages_fetched).toBe(2); // first + one follow only
+    // More pages exist past the cap: that must be flagged, not cut silently.
+    expect(partial).toBe(true);
+    expect(stopReason).toMatch(/page cap/);
+  });
+
+  it("is not partial when the last page has no further link", async () => {
+    const first = { attacks: [{ id: 1 }], _metadata: { links: { prev: "p2" } } };
+    const p2 = { attacks: [{ id: 2 }], _metadata: { links: { prev: null } } };
+    const { partial, stopReason } = await followPages(first, async () => p2, 2);
+    expect(partial).toBe(false);
+    expect(stopReason).toBeUndefined();
   });
 
   it("returns partial data when a follow throws mid-walk", async () => {
@@ -120,6 +131,14 @@ describe("followPages", () => {
     const { merged, partial } = await followPages(first, fetchUrl, 3);
     expect(partial).toBe(true);
     expect(merged.attacks).toEqual([{ id: 1 }]);
+  });
+
+  it("keeps the error that stopped the walk", async () => {
+    const first = { attacks: [{ id: 1 }], _metadata: { links: { prev: "boom" } } };
+    const { stopReason } = await followPages(first, async () => {
+      throw new Error("Torn API error 5: Too many requests");
+    }, 3);
+    expect(stopReason).toMatch(/Torn API error 5/);
   });
 });
 

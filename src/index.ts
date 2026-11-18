@@ -10,6 +10,8 @@ import {
   parseTornError,
   resolveEndpointPath,
   responseFormat,
+  RETRYABLE_TORN_CODES,
+  tornErrorCode,
   sha256Hex,
   validateParams,
   type BodyFormat,
@@ -43,7 +45,12 @@ import { OAuthRecord, durableTokenStore } from "./oauthStore.js";
 export { RateLimiter, OAuthRecord };
 
 /** Server version, surfaced in the MCP display name and serverInfo. */
-const VERSION = "0.12.4";
+const VERSION = "0.12.5";
+
+/** Attempts per Torn URL (first try + retries on transient errors). */
+const ATTEMPTS = 3;
+/** A Torn call that takes longer than this is aborted (then retried). */
+const FETCH_TIMEOUT_MS = 10_000;
 
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -78,6 +85,8 @@ export class TornMCP extends DurableObject<Env> {
   private transport: WebStandardStreamableHTTPServerTransport | null = null;
   /** Cached lowercase item-name → id map, built lazily from /torn/items. */
   private itemMap: Map<string, string> | null = null;
+  /** Per-attempt Torn timeout; a field so tests can shorten it. */
+  fetchTimeoutMs = FETCH_TIMEOUT_MS;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -196,7 +205,9 @@ export class TornMCP extends DurableObject<Env> {
       const widened: Record<string, string | number> = { ...resolved };
       delete widened.from;
       delete widened.to;
-      const refetched = await this.fetchMerged(apiKey, path, widened);
+      // One page only: this is a "most recent instead" fallback, and walking
+      // the full history here could spend most of the key's minute budget.
+      const refetched = await this.fetchMerged(apiKey, path, widened, format, 1);
       if (refetched.ok && !isEmptyPayload(refetched.data)) {
         canonical = refetched.data;
         canonical._note = WINDOW_NOTE;
@@ -204,8 +215,8 @@ export class TornMCP extends DurableObject<Env> {
     }
     if (fetched.partial) {
       canonical._pages_partial =
-        `Stopped after ${MAX_PAGES} pages (subrequest limit). More data may exist — ` +
-        `narrow with from/to or a category filter, or page via _metadata.links.next.`;
+        `Stopped early: ${fetched.stopReason}. More data may exist — ` +
+        `narrow with from/to or a category filter, or page via _metadata.links.`;
     }
 
     // Presentation channel: humanized + computed annotations over the canonical.
@@ -246,27 +257,44 @@ export class TornMCP extends DurableObject<Env> {
     }
 
     const withKey = ensureKey(url, apiKey);
-    let res: Response | null = null;
-    for (let attempt = 0; attempt < 3; attempt++) {
+    let text = "";
+    let status = 0;
+    for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
+      const last = attempt === ATTEMPTS - 1;
+      let res: Response;
       try {
-        res = await fetch(withKey, { headers: { "User-Agent": "torn-mcp" } });
-      } catch {
-        if (attempt === 2) throw new Error("Network error contacting the Torn API.");
+        res = await fetch(withKey, {
+          headers: { "User-Agent": "torn-mcp" },
+          signal: AbortSignal.timeout(this.fetchTimeoutMs),
+        });
+        text = await res.text();
+      } catch (e) {
+        if (last) {
+          const timedOut = e instanceof Error && (e.name === "TimeoutError" || e.name === "AbortError");
+          throw new Error(
+            timedOut
+              ? `The Torn API did not answer within ${Math.round(this.fetchTimeoutMs / 1000)}s. Try again in a moment.`
+              : "Network error contacting the Torn API.",
+          );
+        }
         await sleep(400 * Math.pow(2, attempt));
         continue;
       }
-      if (res.status === 429 || res.status >= 500) {
-        if (attempt === 2) break;
+      status = res.status;
+      // Transient: HTTP 429/5xx, or Torn's backend error, which comes as HTTP 200
+      // + `{ error: { code: 17 } }`. Error 5 (too many requests) is NOT retried:
+      // the key's minute budget is spent and a retry only spends more of it.
+      const code = tornErrorCode(text);
+      const transient = status === 429 || status >= 500 || (code !== null && RETRYABLE_TORN_CODES.has(code));
+      if (transient && !last) {
         await sleep(400 * Math.pow(2, attempt));
         continue;
       }
       break;
     }
-    if (!res) throw new Error("Network error contacting the Torn API.");
 
-    const text = await res.text();
-    if (!res.ok) {
-      throw new Error(parseTornError(text) ?? `Torn API returned HTTP ${res.status}.`);
+    if (status < 200 || status >= 300) {
+      throw new Error(parseTornError(text) ?? `Torn API returned HTTP ${status}.`);
     }
     // Torn signals errors as HTTP 200 + `{ error }` on every endpoint; parseTornBody
     // checks that first, then parses JSON or wraps CSV per the spec's content type.
@@ -282,7 +310,10 @@ export class TornMCP extends DurableObject<Env> {
     path: string,
     params: Record<string, string | number> | undefined,
     format: BodyFormat = "json",
-  ): Promise<{ ok: true; data: any; partial: boolean } | { ok: false; error: string }> {
+    maxPages: number = MAX_PAGES,
+  ): Promise<
+    { ok: true; data: any; partial: boolean; stopReason?: string } | { ok: false; error: string }
+  > {
     if (!apiKey) {
       return {
         ok: false,
@@ -299,8 +330,8 @@ export class TornMCP extends DurableObject<Env> {
       return { ok: false, error: e instanceof Error ? e.message : "Torn request failed." };
     }
     if (format === "csv") return { ok: true, data: firstPage, partial: false };
-    const { merged, partial } = await followPages(firstPage, fetchUrl, MAX_PAGES);
-    return { ok: true, data: merged, partial };
+    const { merged, partial, stopReason } = await followPages(firstPage, fetchUrl, maxPages);
+    return { ok: true, data: merged, partial, stopReason };
   }
 }
 
