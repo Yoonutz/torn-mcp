@@ -1243,11 +1243,46 @@ export const ENDPOINTS = {
           "type": "object",
           "fields": [
             "id",
-            "name"
+            "name",
+            "unlocked_gyms"
           ]
         }
       ],
       "path": "/user/gym"
+    },
+    "halloween": {
+      "requiresId": false,
+      "summary": "Get your Halloween treats information",
+      "description": "Requires minimal access key. <br>Returns your current and cumulative treats and the IDs of basket upgrades you have unlocked.",
+      "keyLevel": "minimal",
+      "stability": "Untable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "halloween",
+          "type": "object",
+          "fields": [
+            "treats",
+            "basket_upgrades"
+          ]
+        }
+      ],
+      "path": "/user/halloween"
     },
     "hof": {
       "requiresId": false,
@@ -1377,7 +1412,7 @@ export const ENDPOINTS = {
     "inventory": {
       "requiresId": false,
       "summary": "Get your inventory",
-      "description": "<b>Cached selection (1 hour per category).</b><br><br>Requires minimal access key. <br>",
+      "description": "<b>Cached selection (15 minutes per category).</b><br><br>Requires minimal access key. <br>",
       "keyLevel": "minimal",
       "stability": "Stable",
       "query": [
@@ -1731,7 +1766,7 @@ export const ENDPOINTS = {
     "log": {
       "requiresId": false,
       "summary": "Get your logs",
-      "description": "Requires full access key. <br> It's possible to pass a list of log ids or a log category id.<br>This selection is standalone and cannot be used together with other selections.",
+      "description": "Requires full access key. <br> It's possible to pass a list of log ids or a log category id.<br>This selection is standalone and cannot be used together with other selections.<br><br>Pagination: `from` and `to` are inclusive bounds at one-second resolution. Log timestamps are nanosecond-precise, so to page without gaps or repeats use the `nanostamp` cursor (returned as `_metadata.nanostamp`, sent without `to`); the `prev` link does this automatically.",
       "keyLevel": "full",
       "stability": "Stable",
       "query": [
@@ -1774,7 +1809,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "integer",
-          "description": "Timestamp that sets the lower limit for the data returned. Data returned will be after this time"
+          "description": "Timestamp that sets the lower limit for the data returned. Data returned will be from and including this time"
         },
         {
           "name": "timestamp",
@@ -1788,7 +1823,7 @@ export const ENDPOINTS = {
           "in": "query",
           "required": false,
           "type": "string",
-          "description": "Timestamp in nanoseconds to bypass system limitation when more than 100 logs were returned in the same second."
+          "description": "Nanosecond cursor for user/log pagination, returned as `_metadata.nanostamp`. Pass it back (without `to`) to continue from the exact position with no skipped or repeated logs; it also bypasses the limitation when more than 100 logs share the same second."
         },
         {
           "name": "comment",
@@ -2087,7 +2122,7 @@ export const ENDPOINTS = {
       "summary": "Get your networth",
       "description": "Requires limited access key. <br>",
       "keyLevel": "limited",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -2952,7 +2987,7 @@ export const ENDPOINTS = {
     "properties": {
       "requiresId": false,
       "summary": "Get your own properties",
-      "description": "Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys.",
+      "description": "Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys. <br>Responses are cached for an hour unless requesting your own or your spouse's properties with a Limited or higher access key.",
       "keyLevel": "public",
       "stability": "Stable",
       "query": [
@@ -3846,6 +3881,40 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/user/travel"
+    },
+    "travelinventory": {
+      "requiresId": false,
+      "summary": "Get your travel inventory capacity",
+      "description": "Requires limited access key. <br>",
+      "keyLevel": "limited",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "travelinventory",
+          "type": "object",
+          "fields": [
+            "capacity",
+            "inventory"
+          ]
+        }
+      ],
+      "path": "/user/travelinventory"
     },
     "virus": {
       "requiresId": false,
@@ -4819,6 +4888,54 @@ export const ENDPOINTS = {
       ],
       "path": "/faction/dirtybombs"
     },
+    "headlines": {
+      "requiresId": false,
+      "summary": "Get your faction's news ticker headlines",
+      "description": "Requires minimal access key with faction API access permissions. <br>Returns the headlines currently shown in your faction's news ticker. 'importance' is 'urgent' for headlines marked as urgent.",
+      "keyLevel": "minimal",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "striptags",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "description": "Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user').",
+          "enum": [
+            "true",
+            "false"
+          ]
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "headlines",
+          "type": "array",
+          "fields": [
+            "id",
+            "headline",
+            "link",
+            "type",
+            "importance"
+          ]
+        }
+      ],
+      "path": "/faction/headlines"
+    },
     "hof": {
       "requiresId": false,
       "summary": "Get your faction's hall of fame rankings.",
@@ -4864,9 +4981,9 @@ export const ENDPOINTS = {
     "inventory": {
       "requiresId": false,
       "summary": "Get your faction's inventory items.",
-      "description": "<b>Cached selection (1 hour, all items cached at once).</b><br><br>Requires limited access key. <br>",
+      "description": "<b>Cached selection (5 minutes, all items cached at once).</b><br><br>Requires limited access key. <br>",
       "keyLevel": "limited",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "cat",
@@ -5789,7 +5906,7 @@ export const ENDPOINTS = {
       "summary": "Get daily factions snapshot CSV",
       "description": "Requires public access key.<br>Returns a CSV daily snapshot of factions.<br>This selection is standalone and cannot be used together with other selections.<br>\nCSV columns: id, name, tag, tag_image, banner_image, leader_id, co_leader_id, respect, days_old, rank, members, members_max, member_list, recruiting, destroyed_timestamp",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -7479,7 +7596,7 @@ export const ENDPOINTS = {
     "info": {
       "requiresId": false,
       "summary": "Get current key info",
-      "description": "Available for any key. <br>",
+      "description": "Available for any key. <br>'sensitive_data' is true when the key returns the same data as a Limited Access key (e.g. battle stats, revive setting, property and company finances): Limited Access, Full Access and custom keys created with 'Include sensitive data' enabled. Custom keys created before this option existed keep the permissions they had, report false and have 'legacy_permissions' set to true.",
       "keyLevel": "public",
       "stability": "Stable",
       "query": [
@@ -7932,7 +8049,7 @@ export const ENDPOINTS = {
       "summary": "Get points market listings",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -8180,7 +8297,7 @@ export const ENDPOINTS = {
     "races": {
       "requiresId": false,
       "summary": "Get races",
-      "description": "Requires public access key. <br>Returns a list of races, ordered by race start timestamp.",
+      "description": "Requires public access key. <br>Returns a list of races, ordered by race start timestamp. <br>The 'available' category returns races which have not started yet and can still be joined; 'from' and 'to' are ignored for this category.",
       "keyLevel": "public",
       "stability": "Stable",
       "query": [
@@ -8223,7 +8340,8 @@ export const ENDPOINTS = {
           "description": "Category of races returned",
           "enum": [
             "official",
-            "custom"
+            "custom",
+            "available"
           ]
         },
         {
@@ -8646,7 +8764,7 @@ export const ENDPOINTS = {
       "summary": "Get current bank rates",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -8776,7 +8894,7 @@ export const ENDPOINTS = {
       "summary": "Get casino playing cards",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -8811,7 +8929,7 @@ export const ENDPOINTS = {
       "summary": "Get city shops stock information",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -8853,7 +8971,7 @@ export const ENDPOINTS = {
       "summary": "Get all companies details",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -9172,7 +9290,7 @@ export const ENDPOINTS = {
       "summary": "Get all gyms",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -9205,6 +9323,87 @@ export const ENDPOINTS = {
         }
       ],
       "path": "/torn/gyms"
+    },
+    "halloween": {
+      "requiresId": false,
+      "summary": "Get Halloween basket upgrades",
+      "description": "Requires minimal access key. <br>Returns the list of available Halloween basket upgrades with their benefits, treats cost and unlock requirement.",
+      "keyLevel": "minimal",
+      "stability": "Stable",
+      "query": [
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "halloween",
+          "type": "object",
+          "fields": [
+            "basket_upgrades"
+          ]
+        }
+      ],
+      "path": "/torn/halloween"
+    },
+    "headlines": {
+      "requiresId": false,
+      "summary": "Get news ticker headlines",
+      "description": "Requires public access key. <br>Returns the headlines currently shown in the news ticker. 'importance' is 'urgent' for headlines marked as announcements.",
+      "keyLevel": "public",
+      "stability": "Unstable",
+      "query": [
+        {
+          "name": "striptags",
+          "in": "query",
+          "required": false,
+          "type": "enum",
+          "description": "Determines if fields include HTML or not ('Hospitalized by <a href=...>user</a>' vs 'Hospitalized by user').",
+          "enum": [
+            "true",
+            "false"
+          ]
+        },
+        {
+          "name": "timestamp",
+          "in": "query",
+          "required": false,
+          "type": "integer|string",
+          "description": "Timestamp to bypass cache"
+        },
+        {
+          "name": "comment",
+          "in": "query",
+          "required": false,
+          "type": "string",
+          "description": "Comment for your tool/service/bot/website to be visible in the logs."
+        }
+      ],
+      "returns": [
+        {
+          "name": "headlines",
+          "type": "array",
+          "fields": [
+            "id",
+            "headline",
+            "link",
+            "type",
+            "importance"
+          ]
+        }
+      ],
+      "path": "/torn/headlines"
     },
     "honors": {
       "requiresId": false,
@@ -9471,7 +9670,7 @@ export const ENDPOINTS = {
       "summary": "Get specific item(s) stats",
       "description": "Requires public key.<br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -9872,7 +10071,7 @@ export const ENDPOINTS = {
       "summary": "Get active poker tables",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -9948,7 +10147,7 @@ export const ENDPOINTS = {
       "summary": "Get rock paper scissors competition stats",
       "description": "Requires public key.",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -9982,7 +10181,7 @@ export const ENDPOINTS = {
       "summary": "Get search for cash crime statuses",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -10017,7 +10216,7 @@ export const ENDPOINTS = {
       "summary": "Get shoplifting crime statuses",
       "description": "Requires public access key. <br>",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",
@@ -10051,7 +10250,7 @@ export const ENDPOINTS = {
       "summary": "Get daily city stats",
       "description": "Requires public key.",
       "keyLevel": "public",
-      "stability": "Unstable",
+      "stability": "Stable",
       "query": [
         {
           "name": "timestamp",

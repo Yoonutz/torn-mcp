@@ -3,7 +3,7 @@
     "info": {
         "title": "Torn API",
         "description": "\n * The development of Torn's API v2 is still ongoing.\n * If selections remain unaltered, they will default to the API v1 version.\n * Unlike API v1, API v2 accepts both selections and IDs as path and query parameters.\n * If any discrepancies or errors are found, please submit a [bug report](https://www.torn.com/forums.php#/p=forums&f=19&b=0&a=0) on the Torn Forums.\n * In case you're using bots to check for changes on openapi.json file, make sure to specificy a custom user-agent header - CloudFlare sometimes prevents requests from default user-agents.",
-        "version": "6.13.8"
+        "version": "6.16.0"
     },
     "servers": [
         {
@@ -1395,6 +1395,45 @@
                 "x-stability": "Stable"
             }
         },
+        "/user/halloween": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get your Halloween treats information",
+                "description": "Requires minimal access key. <br>Returns your current and cumulative treats and the IDs of basket upgrades you have unlocked.",
+                "operationId": "getMyHalloween",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyMinimal"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserHalloweenResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Untable"
+            }
+        },
         "/user/hof": {
             "get": {
                 "tags": [
@@ -1614,7 +1653,7 @@
                     "User"
                 ],
                 "summary": "Get your inventory",
-                "description": "<b>Cached selection (1 hour per category).</b><br><br>Requires minimal access key. <br>",
+                "description": "<b>Cached selection (15 minutes per category).</b><br><br>Requires minimal access key. <br>",
                 "operationId": "getMyInventory",
                 "parameters": [
                     {
@@ -1974,7 +2013,7 @@
                     "User"
                 ],
                 "summary": "Get your logs",
-                "description": "Requires full access key. <br> It's possible to pass a list of log ids or a log category id.<br>This selection is standalone and cannot be used together with other selections.",
+                "description": "Requires full access key. <br> It's possible to pass a list of log ids or a log category id.<br>This selection is standalone and cannot be used together with other selections.<br><br>Pagination: `from` and `to` are inclusive bounds at one-second resolution. Log timestamps are nanosecond-precise, so to page without gaps or repeats use the `nanostamp` cursor (returned as `_metadata.nanostamp`, sent without `to`); the `prev` link does this automatically.",
                 "operationId": "getMyLogs",
                 "parameters": [
                     {
@@ -2013,10 +2052,10 @@
                         "$ref": "#/components/parameters/ApiLimit100Default20"
                     },
                     {
-                        "$ref": "#/components/parameters/ApiTo"
+                        "$ref": "#/components/parameters/ApiToLog"
                     },
                     {
-                        "$ref": "#/components/parameters/ApiFrom"
+                        "$ref": "#/components/parameters/ApiFromLog"
                     },
                     {
                         "$ref": "#/components/parameters/ApiTimestamp"
@@ -2384,7 +2423,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/user/newmessages": {
@@ -2828,7 +2867,7 @@
                     "User"
                 ],
                 "summary": "Get your own properties",
-                "description": "Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys.",
+                "description": "Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys. <br>Responses are cached for an hour unless requesting your own or your spouse's properties with a Limited or higher access key.",
                 "operationId": "getMyProperties",
                 "parameters": [
                     {
@@ -2876,7 +2915,7 @@
                     "User"
                 ],
                 "summary": "Get specific user's properties",
-                "description": "Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys for yourself or your spouse.",
+                "description": "Requires public access key. <br>Extended responses are available when requesting the data with Limited or higher access keys for yourself or your spouse. <br>Responses are cached for an hour unless requesting your own or your spouse's properties with a Limited or higher access key.",
                 "operationId": "getUserProperties",
                 "parameters": [
                     {
@@ -3651,6 +3690,45 @@
                 "x-stability": "Stable"
             }
         },
+        "/user/travelinventory": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get your travel inventory capacity",
+                "description": "Requires limited access key. <br>",
+                "operationId": "getMyTravelInventory",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyLimited"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserTravelInventoryResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
         "/user/virus": {
             "get": {
                 "tags": [
@@ -4127,6 +4205,9 @@
                                             "$ref": "#/components/schemas/UserTravelResponse"
                                         },
                                         {
+                                            "$ref": "#/components/schemas/UserTravelInventoryResponse"
+                                        },
+                                        {
                                             "$ref": "#/components/schemas/UserVirusResponse"
                                         },
                                         {
@@ -4134,6 +4215,9 @@
                                         },
                                         {
                                             "$ref": "#/components/schemas/UserCasinoResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/UserHalloweenResponse"
                                         },
                                         {
                                             "$ref": "#/components/schemas/UserNetworthResponse"
@@ -5043,6 +5127,48 @@
                 "x-stability": "Stable"
             }
         },
+        "/faction/headlines": {
+            "get": {
+                "tags": [
+                    "Faction"
+                ],
+                "summary": "Get your faction's news ticker headlines",
+                "description": "Requires minimal access key with faction API access permissions. <br>Returns the headlines currently shown in your faction's news ticker. 'importance' is 'urgent' for headlines marked as urgent.",
+                "operationId": "getMyFactionHeadlines",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiStripTagsFalse"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyMinimal"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/FactionHeadlinesResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Unstable"
+            }
+        },
         "/faction/hof": {
             "get": {
                 "tags": [
@@ -5136,7 +5262,7 @@
                     "Faction"
                 ],
                 "summary": "Get your faction's inventory items.",
-                "description": "<b>Cached selection (1 hour, all items cached at once).</b><br><br>Requires limited access key. <br> ",
+                "description": "<b>Cached selection (5 minutes, all items cached at once).</b><br><br>Requires limited access key. <br> ",
                 "operationId": "getMyFactionInventory",
                 "parameters": [
                     {
@@ -5181,7 +5307,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/faction/members": {
@@ -6004,7 +6130,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/faction/stats": {
@@ -7003,6 +7129,9 @@
                                         },
                                         {
                                             "$ref": "#/components/schemas/NewsResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/FactionHeadlinesResponse"
                                         },
                                         {
                                             "$ref": "#/components/schemas/RevivesResponse"
@@ -8029,8 +8158,7 @@
                         "in": "path",
                         "description": "Category id or a list of category ids (comma separated)",
                         "required": true,
-                        "style": "form",
-                        "explode": false,
+                        "style": "simple",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -8306,7 +8434,7 @@
                     "Key"
                 ],
                 "summary": "Get current key info",
-                "description": "Available for any key. <br>",
+                "description": "Available for any key. <br>'sensitive_data' is true when the key returns the same data as a Limited Access key (e.g. battle stats, revive setting, property and company finances): Limited Access, Full Access and custom keys created with 'Include sensitive data' enabled. Custom keys created before this option existed keep the permissions they had, report false and have 'legacy_permissions' set to true.",
                 "operationId": "getKeyInfo",
                 "parameters": [
                     {
@@ -8815,7 +8943,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/market/{propertyTypeId}/rentals": {
@@ -9191,7 +9319,7 @@
                     "Racing"
                 ],
                 "summary": "Get races",
-                "description": "Requires public access key. <br>Returns a list of races, ordered by race start timestamp.",
+                "description": "Requires public access key. <br>Returns a list of races, ordered by race start timestamp. <br>The 'available' category returns races which have not started yet and can still be joined; 'from' and 'to' are ignored for this category.",
                 "operationId": "getRacingRaces",
                 "parameters": [
                     {
@@ -9212,7 +9340,7 @@
                         "description": "Category of races returned",
                         "required": false,
                         "schema": {
-                            "$ref": "#/components/schemas/RacingRaceTypeEnum"
+                            "$ref": "#/components/schemas/RacingRacesCategoryEnum"
                         }
                     },
                     {
@@ -9526,7 +9654,7 @@
                         "schema": {
                             "oneOf": [
                                 {
-                                    "$ref": "#/components/schemas/RacingRaceTypeEnum"
+                                    "$ref": "#/components/schemas/RacingRacesCategoryEnum"
                                 },
                                 {
                                     "$ref": "#/components/schemas/RaceClassEnum"
@@ -9883,7 +10011,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/bounties": {
@@ -10006,7 +10134,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/cityshops": {
@@ -10045,7 +10173,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/{shopId}/cityshops": {
@@ -10093,7 +10221,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/companies": {
@@ -10132,7 +10260,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/{typeId}/companies": {
@@ -10180,7 +10308,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/crimes": {
@@ -10483,6 +10611,87 @@
                         "api_key": []
                     }
                 ],
+                "x-stability": "Stable"
+            }
+        },
+        "/torn/halloween": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get Halloween basket upgrades",
+                "description": "Requires minimal access key. <br>Returns the list of available Halloween basket upgrades with their benefits, treats cost and unlock requirement.",
+                "operationId": "getTornHalloween",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyMinimal"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornHalloweenResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "x-stability": "Stable"
+            }
+        },
+        "/torn/headlines": {
+            "get": {
+                "tags": [
+                    "Torn"
+                ],
+                "summary": "Get news ticker headlines",
+                "description": "Requires public access key. <br>Returns the headlines currently shown in the news ticker. 'importance' is 'urgent' for headlines marked as announcements.",
+                "operationId": "getTornHeadlines",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/ApiStripTagsFalse"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiTimestamp"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiComment"
+                    },
+                    {
+                        "$ref": "#/components/parameters/ApiKeyPublic"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TornHeadlinesResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
                 "x-stability": "Unstable"
             }
         },
@@ -10548,8 +10757,7 @@
                         "in": "path",
                         "description": "Honor id or a list of honor ids (comma separated)",
                         "required": true,
-                        "style": "form",
-                        "explode": false,
+                        "style": "simple",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -10694,8 +10902,7 @@
                         "in": "path",
                         "description": "Item uid or a list of item uids (comma separated), 25 uids maximum",
                         "required": true,
-                        "style": "form",
-                        "explode": false,
+                        "style": "simple",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -10786,8 +10993,7 @@
                         "in": "path",
                         "description": "Item uid or a list of item uids (comma separated), 25 uids maximum",
                         "required": true,
-                        "style": "form",
-                        "explode": false,
+                        "style": "simple",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -10822,7 +11028,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/items": {
@@ -10890,8 +11096,7 @@
                         "in": "path",
                         "description": "Item id or a list of item ids (comma separated)",
                         "required": true,
-                        "style": "form",
-                        "explode": false,
+                        "style": "simple",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -11111,8 +11316,7 @@
                         "in": "path",
                         "description": "Medal id or a list of medal ids (comma separated)",
                         "required": true,
-                        "style": "form",
-                        "explode": false,
+                        "style": "simple",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -11303,7 +11507,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/properties": {
@@ -11381,7 +11585,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/searchforcash": {
@@ -11420,7 +11624,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/shoplifting": {
@@ -11459,7 +11663,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/stats": {
@@ -11498,7 +11702,7 @@
                         "api_key": []
                     }
                 ],
-                "x-stability": "Unstable"
+                "x-stability": "Stable"
             }
         },
         "/torn/stocks": {
@@ -11981,6 +12185,12 @@
                                         },
                                         {
                                             "$ref": "#/components/schemas/TornBankResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TornHalloweenResponse"
+                                        },
+                                        {
+                                            "$ref": "#/components/schemas/TornHeadlinesResponse"
                                         },
                                         {
                                             "$ref": "#/components/schemas/TornBountiesResponse"
@@ -16539,6 +16749,14 @@
                     "custom"
                 ]
             },
+            "RacingRacesCategoryEnum": {
+                "type": "string",
+                "enum": [
+                    "official",
+                    "custom",
+                    "available"
+                ]
+            },
             "MarketSpecializedBazaarCategoryEnum": {
                 "type": "string",
                 "enum": [
@@ -16729,7 +16947,8 @@
                     "end_with_nap",
                     "end_with_destroy_attack",
                     "end_with_destroy_defense",
-                    "end_with_peace_treaty"
+                    "end_with_peace_treaty",
+                    "end_with_dirty_bomb"
                 ]
             },
             "FactionAttackResult": {
@@ -16882,7 +17101,8 @@
                     "Marketing Manager",
                     "Revenue Manager",
                     "Casino Manager",
-                    "Casino President"
+                    "Casino President",
+                    "Dealer"
                 ]
             },
             "AttackFinishingHitEffect": {
@@ -17239,6 +17459,10 @@
                 "type": "integer",
                 "format": "int32"
             },
+            "HalloweenBasketUpgradeId": {
+                "type": "integer",
+                "format": "int32"
+            },
             "ChainId": {
                 "type": "integer",
                 "format": "int32"
@@ -17343,7 +17567,7 @@
                         "$ref": "#/components/schemas/RequestLinks"
                     },
                     "nanostamp": {
-                        "description": "Use to bypass system limitation when 100 or more logs were inserted within the same second.",
+                        "description": "Nanosecond paging cursor. Send it back (without `to`) as the next request's `nanostamp` to continue from the exact position; also bypasses the limitation when 100 or more logs share the same second.",
                         "type": "string"
                     }
                 },
@@ -17446,79 +17670,6 @@
                 "enum": [
                     "v1",
                     "v2"
-                ]
-            },
-            "CompanySearchParameter": {
-                "oneOf": [
-                    {
-                        "type": "string",
-                        "enum": [
-                            "recruiting",
-                            "notRecruiting"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "pattern": "^(id|type|daysOld|rating|dailyIncome|weeklyIncome|dailyCustomers|weeklyCustomers):(=|!=|<|<=|>=|>|Equal|NotEqual|Less|LessOrEqual|GreaterOrEqual|Greater):\\d+$"
-                    }
-                ]
-            },
-            "UserSearchParameter": {
-                "oneOf": [
-                    {
-                        "type": "string",
-                        "enum": [
-                            "married",
-                            "notMarried",
-                            "traveling",
-                            "notTraveling",
-                            "inFaction",
-                            "notInFaction",
-                            "inCompany",
-                            "notInCompany",
-                            "inHospital",
-                            "notInHospital",
-                            "inJail",
-                            "notInJail",
-                            "inFederalJail",
-                            "notInFederalJail",
-                            "male",
-                            "female",
-                            "enby",
-                            "lastActionNow",
-                            "lastActionRecent",
-                            "lastActionHourAgo",
-                            "lastActionDayAgo",
-                            "lastActionWeekAgo",
-                            "lastActionMonthAgo",
-                            "lastActionYearAgo"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "pattern": "^(level|daysOld|offences):(=|!=|<|<=|>=|>|Equal|NotEqual|Less|LessOrEqual|GreaterOrEqual|Greater):\\d+$"
-                    },
-                    {
-                        "type": "string",
-                        "pattern": "^factions:\\d+(;\\d+)*$"
-                    }
-                ]
-            },
-            "Parameters": {
-                "oneOf": [
-                    {
-                        "type": "string",
-                        "enum": [
-                            "destroyed",
-                            "notDestroyed",
-                            "recruiting",
-                            "notRecruiting"
-                        ]
-                    },
-                    {
-                        "type": "string",
-                        "pattern": "^(id|respect|members|membersMax):(=|!=|<|<=|>=|>|Equal|NotEqual|Less|LessOrEqual|GreaterOrEqual|Greater):\\d+$"
-                    }
                 ]
             },
             "TornShopliftingStatusTitleEnum": {
@@ -18733,7 +18884,8 @@
                                 "country",
                                 "item",
                                 "trip_duration",
-                                "hourly_profit"
+                                "hourly_profit",
+                                "restock_timestamp"
                             ],
                             "properties": {
                                 "country": {
@@ -18754,6 +18906,10 @@
                                         },
                                         "name": {
                                             "type": "string"
+                                        },
+                                        "stock": {
+                                            "type": "integer",
+                                            "format": "int32"
                                         },
                                         "price": {
                                             "type": "integer",
@@ -18784,6 +18940,17 @@
                                 "hourly_profit": {
                                     "type": "integer",
                                     "format": "int32"
+                                },
+                                "restock_timestamp": {
+                                    "oneOf": [
+                                        {
+                                            "type": "integer",
+                                            "format": "int32"
+                                        },
+                                        {
+                                            "type": "null"
+                                        }
+                                    ]
                                 }
                             },
                             "type": "object"
@@ -19688,7 +19855,8 @@
                     "gym": {
                         "required": [
                             "id",
-                            "name"
+                            "name",
+                            "unlocked_gyms"
                         ],
                         "properties": {
                             "id": {
@@ -19696,9 +19864,34 @@
                             },
                             "name": {
                                 "type": "string"
+                            },
+                            "unlocked_gyms": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/UserUnlockedGym"
+                                }
                             }
                         },
                         "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "UserUnlockedGym": {
+                "required": [
+                    "id",
+                    "name",
+                    "available"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/GymId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "available": {
+                        "type": "boolean"
                     }
                 },
                 "type": "object"
@@ -20132,6 +20325,118 @@
                     },
                     "_metadata": {
                         "$ref": "#/components/schemas/RequestMetadataWithLinksAndTotal"
+                    }
+                },
+                "type": "object"
+            },
+            "UserTravelInventoryItem": {
+                "required": [
+                    "id",
+                    "uid",
+                    "is_equipped",
+                    "name",
+                    "type",
+                    "is_faction_owned",
+                    "is_permanent"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/ItemId"
+                    },
+                    "uid": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ItemUid"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "is_equipped": {
+                        "type": "boolean"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "is_faction_owned": {
+                        "type": "boolean"
+                    },
+                    "is_permanent": {
+                        "description": "True for items added while player was in Torn.",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "UserTravelInventorySlot": {
+                "required": [
+                    "id",
+                    "item"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "item": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/UserTravelInventoryItem"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "UserTravelInventoryCapacity": {
+                "required": [
+                    "base",
+                    "special"
+                ],
+                "properties": {
+                    "base": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "special": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "type": "object"
+            },
+            "UserTravelInventory": {
+                "required": [
+                    "capacity",
+                    "inventory"
+                ],
+                "properties": {
+                    "capacity": {
+                        "$ref": "#/components/schemas/UserTravelInventoryCapacity"
+                    },
+                    "inventory": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserTravelInventorySlot"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "UserTravelInventoryResponse": {
+                "required": [
+                    "travelinventory"
+                ],
+                "properties": {
+                    "travelinventory": {
+                        "$ref": "#/components/schemas/UserTravelInventory"
                     }
                 },
                 "type": "object"
@@ -24403,6 +24708,7 @@
                             "forumsubscribedthreads",
                             "forumthreads",
                             "gym",
+                            "halloween",
                             "hof",
                             "honors",
                             "icons",
@@ -24441,6 +24747,7 @@
                             "trades",
                             "trade",
                             "travel",
+                            "travelinventory",
                             "timestamp",
                             "weaponexp",
                             "workstats",
@@ -24587,6 +24894,65 @@
                 "properties": {
                     "merits": {
                         "$ref": "#/components/schemas/UserMerits"
+                    }
+                },
+                "type": "object"
+            },
+            "UserHalloween": {
+                "required": [
+                    "treats",
+                    "basket_upgrades"
+                ],
+                "properties": {
+                    "treats": {
+                        "required": [
+                            "total",
+                            "current"
+                        ],
+                        "properties": {
+                            "total": {
+                                "type": "integer",
+                                "format": "int32"
+                            },
+                            "current": {
+                                "type": "integer",
+                                "format": "int32"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "basket_upgrades": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/UserHalloweenBasketUpgrade"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "UserHalloweenBasketUpgrade": {
+                "required": [
+                    "id",
+                    "timestamp"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/HalloweenBasketUpgradeId"
+                    },
+                    "timestamp": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "type": "object"
+            },
+            "UserHalloweenResponse": {
+                "required": [
+                    "halloween"
+                ],
+                "properties": {
+                    "halloween": {
+                        "$ref": "#/components/schemas/UserHalloween"
                     }
                 },
                 "type": "object"
@@ -29526,6 +29892,20 @@
                 },
                 "type": "object"
             },
+            "FactionHeadlinesResponse": {
+                "required": [
+                    "headlines"
+                ],
+                "properties": {
+                    "headlines": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornHeadline"
+                        }
+                    }
+                },
+                "type": "object"
+            },
             "NewsResponse": {
                 "required": [
                     "news",
@@ -30566,6 +30946,7 @@
                             "crimes",
                             "crimeexp",
                             "dirtbombs",
+                            "headlines",
                             "hof",
                             "lookup",
                             "members",
@@ -32461,6 +32842,8 @@
                                 "required": [
                                     "level",
                                     "type",
+                                    "sensitive_data",
+                                    "legacy_permissions",
                                     "faction",
                                     "company",
                                     "log"
@@ -32472,6 +32855,12 @@
                                     },
                                     "type": {
                                         "$ref": "#/components/schemas/ApiKeyAccessTypeEnum"
+                                    },
+                                    "sensitive_data": {
+                                        "type": "boolean"
+                                    },
+                                    "legacy_permissions": {
+                                        "type": "boolean"
                                     },
                                     "faction": {
                                         "type": "boolean"
@@ -34292,6 +34681,8 @@
                             },
                             "currency": {
                                 "required": [
+                                    "points_bought",
+                                    "points_average_cost",
                                     "money_on_hand",
                                     "money_on_hand_average",
                                     "money_in_bank",
@@ -34333,12 +34724,23 @@
                                     "points_used": {
                                         "type": "integer",
                                         "format": "int64"
+                                    },
+                                    "points_bought": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "points_average_cost": {
+                                        "type": "integer",
+                                        "format": "int64"
                                     }
                                 },
                                 "type": "object"
                             },
                             "attacking": {
                                 "required": [
+                                    "wars_ranked",
+                                    "wars_territory",
+                                    "wars_raid",
                                     "attacks_won",
                                     "attacks_lost",
                                     "attacks_stalemated",
@@ -34393,6 +34795,18 @@
                                         "format": "int64"
                                     },
                                     "respect_gained": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "wars_ranked": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "wars_territory": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "wars_raid": {
                                         "type": "integer",
                                         "format": "int64"
                                     }
@@ -34569,6 +34983,7 @@
                             },
                             "traveling": {
                                 "required": [
+                                    "canada",
                                     "items_bought_abroad",
                                     "total_trips",
                                     "argentina",
@@ -34630,6 +35045,10 @@
                                     "cayman_islands": {
                                         "type": "integer",
                                         "format": "int64"
+                                    },
+                                    "canada": {
+                                        "type": "integer",
+                                        "format": "int64"
                                     }
                                 },
                                 "type": "object"
@@ -34654,10 +35073,15 @@
                             "crimes": {
                                 "required": [
                                     "total",
+                                    "today",
                                     "jail_sentences"
                                 ],
                                 "properties": {
                                     "total": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "today": {
                                         "type": "integer",
                                         "format": "int64"
                                     },
@@ -34670,27 +35094,86 @@
                             },
                             "communication": {
                                 "required": [
+                                    "messages",
+                                    "mails_friends",
+                                    "mails_coworkers",
+                                    "mails_spouses",
+                                    "mails_faction",
+                                    "mails_total",
+                                    "chats",
+                                    "articles",
+                                    "article_views",
+                                    "article_reads",
+                                    "events",
+                                    "total_events",
+                                    "forum_posts",
+                                    "forum_threads",
+                                    "forum_likes",
+                                    "forum_dislikes",
                                     "total_messages",
-                                    "friends",
-                                    "coworkers",
-                                    "spouses",
                                     "classified_ads_placed",
                                     "personals_placed"
                                 ],
                                 "properties": {
+                                    "messages": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
                                     "total_messages": {
                                         "type": "integer",
                                         "format": "int64"
                                     },
                                     "friends": {
+                                        "description": "Replaced with 'mails_friends' field. Will be removed on 1st of January 2027.",
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "deprecated": true
+                                    },
+                                    "mails_friends": {
                                         "type": "integer",
                                         "format": "int64"
                                     },
                                     "coworkers": {
+                                        "description": "Replaced with 'mails_coworkers' field. Will be removed on 1st of January 2027.",
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "deprecated": true
+                                    },
+                                    "mails_coworkers": {
                                         "type": "integer",
                                         "format": "int64"
                                     },
                                     "spouses": {
+                                        "description": "Replaced with 'mails_spouses' field. Will be removed on 1st of January 2027.",
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "deprecated": true
+                                    },
+                                    "mails_spouses": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "mails_faction": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "mails_total": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "chats": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "articles": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "article_views": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "article_reads": {
                                         "type": "integer",
                                         "format": "int64"
                                     },
@@ -34701,12 +35184,38 @@
                                     "personals_placed": {
                                         "type": "integer",
                                         "format": "int64"
+                                    },
+                                    "events": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "total_events": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "forum_posts": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "forum_threads": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "forum_likes": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "forum_dislikes": {
+                                        "type": "integer",
+                                        "format": "int64"
                                     }
                                 },
                                 "type": "object"
                             },
                             "other": {
                                 "required": [
+                                    "users_daily",
+                                    "gym_trains",
                                     "logins",
                                     "years_played",
                                     "merits_bought",
@@ -34736,6 +35245,14 @@
                                         "format": "int64"
                                     },
                                     "stat_enhancers_used": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "gym_trains": {
+                                        "type": "integer",
+                                        "format": "int64"
+                                    },
+                                    "users_daily": {
                                         "type": "integer",
                                         "format": "int64"
                                     }
@@ -36606,7 +37123,10 @@
                     "title",
                     "description",
                     "start",
-                    "end"
+                    "end",
+                    "earliest_start",
+                    "latest_end",
+                    "fixed_start_time"
                 ],
                 "properties": {
                     "title": {
@@ -36620,6 +37140,14 @@
                         "format": "int32"
                     },
                     "end": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "earliest_start": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "latest_end": {
                         "type": "integer",
                         "format": "int32"
                     },
@@ -37056,6 +37584,63 @@
                 },
                 "type": "object"
             },
+            "AttackLogItem": {
+                "required": [
+                    "id",
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/ItemId"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "AttackLogAttacker": {
+                "required": [
+                    "id",
+                    "name",
+                    "item"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/UserId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "item": {
+                        "description": "This value is null if there was no item being used in this turn or during this effect.",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/AttackLogItem"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "AttackLogDefender": {
+                "required": [
+                    "id",
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/UserId"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "AttackLog": {
                 "required": [
                     "text",
@@ -37080,42 +37665,10 @@
                         "type": "string"
                     },
                     "attacker": {
+                        "description": "This value is null in stealthed attacks.",
                         "oneOf": [
                             {
-                                "description": "This value could be null in stealthed attacks.",
-                                "required": [
-                                    "id",
-                                    "name",
-                                    "item"
-                                ],
-                                "properties": {
-                                    "id": {
-                                        "$ref": "#/components/schemas/UserId"
-                                    },
-                                    "name": {
-                                        "type": "string"
-                                    },
-                                    "item": {
-                                        "oneOf": [
-                                            {
-                                                "description": "This object could be null if there was no item being used in this turn or during this effect.",
-                                                "properties": {
-                                                    "id": {
-                                                        "$ref": "#/components/schemas/ItemId"
-                                                    },
-                                                    "name": {
-                                                        "type": "string"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            },
-                                            {
-                                                "type": "null"
-                                            }
-                                        ]
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/AttackLogAttacker"
                             },
                             {
                                 "type": "null"
@@ -37123,22 +37676,10 @@
                         ]
                     },
                     "defender": {
+                        "description": "This value is null in stealthed attacks.",
                         "oneOf": [
                             {
-                                "description": "This value could be null in stealthed attacks.",
-                                "required": [
-                                    "id",
-                                    "name"
-                                ],
-                                "properties": {
-                                    "id": {
-                                        "$ref": "#/components/schemas/UserId"
-                                    },
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
+                                "$ref": "#/components/schemas/AttackLogDefender"
                             },
                             {
                                 "type": "null"
@@ -37146,20 +37687,15 @@
                         ]
                     },
                     "attacker_item": {
-                        "description": "This field only exists if the attacker is stealthed and they used a temporary item.",
-                        "required": [
-                            "id",
-                            "name"
-                        ],
-                        "properties": {
-                            "id": {
-                                "$ref": "#/components/schemas/ItemId"
+                        "description": "This field only exists if the attacker is stealthed and they used a temporary item. It is null if the item could not be resolved.",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/AttackLogItem"
                             },
-                            "name": {
-                                "type": "string"
+                            {
+                                "type": "null"
                             }
-                        },
-                        "type": "object"
+                        ]
                     }
                 },
                 "type": "object"
@@ -37786,6 +38322,8 @@
                             "factionhof",
                             "factiontree",
                             "gyms",
+                            "halloween",
+                            "headlines",
                             "hof",
                             "honors",
                             "itemammo",
@@ -37832,6 +38370,125 @@
                     }
                 },
                 "type": "object"
+            },
+            "TornHalloweenUpgrade": {
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "flavor",
+                    "cost",
+                    "requirement",
+                    "type"
+                ],
+                "properties": {
+                    "id": {
+                        "$ref": "#/components/schemas/HalloweenBasketUpgradeId"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "flavor": {
+                        "type": "string"
+                    },
+                    "cost": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "requirement": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "type": "object"
+            },
+            "TornHalloween": {
+                "required": [
+                    "basket_upgrades"
+                ],
+                "properties": {
+                    "basket_upgrades": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornHalloweenUpgrade"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "TornHalloweenResponse": {
+                "required": [
+                    "halloween"
+                ],
+                "properties": {
+                    "halloween": {
+                        "$ref": "#/components/schemas/TornHalloween"
+                    }
+                },
+                "type": "object"
+            },
+            "TornHeadline": {
+                "required": [
+                    "id",
+                    "headline",
+                    "link",
+                    "type",
+                    "importance"
+                ],
+                "properties": {
+                    "id": {
+                        "oneOf": [
+                            {
+                                "type": "integer",
+                                "format": "int32"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "headline": {
+                        "type": "string"
+                    },
+                    "link": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "importance": {
+                        "type": "string",
+                        "enum": [
+                            "normal",
+                            "urgent"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "TornHeadlinesResponse": {
+                "required": [
+                    "headlines"
+                ],
+                "properties": {
+                    "headlines": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TornHeadline"
+                        }
+                    }
+                },
+                "type": "object"
             }
         },
         "parameters": {
@@ -37845,7 +38502,6 @@
                 "schema": {
                     "type": "array",
                     "items": {
-                        "schema": "CompanySearchParameter",
                         "oneOf": [
                             {
                                 "type": "string",
@@ -37872,7 +38528,6 @@
                 "schema": {
                     "type": "array",
                     "items": {
-                        "schema": "UserSearchParameter",
                         "oneOf": [
                             {
                                 "type": "string",
@@ -37988,7 +38643,7 @@
             "ApiNanostamp": {
                 "name": "nanostamp",
                 "in": "query",
-                "description": "Timestamp in nanoseconds to bypass system limitation when more than 100 logs were returned in the same second.",
+                "description": "Nanosecond cursor for user/log pagination, returned as `_metadata.nanostamp`. Pass it back (without `to`) to continue from the exact position with no skipped or repeated logs; it also bypasses the limitation when more than 100 logs share the same second.",
                 "required": false,
                 "schema": {
                     "type": "string"
@@ -38046,7 +38701,6 @@
                 "schema": {
                     "type": "array",
                     "items": {
-                        "schema": "Parameters",
                         "oneOf": [
                             {
                                 "type": "string",
@@ -38286,6 +38940,26 @@
                 "name": "from",
                 "in": "query",
                 "description": "Timestamp that sets the lower limit for the data returned. Data returned will be after this time",
+                "required": false,
+                "schema": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "ApiFromLog": {
+                "name": "from",
+                "in": "query",
+                "description": "Timestamp that sets the lower limit for the data returned. Data returned will be from and including this time",
+                "required": false,
+                "schema": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "ApiToLog": {
+                "name": "to",
+                "in": "query",
+                "description": "Timestamp that sets the upper limit for the data returned. Data returned will be up to and including this time",
                 "required": false,
                 "schema": {
                     "type": "integer",

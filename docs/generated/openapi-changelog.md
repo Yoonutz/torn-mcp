@@ -1,5 +1,64 @@
 # Torn OpenAPI change log
 
+## 2026-11-16 - OpenAPI 6.16.0
+
+**OpenAPI version:** 6.15.5 → 6.16.0
+**Endpoints:** 190 → 192 catalog (from 237 → 239 raw operations) - +2 −0 ~1, 189 unchanged
+
+| Category | Endpoints | + Added | − Removed | ~ Changed |
+|----------|-----------|---------|-----------|-----------|
+| user | 71 | 0 | 0 | 0 |
+| faction | 43 | +1 | 0 | 0 |
+| torn | 40 | +1 | 0 | 0 |
+| company | 10 | 0 | 0 | 0 |
+| market | 9 | 0 | 0 | 0 |
+| racing | 8 | 0 | 0 | 1 |
+| forum | 6 | 0 | 0 | 0 |
+| property | 3 | 0 | 0 | 0 |
+| key | 2 | 0 | 0 | 0 |
+| **Total** | **192** | **+2** | **0** | **1** |
+
+**Added:** faction/headlines, torn/headlines
+**Changed (params/enums):** racing/races
+
+## 2026-11-09 - OpenAPI 6.15.5
+
+**OpenAPI version:** 6.15.0 → 6.15.5
+**Endpoints:** 190 → 190 catalog (from 237 → 237 raw operations) - +0 −0 ~0, 190 unchanged
+
+| Category | Endpoints | + Added | − Removed | ~ Changed |
+|----------|-----------|---------|-----------|-----------|
+| user | 71 | 0 | 0 | 0 |
+| faction | 42 | 0 | 0 | 0 |
+| torn | 39 | 0 | 0 | 0 |
+| company | 10 | 0 | 0 | 0 |
+| market | 9 | 0 | 0 | 0 |
+| racing | 8 | 0 | 0 | 0 |
+| forum | 6 | 0 | 0 | 0 |
+| property | 3 | 0 | 0 | 0 |
+| key | 2 | 0 | 0 | 0 |
+| **Total** | **190** | **0** | **0** | **0** |
+
+## 2026-11-02 - OpenAPI 6.15.0
+
+**OpenAPI version:** 6.13.8 → 6.15.0
+**Endpoints:** 187 → 190 catalog (from 234 → 237 raw operations) - +3 −0 ~0, 187 unchanged
+
+| Category | Endpoints | + Added | − Removed | ~ Changed |
+|----------|-----------|---------|-----------|-----------|
+| user | 71 | +2 | 0 | 0 |
+| faction | 42 | 0 | 0 | 0 |
+| torn | 39 | +1 | 0 | 0 |
+| company | 10 | 0 | 0 | 0 |
+| market | 9 | 0 | 0 | 0 |
+| racing | 8 | 0 | 0 | 0 |
+| forum | 6 | 0 | 0 | 0 |
+| property | 3 | 0 | 0 | 0 |
+| key | 2 | 0 | 0 | 0 |
+| **Total** | **190** | **+3** | **0** | **0** |
+
+**Added:** torn/halloween, user/halloween, user/travelinventory
+
 ## 2026-10-12 - OpenAPI 6.13.8
 
 **OpenAPI version:** 6.13.6 → 6.13.8
