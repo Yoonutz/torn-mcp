@@ -251,3 +251,24 @@ describe("mergePages - nested lists", () => {
     expect(merged.itemmarket.cache_timestamp).toBe(2);
   });
 });
+
+describe("mergePages - prototype pollution", () => {
+  it("ignores __proto__, constructor and prototype keys from a page", () => {
+    const evil = JSON.parse(
+      '{"items":{"__proto__":{"polluted":"yes"},"constructor":{"prototype":{"polluted2":"yes"}},"b":2}}',
+    );
+    const out = mergePages([{ items: { a: 1 } }, evil]);
+    expect(({} as any).polluted).toBeUndefined();
+    expect(({} as any).polluted2).toBeUndefined();
+    expect(Object.getPrototypeOf(out.items)).toBe(Object.prototype);
+    expect(out.items).toEqual({ a: 1, b: 2 });
+  });
+
+  it("ignores a top-level __proto__ key on a page", () => {
+    const evil = JSON.parse('{"__proto__":{"pollutedTop":"yes"},"items":[2]}');
+    const out = mergePages([{ items: [1] }, evil]);
+    expect(({} as any).pollutedTop).toBeUndefined();
+    expect(Object.getPrototypeOf(out)).toBe(Object.prototype);
+    expect(out.items).toEqual([1, 2]);
+  });
+});
