@@ -128,7 +128,7 @@ export function registerAllTools(server: McpServer, deps: ToolDeps): void {
           endpoint: z.enum(endpointNames(tag)).describe(`The ${tag} data type to fetch.`),
           id: z.string().optional().describe("Optional entity id (player/faction/item/etc.)."),
           params: z
-            .record(z.union([z.string(), z.number()]))
+            .record(z.string(), z.union([z.string(), z.number()]))
             .optional()
             .describe("Optional extra query parameters."),
         },
@@ -160,7 +160,7 @@ export function registerAllTools(server: McpServer, deps: ToolDeps): void {
           .describe("Endpoint names of that tag, e.g. ['profile', 'bars']."),
         id: z.string().optional().describe("Optional entity id (player/faction/etc.)."),
         params: z
-          .record(z.union([z.string(), z.number()]))
+          .record(z.string(), z.union([z.string(), z.number()]))
           .optional()
           .describe("Optional extra query parameters."),
       },

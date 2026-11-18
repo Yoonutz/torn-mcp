@@ -77,11 +77,20 @@ TORN_TEST_API_KEY=<key> node scripts/conformance.mjs
 
 Outputs: `conformance-report.md`, `conformance-for-torn.md`, `conformance.json`, and `scripts/lib/returns-overrides.generated.json`.
 
+A live run fails (exit 1) when any of these holds (`scripts/lib/conformance-gate.mjs`):
+
+- new schema drift against `conformance-baseline.json`;
+- the test key is rejected on `/user/basic` (the other endpoints are then not called);
+- more than half of the endpoints were skipped;
+- more than 5 unexpected skips (`TORN_CONFORMANCE_MAX_UNEXPECTED_SKIPS` changes the limit).
+
+With `CONFORMANCE_REQUIRE_KEY=1` (set in CI) a missing key fails the run instead of dropping to compile-only. `--update-baseline` refuses to write from a run that tested too little.
+
 ## File map
 
 ```
 scripts/
-  conformance.mjs              coordinator: calls every endpoint, exits 1 on new drift
+  conformance.mjs              coordinator: calls every endpoint, exit code from the gate
   generate-endpoints.mjs       builds src/generated/* and updates README
   sync-openapi.mjs             downloads latest openapi.json, runs generate
   lib/
@@ -92,6 +101,8 @@ scripts/
     conformance-baseline.mjs   reconcileBaseline (new/known/resolved drift)
     conformance-filter.mjs     classifyErrors (drops oneOf false positives)
     conformance-throttle.mjs   rate-limit helpers
+    conformance-http.mjs       Torn GET with timeout, HTTP/non-JSON errors, key scrubbing
+    conformance-gate.mjs       pass/fail rules (drift, broken key, skips, missing secret)
     auto-override.mjs          shouldAutoOverride (live shape vs spec)
     dev-findings.mjs           buildDevFindings (forum-ready payloads)
     relax-oneof.mjs            relaxOverlappingOneOf (pre-validation schema fixup)

@@ -1,6 +1,6 @@
 # Torn MCP - Roadmap
 
-Current version: **v0.12.5**. Roadmap reflects actual repo state - no drift.
+Current version: **v0.12.6**. Roadmap reflects actual repo state - no drift.
 
 | Phase                                   | Focus                                             | Effort   | Status     |
 | --------------------------------------- | ------------------------------------------------- | -------- | ---------- |
@@ -57,6 +57,16 @@ Tracks shipped fixes and open bugs. New bugs land as ⏳ Proposed; flip to ✅ w
 | Calls not identifiable in the player's Torn API log | ✅ Fixed | v0.12.5 | Every call sends Torn's `comment=torn-mcp` |
 | `index.ts` fetch path had no tests | ✅ Fixed | v0.12.5 | `src/index.test.ts` runs the Durable Object in Node via a `cloudflare:workers` stub |
 | Open Dependabot bumps (#44, #46, #47, #49, #50) | ✅ Fixed | v0.12.5 | fast-uri 3.1.9, qs 6.17.1, undici 7.30.1 + wrangler 4.156.0, @hono/node-server 2.1.8, hono 4.13.18 folded into one lockfile change |
+| Conformance went green with a broken or expired test key (every call skipped) | ✅ Fixed | v0.12.6 | `/user/basic` is checked first; a rejected key fails the run and no other endpoint is called |
+| Conformance went green in silent compile-only mode when the secret was missing | ✅ Fixed | v0.12.6 | CI sets `CONFORMANCE_REQUIRE_KEY=1`; a missing key fails the run (explicit `--compile` still allowed) |
+| A run that skipped most endpoints, or many unexpected ones, still passed | ✅ Fixed | v0.12.6 | Fails above 50% skipped or more than 5 unexpected skips (`TORN_CONFORMANCE_MAX_UNEXPECTED_SKIPS`); each unexpected skip is a run-page warning |
+| `--update-baseline` could write an empty baseline (compile-only run or broken key) | ✅ Fixed | v0.12.6 | Refuses to snapshot a run that tested too little; derived overrides are not rewritten after a key failure |
+| Admin `GH_PAT` persisted in `.git/config` on every conformance and sync run | ✅ Fixed | v0.12.6 | `persist-credentials: false`; the PAT is only in the env of the final push step |
+| Conformance had no timeouts and no concurrency guard | ✅ Fixed | v0.12.6 | 15 s per Torn call, 30 min job cap (20 min for sync), one run at a time per workflow |
+| Conformance skip notes were cryptic for HTTP errors and non-JSON bodies | ✅ Fixed | v0.12.6 | `lib/conformance-http.mjs` reports `HTTP 502`, `non-JSON response`, timeouts; keys scrubbed from errors; calls carry `comment=torn-mcp-conformance` |
+| `zod` < 4.6.6 (high, memory exhaustion on large constrained collections) | ✅ Fixed | v0.12.6 | Upgraded to zod 4.6.7; `z.record` now names its key type |
+| `body-parser` 2.3.0 (high) and `ip-address` 10.7.2 (moderate), via the MCP SDK | ✅ Fixed | v0.12.6 | Lockfile bump to 2.4.0 and 10.7.6 |
+| `picomatch` <= 4.0.7 (high, dev only via vitest) | ⏳ Proposed | - | No patched release exists yet; bump when one ships |
 
 ## ✨ Features
 

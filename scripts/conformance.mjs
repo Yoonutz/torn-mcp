@@ -33,6 +33,8 @@ import { reconcileBaseline } from "./lib/conformance-baseline.mjs";
 import { shouldAutoOverride } from "./lib/auto-override.mjs";
 import { SEEDS, PARAM_SEEDS, PARAM_OVERRIDES, DOCUMENTED_SKIPS } from "./lib/conformance-seeds.mjs";
 import { buildMainReport, buildDevReport } from "./lib/conformance-report.mjs";
+import { buildTornUrl, fetchTornJson } from "./lib/conformance-http.mjs";
+import { assessBootstrap, decideExit, MAX_SKIP_SHARE } from "./lib/conformance-gate.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const spec = JSON.parse(readFileSync(join(root, "openapi.json"), "utf8"));
@@ -41,6 +43,10 @@ const catalog = buildCatalog(spec);
 const specCatalog = buildCatalog(spec, { skipOverrides: true });
 const KEY = process.env.TORN_TEST_API_KEY;
 const COMPILE_ONLY = process.argv.includes("--compile") || !KEY;
+// CI sets CONFORMANCE_REQUIRE_KEY=1: there a missing secret must fail the run
+// instead of silently dropping to compile-only mode. An explicit --compile is
+// always allowed.
+const REQUIRE_KEY = process.env.CONFORMANCE_REQUIRE_KEY === "1" && !process.argv.includes("--compile");
 
 // verbose: errors carry the offending live value (e.data) for evidence notes.
 const ajv = new Ajv({ strict: false, allErrors: true, validateFormats: false, verbose: true });
@@ -98,12 +104,6 @@ const throttle = createConformanceThrottle({
   },
 });
 
-function buildUrl(path, params) {
-  const u = new URL(`https://api.torn.com/v2${path}`);
-  for (const [k, v] of Object.entries(params ?? {})) u.searchParams.set(k, String(v));
-  u.searchParams.set("key", KEY);
-  return u.toString();
-}
 
 /** Required query params filled with their first documented enum value. */
 function defaultParams(def) {
@@ -118,15 +118,9 @@ const cache = new Map(); // source "tag/ep" or "ctx:userId" → resolved value
 async function tornGet(path, params) {
   return throttle.run(async () => {
     const t = Date.now();
-    let res, json, err;
-    try {
-      res = await fetch(buildUrl(path, params), { headers: { "User-Agent": "torn-mcp-conformance" } });
-      json = await res.json();
-      if (json && json.error) err = `Torn ${json.error.code}: ${json.error.error}`;
-    } catch (e) {
-      err = e.message;
-    }
-    return { json, err, ms: Date.now() - t, status: res?.status };
+    // Timeout, HTTP status, non-JSON bodies and key scrubbing: lib/conformance-http.mjs.
+    const { json, err, status } = await fetchTornJson(buildTornUrl(path, params, KEY));
+    return { json, err, ms: Date.now() - t, status };
   });
 }
 
@@ -225,8 +219,15 @@ async function pluckFromSource(source, field = "id", sourceParams, where) {
 }
 
 let ctx; // { userId, factionId, companyId }
+let bootstrapError = null; // set when the test key cannot be used at all
 async function bootstrap() {
-  const basic = (await tornGet("/user/basic", {})).json;
+  const basicRes = await tornGet("/user/basic", {});
+  bootstrapError = assessBootstrap(basicRes);
+  if (bootstrapError) {
+    ctx = {};
+    return;
+  }
+  const basic = basicRes.json;
   const profile = (await tornGet("/user/profile", {})).json;
   const job = (await tornGet("/user/job", {})).json;
   ctx = {
@@ -315,8 +316,9 @@ const results = [];
 const compileIssues = [];
 
 if (!COMPILE_ONLY) await bootstrap();
+if (bootstrapError) console.error(`[conformance] ${bootstrapError}. Not calling the other endpoints.`);
 
-for (const tag of catalog.tagList) {
+for (const tag of bootstrapError ? [] : catalog.tagList) {
   for (const [name, def] of Object.entries(catalog.tags[tag])) {
     const refName = responseRef(def);
     const validate = refName ? validatorFor(refName) : null;
@@ -394,7 +396,8 @@ for (const tag of catalog.tagList) {
 // ── Emit auto-derived overrides ─────────────────────────────────────
 // Write the structural-drift shapes captured this run (live mode only). Sorted,
 // no timestamps → stable diffs. `npm run generate` bakes these into the catalog.
-if (!COMPILE_ONLY) {
+// Never with a broken key: an empty run would wipe every derived override.
+if (!COMPILE_ONLY && !bootstrapError) {
   const sorted = {};
   for (const k of Object.keys(generatedOverrides).sort()) sorted[k] = generatedOverrides[k];
   writeFileSync(
@@ -411,6 +414,15 @@ const driftResults = results.filter((r) => r.status === "fail");
 
 // --update-baseline: snapshot current drift as accepted, then exit.
 if (process.argv.includes("--update-baseline")) {
+  // Refuse to snapshot a run that tested too little: it would record an empty
+  // or partial baseline and hide real drift on every later run.
+  const skipCount = results.filter((r) => r.status === "skip").length;
+  if (COMPILE_ONLY || bootstrapError || (results.length && skipCount / results.length > MAX_SKIP_SHARE)) {
+    console.error(
+      `Baseline NOT updated: ${bootstrapError ?? (COMPILE_ONLY ? "no live calls (compile-only)" : `${skipCount} of ${results.length} endpoints skipped`)}.`,
+    );
+    process.exit(1);
+  }
   const out = {};
   for (const r of driftResults) out[r.ep] = r.reasons ?? [];
   writeFileSync(BASELINE_PATH, JSON.stringify(out, null, 2) + "\n");
@@ -499,6 +511,28 @@ if (process.env.GITHUB_STEP_SUMMARY) {
   if (devReport) appendFileSync(process.env.GITHUB_STEP_SUMMARY, "\n---\n\n" + devReport);
 }
 
-// Fail the run ONLY on new drift — known Torn spec bugs don't break the pipeline.
+// Unexpected skips show as warnings on the run page, not only in the summary.
+if (process.env.GITHUB_ACTIONS) {
+  for (const r of unexpectedSkips) console.log(`::warning title=Conformance skip::${r.ep}: ${r.note ?? "skipped"}`);
+}
+
+// Known Torn spec bugs never break the pipeline; new drift, a broken key, a
+// missing secret or a run that tested too little do (lib/conformance-gate.mjs).
+const gate = decideExit({
+  compileOnly: COMPILE_ONLY,
+  keyPresent: Boolean(KEY),
+  requireKey: REQUIRE_KEY,
+  bootstrapError,
+  newDrift: newDrift.length,
+  unexpectedSkips: unexpectedSkips.length,
+  tested: results.length - skips.length,
+  skipped: skips.length,
+  maxUnexpectedSkips: parsePositiveInt(process.env.TORN_CONFORMANCE_MAX_UNEXPECTED_SKIPS, undefined),
+});
 console.log(`\n${newDrift.length} new drift failure(s); ${knownDrift.length} known (accepted).`);
-process.exit(newDrift.length > 0 ? 1 : 0);
+if (gate.problems.length) {
+  const lines = ["", "## ❌ Conformance gate", "", ...gate.problems.map((p) => `- ${p}`)];
+  console.error(lines.join("\n"));
+  if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+}
+process.exit(gate.exitCode);
