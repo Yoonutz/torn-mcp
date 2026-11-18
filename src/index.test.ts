@@ -106,3 +106,35 @@ describe("Torn fetch path", () => {
     expect(urls).toHaveLength(2);
   });
 });
+
+describe("multi-selection batch call", () => {
+  it("fetches several selections of one tag in a single Torn call", async () => {
+    replies = [{ profile: { id: 1, name: "Bob" }, bars: { energy: { current: 150 } } }];
+    const res = await makeMcp().callSelections(KEY, "user", ["profile", "bars"], undefined, undefined);
+    expect(res.isError).toBeUndefined();
+    expect(urls).toHaveLength(1);
+    const u = new URL(urls[0]!);
+    expect(u.pathname).toBe("/v2/user");
+    expect(u.searchParams.get("selections")).toBe("profile,bars");
+    expect(res.structuredContent.bars.energy.current).toBe(150);
+  });
+
+  it("passes an id as Torn's id query param", async () => {
+    replies = [{ profile: { id: 4 } }];
+    await makeMcp().callSelections(KEY, "user", ["profile"], "4", undefined);
+    expect(new URL(urls[0]!).searchParams.get("id")).toBe("4");
+  });
+
+  it("rejects an unknown selection before calling Torn", async () => {
+    const res = await makeMcp().callSelections(KEY, "user", ["profile", "nope"], undefined, undefined);
+    expect(res.isError).toBe(true);
+    expect(res.content[0].text).toMatch(/nope/);
+    expect(urls).toHaveLength(0);
+  });
+
+  it("keeps Torn's error hint", async () => {
+    replies = [tornError(16, "Access level of this key is not high enough")];
+    const res = await makeMcp().callSelections(KEY, "user", ["bars"], undefined, undefined);
+    expect(res.content[0].text).toMatch(/Limited or Full/);
+  });
+});

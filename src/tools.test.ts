@@ -6,7 +6,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { registerAllTools, describeTag, MAX_DESCRIPTION_CHARS } from "./tools.js";
+import { registerAllTools, describeTag, MAX_DESCRIPTION_CHARS, MAX_SELECTIONS } from "./tools.js";
 import { textResult } from "./mcpResult.js";
 import { ENDPOINTS, TAGS } from "./generated/endpoints.js";
 import { MAX_IDS } from "./custom/tools.js";
@@ -19,6 +19,7 @@ beforeAll(async () => {
   const server = new McpServer({ name: "test", version: "0" });
   registerAllTools(server, {
     callTorn: async () => textResult("{}"),
+    callSelections: async () => textResult("{}"),
     makeCall: () => async () => ({}),
   });
   const [clientSide, serverSide] = InMemoryTransport.createLinkedPair();
@@ -29,13 +30,14 @@ beforeAll(async () => {
 });
 
 describe("registered tool set (as seen by a client)", () => {
-  it("registers 9 grouped tools, 12 intelligence tools and the discovery tool", () => {
+  it("registers 9 grouped tools, the batch tool, 12 intelligence tools and the discovery tool", () => {
     const names = tools.map((t) => t.name).sort();
     for (const tag of TAGS) expect(names).toContain(`torn_${tag}`);
     expect(names).toContain("torn_list_endpoints");
     expect(names).toContain("analyze_player");
     expect(names).toContain("find_profitable_items");
-    expect(tools).toHaveLength(22);
+    expect(names).toContain("torn_selections");
+    expect(tools).toHaveLength(23);
   });
 
   it("declares a title and read-only annotations on every tool", () => {
@@ -82,6 +84,14 @@ describe("registered tool set (as seen by a client)", () => {
       const schema = tools.find((t) => t.name === tool)!.inputSchema.properties[field];
       expect(schema.maxItems, `${tool}.${field} has no maxItems`).toBe(MAX_IDS);
     }
+  });
+
+  it("lets the batch tool take several selections of one tag", () => {
+    const t = tools.find((x) => x.name === "torn_selections")!;
+    expect(t.inputSchema.properties.tag.enum).toEqual([...TAGS]);
+    expect(t.inputSchema.properties.selections.type).toBe("array");
+    expect(t.inputSchema.properties.selections.maxItems).toBe(MAX_SELECTIONS);
+    expect(t.inputSchema.required).toEqual(expect.arrayContaining(["tag", "selections"]));
   });
 
   it("exposes the property endpoint on torn_property", () => {

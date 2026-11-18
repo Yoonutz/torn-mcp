@@ -25,7 +25,7 @@ import {
   WINDOW_NOTE,
   MAX_PAGES,
 } from "./enrich.js";
-import { type TornTag } from "./generated/endpoints.js";
+import { ENDPOINTS, type TornTag } from "./generated/endpoints.js";
 import { MANIFEST } from "./generated/manifest.js";
 import { RateLimiter, LIMIT, type RateCheck } from "./rateLimiter.js";
 import { dualResult, errorResult, type ToolResult } from "./mcpResult.js";
@@ -94,6 +94,8 @@ export class TornMCP extends DurableObject<Env> {
     registerAllTools(this.mcp, {
       callTorn: (extra, tag, endpoint, id, params) =>
         this.callTorn(keyFromExtra(extra, this.env), tag, endpoint, id, params),
+      callSelections: (extra, tag, selections, id, params) =>
+        this.callSelections(keyFromExtra(extra, this.env), tag, selections, id, params),
       makeCall: (extra) => {
         const apiKey = keyFromExtra(extra, this.env);
         return (tag, endpoint, id, params) => this.call(apiKey, tag, endpoint, id, params);
@@ -222,6 +224,37 @@ export class TornMCP extends DurableObject<Env> {
     // Presentation channel: humanized + computed annotations over the canonical.
     const enriched = annotate(tag, endpoint, canonical);
     return dualResult(canonical, JSON.stringify(enriched, null, 2));
+  }
+
+  /**
+   * Batch handler: several selections of one tag through Torn's root path
+   * (`/user?selections=profile,bars`), one Torn request. Selections are checked
+   * against the tag's catalog first so a typo never costs a call.
+   */
+  private async callSelections(
+    apiKey: string,
+    tag: TornTag,
+    selections: string[],
+    id: string | undefined,
+    params: Record<string, string | number> | undefined,
+  ): Promise<ToolResult> {
+    const known = ENDPOINTS[tag] as Record<string, unknown> | undefined;
+    if (!known) return errorResult(`Unknown tag '${tag}'.`);
+    const unknown = selections.filter((s) => !(s in known));
+    if (unknown.length) {
+      return errorResult(
+        `Unknown ${tag} selection${unknown.length > 1 ? "s" : ""} '${unknown.join(", ")}'. ` +
+          `Use endpoint names of the ${tag} tag.`,
+      );
+    }
+    const query: Record<string, string | number> = {
+      ...resolveTimeParams(params, Date.now()),
+      selections: selections.join(","),
+    };
+    if (id) query.id = id;
+    const fetched = await this.fetchMerged(apiKey, `/${tag}`, query, "json", 1);
+    if (!fetched.ok) return errorResult(fetched.error);
+    return dualResult(fetched.data, JSON.stringify(annotate(tag, "", fetched.data), null, 2));
   }
 
   /**

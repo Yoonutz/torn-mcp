@@ -36,12 +36,23 @@ function tagTitle(tag: TornTag): string {
 /** Longest endpoint summary shown inline; the full text lives in discovery. */
 const SUMMARY_CHARS = 60;
 
+/** Most selections one batch call takes (one Torn request either way). */
+export const MAX_SELECTIONS = 10;
+
 export interface ToolDeps {
   /** Generated-tool handler: fetch + enrich one endpoint for the per-request key. */
   callTorn: (
     extra: unknown,
     tag: TornTag,
     endpoint: string,
+    id: string | undefined,
+    params: Record<string, string | number> | undefined,
+  ) => Promise<ToolResult>;
+  /** Batch handler: several selections of one tag in one Torn request. */
+  callSelections: (
+    extra: unknown,
+    tag: TornTag,
+    selections: string[],
     id: string | undefined,
     params: Record<string, string | number> | undefined,
   ) => Promise<ToolResult>;
@@ -103,7 +114,7 @@ export function describeTag(tag: TornTag): string {
   );
 }
 
-/** Register every tool: 9 grouped, 12 intelligence, 1 discovery. All are read-only. */
+/** Register every tool: 9 grouped, 1 batch, 12 intelligence, 1 discovery. All are read-only. */
 export function registerAllTools(server: McpServer, deps: ToolDeps): void {
   // Generated layer: one grouped tool per Torn tag.
   for (const tag of TAGS) {
@@ -126,6 +137,38 @@ export function registerAllTools(server: McpServer, deps: ToolDeps): void {
       async ({ endpoint, id, params }, extra) => deps.callTorn(extra, tag, endpoint, id, params),
     );
   }
+
+  // Batch: Torn's root selection paths (`/user?selections=a,b`) answer several
+  // data types in one request, which costs one call of the key's minute budget.
+  server.registerTool(
+    "torn_selections",
+    {
+      title: "Torn Batch Selections",
+      description:
+        "Fetch several data types of one Torn tag in a single API call, to save the key's " +
+        "rate budget (Torn allows about 100 calls a minute). Set 'tag' (user, faction, torn, " +
+        "company, market, racing, forum, property, key) and 'selections' to endpoint names " +
+        `of that tag, up to ${MAX_SELECTIONS} (e.g. user: profile, bars, cooldowns, money). ` +
+        "Pass 'id' to target another player/faction/etc. One page only: no pagination is " +
+        "followed, so use it for snapshots, not long logs.",
+      inputSchema: {
+        tag: z.enum(TAGS).describe("The Torn tag the selections belong to."),
+        selections: z
+          .array(z.string())
+          .min(1)
+          .max(MAX_SELECTIONS)
+          .describe("Endpoint names of that tag, e.g. ['profile', 'bars']."),
+        id: z.string().optional().describe("Optional entity id (player/faction/etc.)."),
+        params: z
+          .record(z.union([z.string(), z.number()]))
+          .optional()
+          .describe("Optional extra query parameters."),
+      },
+      annotations: readOnly("Torn Batch Selections"),
+    },
+    async ({ tag, selections, id, params }, extra) =>
+      deps.callSelections(extra, tag, selections, id, params),
+  );
 
   // Intelligence layer: each tool binds the per-request key from its `extra`.
   registerCustomTools(server, deps.makeCall);

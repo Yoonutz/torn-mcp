@@ -245,6 +245,8 @@ export function authorizationServerMetadata(origin: string) {
     grant_types_supported: ["authorization_code", "refresh_token"],
     code_challenge_methods_supported: ["S256"],
     token_endpoint_auth_methods_supported: ["none"],
+    revocation_endpoint: `${origin}/revoke`,
+    revocation_endpoint_auth_methods_supported: ["none"],
     service_documentation: "https://github.com/Yoonutz/torn-mcp#readme",
   };
 }
@@ -413,7 +415,13 @@ async function handleAuthorize(request: Request, deps: OAuthDeps): Promise<Respo
 
 async function tokenPair(deps: OAuthDeps, tornKey: string, clientId: string): Promise<Response> {
   const access = await issue(deps, "access", tornKey, ACCESS_TTL_S);
-  const refresh = await issue(deps, "refresh", tornKey, REFRESH_TTL_S, { client_id: clientId });
+  // The refresh record names its access token so revoking the refresh token
+  // can end that access token too (RFC 7009 section 2.1).
+  const accessId = parseToken(access, true)!.id;
+  const refresh = await issue(deps, "refresh", tornKey, REFRESH_TTL_S, {
+    client_id: clientId,
+    access_id: accessId,
+  });
   return json({
     access_token: access,
     token_type: "Bearer",
@@ -466,6 +474,37 @@ async function handleToken(request: Request, deps: OAuthDeps): Promise<Response>
   return oauthError("unsupported_grant_type", "Use authorization_code or refresh_token.");
 }
 
+/**
+ * RFC 7009 revocation. Public clients, so no client auth; the token itself is
+ * the proof. A record is only deleted when the token's secret half decrypts it,
+ * so knowing a token id alone revokes nothing. Always 200 for any token, as the
+ * RFC asks, so the answer leaks nothing about which tokens exist.
+ */
+async function handleRevoke(request: Request, deps: OAuthDeps): Promise<Response> {
+  if (request.method !== "POST") return oauthError("invalid_request", "Use POST.", 405);
+  let token = "";
+  try {
+    const v = (await request.formData()).get("token");
+    token = typeof v === "string" ? v.trim() : "";
+  } catch {
+    return oauthError("invalid_request", "Expected an application/x-www-form-urlencoded body.");
+  }
+  if (!token) return oauthError("invalid_request", "Give the token to revoke.");
+  const parsed = parseToken(token, true);
+  if (parsed) {
+    // Token strings do not say their kind; try both (token_type_hint is optional).
+    for (const kind of ["access", "refresh"] as const) {
+      const name = recordName(kind, parsed.id);
+      const rec = await deps.store.get(name);
+      if (!rec || (await unseal(parsed.secret, rec)) === null) continue;
+      await deps.store.delete(name);
+      const accessId = rec.meta?.access_id;
+      if (kind === "refresh" && accessId) await deps.store.delete(recordName("access", accessId));
+    }
+  }
+  return new Response(null, { status: 200, headers: { "cache-control": "no-store", ...CORS } });
+}
+
 async function handleRegister(request: Request): Promise<Response> {
   if (request.method !== "POST") return oauthError("invalid_request", "Use POST.", 405);
   let body: { redirect_uris?: unknown; client_name?: unknown };
@@ -507,7 +546,8 @@ export async function handleOAuth(request: Request, deps: OAuthDeps): Promise<Re
     path.startsWith("/.well-known/oauth-") ||
     path === "/authorize" ||
     path === "/token" ||
-    path === "/register";
+    path === "/register" ||
+    path === "/revoke";
   if (!isOAuth) return null;
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
 
@@ -520,6 +560,7 @@ export async function handleOAuth(request: Request, deps: OAuthDeps): Promise<Re
   if (path === "/authorize") return handleAuthorize(request, deps);
   if (path === "/token") return handleToken(request, deps);
   if (path === "/register") return handleRegister(request);
+  if (path === "/revoke") return handleRevoke(request, deps);
   return new Response("Not found", { status: 404 });
 }
 

@@ -56,6 +56,7 @@ Tracks shipped fixes and open bugs. New bugs land as ⏳ Proposed; flip to ✅ w
 | Summary tools hid failed sub-calls (`.catch(() => null)`) | ✅ Fixed | v0.12.5 | `members_error`, `employees_error`, `*_territory_error`, `market_value_error`, `reference_value_error` |
 | Calls not identifiable in the player's Torn API log | ✅ Fixed | v0.12.5 | Every call sends Torn's `comment=torn-mcp` |
 | `index.ts` fetch path had no tests | ✅ Fixed | v0.12.5 | `src/index.test.ts` runs the Durable Object in Node via a `cloudflare:workers` stub |
+| Open Dependabot bumps (#44, #46, #47, #49, #50) | ✅ Fixed | v0.12.5 | fast-uri 3.1.9, qs 6.17.1, undici 7.30.1 + wrangler 4.156.0, @hono/node-server 2.1.8, hono 4.13.18 folded into one lockfile change |
 
 ## ✨ Features
 
@@ -64,8 +65,8 @@ Tracks shipped features and future ideas. Ideas land as ⏳ Proposed; flip to �
 | Feature                                      | Status     | Version | Notes                                                                                                                           |
 | -------------------------------------------- | ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | Reality-derived response shapes in discovery | ✅ Shipped | v0.10.0 | Conformance auto-derives structural-drift shapes into discovery; manual overrides stay the curated authority for nested renames |
-| OAuth token revocation (RFC 7009) | ⏳ Proposed | - | Let a client delete its tokens on disconnect instead of waiting for the 180-day expiry |
-| Multi-selection batching (`/user?selections=a,b`) | ⏳ Proposed | - | The 9 root selection paths are skipped by the catalog; batching would save calls |
+| OAuth token revocation (RFC 7009) | ✅ Shipped | v0.12.5 | `/revoke` deletes the token record (needs the token's secret half); a revoked refresh token also ends its access token |
+| Multi-selection batching (`/user?selections=a,b`) | ✅ Shipped | v0.12.5 | `torn_selections`: up to 10 selections of one tag in one Torn call; names checked against the catalog first |
 
 ## ✅ Phase 1 - Core server & tools
 
