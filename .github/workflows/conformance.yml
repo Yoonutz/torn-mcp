@@ -21,19 +21,29 @@ on:
         default: false
 
 # Least privilege: the default token only reads. The baseline-refresh push
-# authenticates with GH_PAT (persisted by checkout), not GITHUB_TOKEN.
+# authenticates with GH_PAT, given to that one step only (see below).
 permissions:
   contents: read
+
+# One run at a time: a manual refresh and the weekly cron must never race their
+# pushes to main. A queued run waits; it is not cancelled.
+concurrency:
+  group: conformance
+  cancel-in-progress: false
 
 jobs:
   conformance:
     runs-on: ubuntu-latest
+    # A full live run takes a few minutes (about 200 calls, throttled). This
+    # caps a stuck run well below GitHub's 6-hour default.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
         with:
-          # Needed only by the baseline-refresh path to push to main (ruleset
-          # bypassed via the admin PAT); harmless for the read-only check run.
-          token: ${{ secrets.GH_PAT }}
+          # No credential left in .git/config: npm ci and the spec sync run
+          # third-party code, which must never see the admin PAT. The refresh
+          # step passes GH_PAT to its own push only.
+          persist-credentials: false
       - uses: actions/setup-node@v6
         with:
           node-version: 20
@@ -56,6 +66,8 @@ jobs:
         if: ${{ inputs.update_baseline != true }}
         env:
           TORN_TEST_API_KEY: ${{ secrets.TORN_TEST_API_KEY }}
+          # Fail instead of silently dropping to compile-only when the secret is gone.
+          CONFORMANCE_REQUIRE_KEY: "1"
         run: node scripts/conformance.mjs
 
       # Manual refresh: re-snapshot Torn's standing drift into the baseline, show
@@ -67,9 +79,11 @@ jobs:
       # Committing endpoints.ts alone against an older committed spec would fail
       # the contract test's specHash check on main.
       - name: Refresh baseline
+        id: refresh
         if: ${{ inputs.update_baseline == true }}
         env:
           TORN_TEST_API_KEY: ${{ secrets.TORN_TEST_API_KEY }}
+          CONFORMANCE_REQUIRE_KEY: "1"
         run: |
           # Live run snapshots the baseline AND writes auto-derived overrides;
           # then bake those overrides into the committed catalog + types + README.
@@ -94,4 +108,12 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add $FILES
           git commit -m "Refresh conformance baseline and auto-derived overrides"
-          git push
+          echo "push=true" >> "$GITHUB_OUTPUT"
+
+      # Its own step, so the admin PAT is in no environment where npm, the tests
+      # or the harness run, and it is never written to .git/config.
+      - name: Push refreshed baseline
+        if: ${{ inputs.update_baseline == true && steps.refresh.outputs.push == 'true' }}
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: git push "https://x-access-token:${GH_PAT}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main

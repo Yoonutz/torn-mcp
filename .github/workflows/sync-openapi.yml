@@ -10,18 +10,25 @@ on:
     - cron: "0 6 * * 1" # Mondays 06:00 UTC
   workflow_dispatch: {}
 
-# Least privilege: the default token only reads. The sync commit/push
-# authenticates with GH_PAT (persisted by checkout), not GITHUB_TOKEN.
+# Least privilege: the default token only reads. The push authenticates with
+# GH_PAT, given to the push step only (never persisted in .git/config).
 permissions:
   contents: read
+
+concurrency:
+  group: sync-openapi
+  cancel-in-progress: false
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
         with:
-          token: ${{ secrets.GH_PAT }}
+          # npm ci, the spec sync and the tests run third-party code; none of it
+          # may see the admin PAT.
+          persist-credentials: false
       - uses: actions/setup-node@v6
         with:
           node-version: 20
@@ -31,6 +38,7 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - name: Commit regenerated files if the spec changed
+        id: commit
         run: |
           if [ ! -f .sync-msg.txt ]; then
             echo "No sync changes — nothing to commit."
@@ -46,4 +54,10 @@ jobs:
           # .sync-msg.txt is gitignored scratch: it is only the commit message
           # (read by -F), never staged.
           git commit -F .sync-msg.txt
-          git push
+          echo "push=true" >> "$GITHUB_OUTPUT"
+
+      - name: Push sync commit
+        if: ${{ steps.commit.outputs.push == 'true' }}
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: git push "https://x-access-token:${GH_PAT}@github.com/${GITHUB_REPOSITORY}.git" HEAD:main

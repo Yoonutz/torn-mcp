@@ -94,6 +94,15 @@ describe("registered tool set (as seen by a client)", () => {
     expect(t.inputSchema.required).toEqual(expect.arrayContaining(["tag", "selections"]));
   });
 
+  it("keeps 'params' a string-to-(string|number) map after the zod 4 upgrade", () => {
+    for (const name of ["torn_user", "torn_selections"]) {
+      const params = tools.find((t) => t.name === name)!.inputSchema.properties.params;
+      expect(params.type).toBe("object");
+      const types = (params.additionalProperties.anyOf ?? [params.additionalProperties]).flatMap((s: any) => s.type);
+      expect(types.sort()).toEqual(["number", "string"]);
+    }
+  });
+
   it("exposes the property endpoint on torn_property", () => {
     const prop = tools.find((t) => t.name === "torn_property")!;
     expect(prop.inputSchema.properties.endpoint.enum).toContain("property");
